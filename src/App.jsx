@@ -29,14 +29,12 @@ import ContractMng from "./pages/ContractMng";
 import ContractNew from "./pages/ContractNew";
 import ContractProceeding from "./pages/ContractProceeding";
 
-import KakaoMapGeocoderComponent from "./components/KakaoMapGeocoderComponent";
 
 export default function App() {
   return (
     <>
       <Router>
         <ScrollToTop />
-        <KakaoMapGeocoderComponent />
         <Routes>
           <Route path="/" element={<Navigate to="/myoffice" replace />} />
           {/* Dashboard Layout */}

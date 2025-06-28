@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import KakaoMapGeocoderComponent from '../components/KakaoMapGeocoderComponent';
 
 const { kakao } = window;
 function OfficeMap() {
@@ -15,6 +16,7 @@ function OfficeMap() {
       <div>OfficeMap</div>
       <div id={"map"} style={{ width: "1200px", height: "800px" }}></div>
       { }
+      <KakaoMapGeocoderComponent />
     </>
   )
 }
