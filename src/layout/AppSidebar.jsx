@@ -37,9 +37,9 @@ const navItems = [
     icon: <GridIcon />,
     name: "계약 정보",
     subItems: [
-      { name: "내 계약 관리", path: "/myoffice/cnt/mng", pro: false }
-      , { name: "새 전자계약 진행", path: "/myoffice/cnt/new", pro: false }
-      , { name: "진행중인 계약", path: "/myoffice/cnt/proceeding", pro: false }],
+      { name: "내 계약 관리", path: "/myoffice/cont/mng", pro: false }
+      , { name: "새 전자계약 진행", path: "/myoffice/cont/new", pro: false }
+      , { name: "진행중인 계약", path: "/myoffice/cont/proceeding", pro: false }],
   },
   {
     icon: <CalenderIcon />,
