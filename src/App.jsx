@@ -54,7 +54,7 @@ export default function App() {
               <Route path="new" element={<ListingNew />} />
               <Route path="mng" element={<ListingMng />} />
             </Route>
-            <Route path="cnt" element={<Contract />} >
+            <Route path="cont" element={<Contract />} >
               <Route path="mng" element={<ContractMng />} />
               <Route path="new" element={<ContractNew />} />
               <Route path="proceeding" element={<ContractProceeding />} />
