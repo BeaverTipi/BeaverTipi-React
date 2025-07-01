@@ -1,0 +1,3 @@
+INSERT INTO COMMON_CODE VALUES ('FAC', '001', 'APPLIANCE', '세탁기, 냉장고, 오븐, TV 등 전자기기 기반 시설', 1, 'Y', 'FACILITY_OPTION', '가전제품');
+INSERT INTO COMMON_CODE VALUES ('FAC', '002', 'FURNITURE', '침대, 옷장, 책상, 식탁 등 비전자 가구 시설', 2, 'Y', 'FACILITY_OPTION', '가구');
+INSERT INTO COMMON_CODE VALUES ('FAC', '003', 'BUILDING_FAC', '붙박이장 등 건축물 내 고정된 부착 시설', 3, 'Y', 'FACILITY_OPTION', '건물 고정시설');

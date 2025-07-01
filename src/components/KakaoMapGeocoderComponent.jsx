@@ -1,82 +1,60 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const KakaoMapGeocoderComponent = () => {
+function KakaoMapGeocoderComponent({ kakao, brokerAddr }) {
+
   const mapContainerRef = useRef(null);
   const [isKakaoMapsLoaded, setIsKakaoMapsLoaded] = useState(false);
 
+
   useEffect(() => {
-    if (window.kakao && window.kakao.maps) {
+
+    //KakaoMap SDK가 로딩됐는지 확인함.
+    if (kakao && kakao.maps && kakao.maps.load) {
+
       window.kakao.maps.load(() => {
+        //첫 위치 지정: 중개사무소 주소
+        const address = brokerAddr;
+        //🔍 주소를 유혹하는 디지털 탐정
+        const geocoder = new kakao.maps.services.Geocoder();
+        console.log("응 로딩 됐구 실행할게~^0^ 2트");
+
+        //useState() 훅을 이용해, 지도가 실행될 때에만 UI로 출력되게끔 boolean타입 setting
         setIsKakaoMapsLoaded(true);
-      });
-      return;
-    }
 
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=f6ac04f1e14d24a9da646848581a9a89&autoload=false&libraries=services";
+        //물리 주소를 경도/위도 좌표로 변환해줌.
+        geocoder.addressSearch(address, function (result, status) {
+          //[조건절]: 물리 주소가 해석 가능한 형태로 주어졌을 때
+          if (status === kakao.maps.services.Status.OK) {
+            //중개사무소 위치를 좌표로 변환
+            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+            //지도의 중심 좌표와 확대 레벨 설정
+            const options = {
+              center: /*new kakao.maps.LatLng(36.325267, 127.408667),*/ coords,
+              level: 1
+            }
+            //useRef() 훅으로 연결된 div에
+            const map = new kakao.maps.Map(mapContainerRef.current, options);
 
-    script.onload = () => {
-      if (window.kakao && window.kakao.maps && window.kakao.maps.load) {
-        window.kakao.maps.load(() => {
-          setIsKakaoMapsLoaded(true);
+            //* 마커 지정하는 함수
+            new kakao.maps.Marker({ map, position: coords });
+            //[조건절]: 물리 주소가 잘못된 형식일 때
+          } else {
+            console.error('주소 변환 실패:', status);
+          }
         });
-      } else {
-        console.error("카카오 맵스 SDK 로드 실패: 'kakao.maps.load' 또는 'kakao.maps'가 없음");
-      }
-    };
-
-    script.onerror = (error) => {
-      console.error("카카오 맵스 SDK 로드 중 에러 발생:", error);
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isKakaoMapsLoaded && mapContainerRef.current) {
-      // Geocoder가 정의되어 있는지 먼저 확인
-      if (!window.kakao.maps.services || !window.kakao.maps.services.Geocoder) {
-        console.error("Geocoder를 사용할 수 없습니다. services 라이브러리가 로드되지 않았습니다.");
-        return;
-      }
-
-      const address = "서울특별시 중구 세종대로 110";
-      const geocoder = new window.kakao.maps.services.Geocoder();
-
-      geocoder.addressSearch(address, function (result, status) {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-
-          const mapOption = {
-            center: coords,
-            level: 3
-          };
-
-          const map = new window.kakao.maps.Map(mapContainerRef.current, mapOption);
-
-          new window.kakao.maps.Marker({
-            map: map,
-            position: coords
-          });
-        } else {
-          console.error('주소 변환 실패:', status);
-        }
       });
+      //SDK 자체가 메모리에 오르지 못한 레드카드
+    } else {
+      console.error("카카오맵 SDK가 로딩되지 않았습니다.");
     }
-  }, [isKakaoMapsLoaded]);
 
+
+  }, []);
   return (
     <div
       id="map"
       ref={mapContainerRef}
-      style={{ width: '500px', height: '400px', border: '1px solid #ccc' }}
+      style={{ width: '1200px', height: '800px', border: '1px solid #ccc' }}
     >
       {!isKakaoMapsLoaded && (
         <div style={{

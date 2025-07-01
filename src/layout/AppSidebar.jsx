@@ -303,25 +303,25 @@ const AppSidebar = () => {
             <>
               <img
                 className="dark:hidden block mx-auto"
-                src="/images/logo/beavertipi-logo.png"
+                src="/images/logo/logo-white.png"
                 alt="Logo"
-                maxWidth={150}
+                style={{ maxWidth: "150" }}
                 height={40}
               />
               <img
                 className="hidden dark:block mx-auto"
-                src="/images/logo/beavertipi-logo.png"
+                src="/images/logo/logo-dark.png"
                 alt="Logo"
-                maxWidth={150}
+                style={{ maxWidth: "150" }}
                 height={40}
 
               />
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/logo-icon.png"
               alt="Logo"
-              maxWidth={150}
+              style={{ maxWidth: "150" }}
               height={32}
               className={"block mx-auto"}
             />
