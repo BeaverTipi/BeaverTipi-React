@@ -5,7 +5,6 @@ function KakaoMapGeocoderComponent({ kakao, brokerAddr }) {
   const mapContainerRef = useRef(null);
   const [isKakaoMapsLoaded, setIsKakaoMapsLoaded] = useState(false);
 
-  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false);
 
   useEffect(() => {
 
@@ -56,7 +55,7 @@ function KakaoMapGeocoderComponent({ kakao, brokerAddr }) {
       ref={mapContainerRef}
       style={{ width: '1200px', height: '800px', border: '1px solid #ccc' }}
     >
-      {!isKakaoLoaded && (
+      {!isKakaoMapsLoaded && (
         <div style={{
           display: 'flex', justifyContent: 'center', alignItems: 'center',
           width: '100%', height: '100%', backgroundColor: '#f0f0f0', color: '#666'
