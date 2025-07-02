@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-routerq";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -29,7 +29,7 @@ import ContractMng from "./pages/ContractMng";
 import ContractNew from "./pages/ContractNew";
 import ContractProceeding from "./pages/ContractProceeding";
 import { AxiosProvider } from "./context/AxiosContext";
-import ProtectedRoute from "./components/ProtectedRoute"; // ✅ 보호 컴포넌트 경로 맞게 조정
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 export default function App() {
   return (
