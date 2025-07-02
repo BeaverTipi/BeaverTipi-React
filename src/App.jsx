@@ -28,7 +28,7 @@ import Contract from "./pages/Contract";
 import ContractMng from "./pages/ContractMng";
 import ContractNew from "./pages/ContractNew";
 import ContractProceeding from "./pages/ContractProceeding";
-import { AxiosProvider } from "./context/AxiosContext";
+import { AxiosProvider } from "./context/AxiosProvider";
 import ProtectedRoute from "./components/ProtectedRoute"; // ✅ 보호 컴포넌트 경로 맞게 조정
 
 export default function App() {
