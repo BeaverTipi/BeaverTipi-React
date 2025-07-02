@@ -23,23 +23,23 @@ const navItems = [
     icon: <GridIcon />,
     name: "오피스 관리",
     subItems: [
-      { name: "사무소 정보", path: "/myoffice/info/text", pro: false }
-      , { name: "지도 UI", path: "/myoffice/info/map", pro: false }],
+      { name: "사무소 정보", path: "/broker/myoffice/info/text", pro: false }
+      , { name: "지도 UI", path: "/broker/myoffice/info/map", pro: false }],
   },
   {
     icon: <GridIcon />,
     name: "상품 관리",
     subItems: [
-      { name: "신규 매물 등록", path: "/myoffice/lstg/new", pro: false }
-      , { name: "등록 매물", path: "/myoffice/lstg/mng", pro: false }],
+      { name: "신규 매물 등록", path: "/broker/myoffice/lstg/new", pro: false }
+      , { name: "등록 매물", path: "/broker/myoffice/lstg/mng", pro: false }],
   },
   {
     icon: <GridIcon />,
     name: "계약 정보",
     subItems: [
-      { name: "내 계약 관리", path: "/myoffice/cont/mng", pro: false }
-      , { name: "새 전자계약 진행", path: "/myoffice/cont/new", pro: false }
-      , { name: "진행중인 계약", path: "/myoffice/cont/proceeding", pro: false }],
+      { name: "내 계약 관리", path: "/broker/myoffice/cont/mng", pro: false }
+      , { name: "새 전자계약 진행", path: "/broker/myoffice/cont/new", pro: false }
+      , { name: "진행중인 계약", path: "/broker/myoffice/cont/proceeding", pro: false }],
   },
   {
     icon: <CalenderIcon />,

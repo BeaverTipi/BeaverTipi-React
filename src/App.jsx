@@ -38,7 +38,7 @@ export default function App() {
         <Router>
           <ScrollToTop />
           <Routes>
-            <Route path="/" element={<Navigate to="/myoffice" replace />} />
+            <Route path="/" element={<Navigate to="/broker/myoffice" replace />} />
             {/* Dashboard Layout */}
             <Route path="/broker/myoffice" element={<AppLayout />}>
 
