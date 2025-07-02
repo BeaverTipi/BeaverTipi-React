@@ -33,24 +33,16 @@ import ProtectedRoute from "./components/ProtectedRoute"; // ✅ 보호 컴포�
 
 export default function App() {
   return (
-    <AxiosProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
+    <>
+      <AxiosProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Navigate to="/broker/myoffice" replace />} />
+            {/* Dashboard Layout */}
+            <Route path="/broker/myoffice" element={<AppLayout />}>
 
-          {/* 첫 진입 시 자동 리디렉션 */}
-          <Route path="/" element={<Navigate to="/broker/myoffice" replace />} />
-
-          {/* 인증이 필요한 대시보드 라우트 */}
-          <Route
-            path="/broker/myoffice"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Home />} />
+              <Route index element={<Home />} />
 
             {/* 실제 기능 라우트 */}
             <Route path="info" element={<OfficeInfo />}>
