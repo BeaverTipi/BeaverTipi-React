@@ -1,17 +1,28 @@
-// ProtectedRoute.jsx
-import { Navigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 const ProtectedRoute = ({ children }) => {
-  const authToken = Cookies.get("access_token"); // 쿠키에서 인증 토큰 확인
+  const [checking, setChecking] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const location = useLocation();
+  useEffect(() => {
+    axios
+      .get("http://localhost/rest/auth", {
+        withCredentials: true,
+      })
+      .then(() => {
+        setAuthenticated(true);
+      })
+      .catch(() => {
+        const currentUrl = encodeURIComponent(window.location.href);
+        window.location.href = `http://localhost/?redirect=${currentUrl}`;
+      })
+      .finally(() => setChecking(false));
+  }, [location.pathname, location.search]);
 
-  if (!authToken) {
-    const currentUrl = encodeURIComponent(window.location.href);
-     window.location.href = `http://localhost/?redirect=${currentUrl}`;
-    return null;
-  }
-
-  return children;
+  if (checking) return null;
+  return authenticated ? children : null;
 };
 
 export default ProtectedRoute;
