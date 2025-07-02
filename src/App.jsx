@@ -28,70 +28,72 @@ import Contract from "./pages/Contract";
 import ContractMng from "./pages/ContractMng";
 import ContractNew from "./pages/ContractNew";
 import ContractProceeding from "./pages/ContractProceeding";
+import { AxiosProvider } from "./context/AxiosContext";
 
 
 export default function App() {
   return (
     <>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Navigate to="/myoffice" replace />} />
-          {/* Dashboard Layout */}
-          <Route path="/myoffice" element={<AppLayout />}>
+      <AxiosProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Navigate to="/myoffice" replace />} />
+            {/* Dashboard Layout */}
+            <Route path="/broker/myoffice" element={<AppLayout />}>
 
-            <Route index element={<Home />} />
+              <Route index element={<Home />} />
 
-            {/* 프로젝트 실사용 컴포넌트 */}
-            <Route path="info" element={<OfficeInfo />} >
-              <Route path="text" element={<OfficeText />} />
-              <Route path="map" element={<OfficeMap />} />
+              {/* 프로젝트 실사용 컴포넌트 */}
+              <Route path="info" element={<OfficeInfo />} >
+                <Route path="text" element={<OfficeText />} />
+                <Route path="map" element={<OfficeMap />} />
+              </Route>
+
+              <Route path="lstg" element={<Listing />} >
+                <Route path="new" element={<ListingNew />} />
+                <Route path="mng" element={<ListingMng />} />
+              </Route>
+              <Route path="cont" element={<Contract />} >
+                <Route path="mng" element={<ContractMng />} />
+                <Route path="new" element={<ContractNew />} />
+                <Route path="proceeding" element={<ContractProceeding />} />
+
+              </Route>
+
+              {/* Others Page */}
+              <Route path="profile" element={<UserProfiles />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="blank" element={<Blank />} />
+
+              {/* Forms */}
+              <Route path="form-elements" element={<FormElements />} />
+
+              {/* Tables */}
+              <Route path="basic-tables" element={<BasicTables />} />
+
+              {/* Ui Elements */}
+              <Route path="alerts" element={<Alerts />} />
+              <Route path="avatars" element={<Avatars />} />
+              <Route path="badge" element={<Badges />} />
+              <Route path="buttons" element={<Buttons />} />
+              <Route path="images" element={<Images />} />
+              <Route path="videos" element={<Videos />} />
+
+              {/* Charts */}
+              <Route path="line-chart" element={<LineChart />} />
+              <Route path="bar-chart" element={<BarChart />} />
             </Route>
 
-            <Route path="lstg" element={<Listing />} >
-              <Route path="new" element={<ListingNew />} />
-              <Route path="mng" element={<ListingMng />} />
-            </Route>
-            <Route path="cont" element={<Contract />} >
-              <Route path="mng" element={<ContractMng />} />
-              <Route path="new" element={<ContractNew />} />
-              <Route path="proceeding" element={<ContractProceeding />} />
+            {/* Auth Layout */}
+            <Route path="signin" element={<SignIn />} />
+            <Route path="signup" element={<SignUp />} />
 
-            </Route>
-
-            {/* Others Page */}
-            <Route path="profile" element={<UserProfiles />} />
-            <Route path="calendar" element={<Calendar />} />
-            <Route path="blank" element={<Blank />} />
-
-            {/* Forms */}
-            <Route path="form-elements" element={<FormElements />} />
-
-            {/* Tables */}
-            <Route path="basic-tables" element={<BasicTables />} />
-
-            {/* Ui Elements */}
-            <Route path="alerts" element={<Alerts />} />
-            <Route path="avatars" element={<Avatars />} />
-            <Route path="badge" element={<Badges />} />
-            <Route path="buttons" element={<Buttons />} />
-            <Route path="images" element={<Images />} />
-            <Route path="videos" element={<Videos />} />
-
-            {/* Charts */}
-            <Route path="line-chart" element={<LineChart />} />
-            <Route path="bar-chart" element={<BarChart />} />
-          </Route>
-
-          {/* Auth Layout */}
-          <Route path="signin" element={<SignIn />} />
-          <Route path="signup" element={<SignUp />} />
-
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-
+            {/* Fallback Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </AxiosProvider>
     </>
   );
 }
