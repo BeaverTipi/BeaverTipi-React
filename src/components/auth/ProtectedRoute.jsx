@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     axios
       .get("http://localhost/rest/auth", {
-        withCredentials: true, // ✅ HttpOnly 쿠키 전송
+        withCredentials: true,
       })
       .then(() => {
         setAuthenticated(true);
