@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import KakaoMapGeocoderComponent from '../components/KakaoMapGeocoderComponent';
-import { useAxios } from '../context/AxiosContext';
+import { useAxios } from '../hooks/useAxios';
 
 const { kakao } = window;
 function OfficeMap() {
@@ -21,7 +21,7 @@ function OfficeMap() {
 
   return (
     <>
-      <KakaoMapGeocoderComponent kakao={kakao} brokerAddr={brokerAddr} />
+      <KakaoMapGeocoderComponent kakao={kakao} brokerAddr={brokerAddr} radius={300} />
       <div>OfficeMap</div>
       <div id={"whereToPrintLstgList"}>
         <ul>
