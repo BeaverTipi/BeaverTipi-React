@@ -25,6 +25,7 @@ export function AxiosProvider({ children }) {
       return config; // 쿠키에 token이 존재할 때, config 내에 반영시켜 비동기 요청 전송
     },
     error => {
+
       console.error("[요청에러]", error);
       return Promise.reject(error); //오류를 그대로 던져서 catch문으로 넘김
     }
