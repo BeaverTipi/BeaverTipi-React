@@ -44,29 +44,29 @@ const navItems = [
   {
     icon: <CalenderIcon />,
     name: "Calendar",
-    path: "/calendar",
+    path: "/broker/myoffice/calendar",
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
-    path: "/profile",
+    path: "/broker/myoffice/profile",
   },
   {
     name: "Forms",
     icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    subItems: [{ name: "Form Elements", path: "/broker/myoffice/form-elements", pro: false }],
   },
   {
     name: "Tables",
     icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Basic Tables", path: "/broker/myoffice/basic-tables", pro: false }],
   },
   {
     name: "Pages",
     icon: <PageIcon />,
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Blank Page", path: "/broker/myoffice/blank", pro: false },
+      { name: "404 Error", path: "/broker/myoffice/error-404", pro: false },
     ],
   },
 ];
@@ -76,28 +76,28 @@ const othersItems = [
     icon: <PieChartIcon />,
     name: "Charts",
     subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
+      { name: "Line Chart", path: "/broker/myoffice/line-chart", pro: false },
+      { name: "Bar Chart", path: "/broker/myoffice/bar-chart", pro: false },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
     subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
+      { name: "Alerts", path: "/broker/myoffice/alerts", pro: false },
+      { name: "Avatar", path: "/broker/myoffice/avatars", pro: false },
+      { name: "Badge", path: "/broker/myoffice/badge", pro: false },
+      { name: "Buttons", path: "/broker/myoffice/buttons", pro: false },
+      { name: "Images", path: "/broker/myoffice/images", pro: false },
+      { name: "Videos", path: "/broker/myoffice/videos", pro: false },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sign In", path: "/broker/myoffice/signin", pro: false },
+      { name: "Sign Up", path: "/broker/myoffice/signup", pro: false },
     ],
   },
 ];
