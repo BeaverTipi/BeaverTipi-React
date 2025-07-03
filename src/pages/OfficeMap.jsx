@@ -14,7 +14,7 @@ function OfficeMap() {
   const [lstgList, setLstgList] = useState({});
 
   useEffect(() => {
-    axios.get("/lstg/list")
+    axios.get("/lstg/list/M2507000110")
       .then(data => setLstgList(data)) //interceptor에서 resp.data를 리턴해주기 때문에 바로 가능!
       .catch(error => console.error("목록 불러오기 실패", error));
   }, []);
