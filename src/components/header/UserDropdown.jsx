@@ -1,26 +1,31 @@
-import { use, useEffect, useState } from "react";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
 import { useAxios } from "../../hooks/useAxios";
+import { Dropdown } from "../ui/dropdown/Dropdown";
+import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [logout, setLogout] = useState(false);
   const axios = useAxios();
-  const 
-  useEffect({
+  const showSwal = () => {
+    withReactContent(Swal).fire({
+      title: <i>Logout</i>,
+      text: '로그아웃 되었습니다.',
+    })
+  }
+  useEffect(()=>{
     if (logout) {
       axios.post('/account/logout', {})
         .then(() => {
-          // 예: 로그아웃 후 리디렉션 등 처리
-          window.location.href = "/";
+          showSwal();
         })
         .then(() =>{
-          window.location.href = "http://localhost/";
+          window.location.href = "http://localhost/"
         })
         .catch((err) => {
-          console.error("Logout error", err);
+          console.error("Logout error", err)
         });
     }
   },[logout])
@@ -31,7 +36,7 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
-  function logout(){
+  function logoutFn(){
     setLogout(true);
   }
   return (
@@ -157,7 +162,7 @@ export default function UserDropdown() {
           </li>
         </ul>
         <button
-          onClick={logout}
+          onClick={logoutFn}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <svg
