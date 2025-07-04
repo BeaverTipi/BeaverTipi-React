@@ -59,20 +59,62 @@ export default function ListingTable() {
   const [listingWindow, setListingWindow] = useState(null);
 
   const handleOpenListingDetail = (lstg) => {
-    const url = `http://localhost:81/broker/myoffice/listing-details?id=${lstg.lstgId}`; // 상세페이지 경로
+
+
+
+    const url = `http://localhost:81/broker/myoffice/listing-details`;
     const windowName = `BeaverTipi::${lstg.lstgNm}`;
+    let newWin;
 
     if (!listingWindow || listingWindow.closed) {
-      // 창이 없거나 닫혔다면 새로 열기
-      const newWin = window.open(url, windowName, "width=800,height=600");
+      newWin = window.open(url, windowName, "width=800,height=600");
       setListingWindow(newWin);
     } else {
-      // 이미 창이 열려있다면 URL 업데이트 후 새로고침
       listingWindow.location.href = url;
       listingWindow.focus();
+      newWin = listingWindow;
     }
-  };
 
+    // 메시지 수신 후 lstgId 보내기
+    const waitForReady = (event) => {
+      if (event.origin !== "http://localhost:81") return;
+      if (event.data?.type === "ready") {
+        console.log("💌 자식이 준비 완료 알림 보냄");
+        newWin.postMessage({ type: "lstgData", lstgId: lstg.lstgId }, "http://localhost:81");
+        window.removeEventListener("message", waitForReady);
+      }
+    };
+    //    const waitForReady = (event) => {
+    //     if (event.origin !== "http://localhost:81") return;
+    //     if (event.data?.type === "ready") {
+    //       console.log("💌 자식이 준비 완료 알림 보냄");
+
+    //       // 🔐 Spring 서버로 JWT 발급 요청
+    //       rawAxios.post("http://localhost/rest/broker/myoffice/api/token", { lstgId: lstg.lstgId }, {
+    //         withCredentials: true,
+    //       })
+    //         .then((res) => {
+    //           const token = res.data.token;
+
+    //           // ✅ JWT 토큰을 자식 창에 전달
+    //           newWin.postMessage({ type: "secureLstg", token }, "http://localhost:81");
+
+    //           // 💡 메시지 리스너 제거
+    //           window.removeEventListener("message", waitForReady);
+    //         })
+    //         .catch((err) => {
+    //           console.error("❌ JWT 토큰 발급 실패:", err);
+    //           alert("보안 토큰을 발급받지 못했습니다.");
+    //           window.removeEventListener("message", waitForReady);
+    //         });
+    //     }
+    //   };
+    //   window.addEventListener("message", waitForReady);
+    //   window.addEventListener("message", waitForReady);
+    // };
+
+    window.addEventListener("message", waitForReady);
+  };
 
 
 
