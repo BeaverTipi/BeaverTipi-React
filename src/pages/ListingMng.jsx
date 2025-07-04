@@ -1,8 +1,8 @@
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 import ComponentCard from "../components/common/ComponentCard";
-import BasicTableOne from "../components/tables/BasicTables/BasicTableOne";
 import { useEffect, useState } from "react";
 import { useAxios } from "../hooks/useAxios";
+import ListingTable from "../components/myOfficeListing/ListingTable";
 
 
 function ListingMng() {
@@ -11,7 +11,11 @@ function ListingMng() {
 
   useEffect(() => {
     axios.get("/lstg/list/M2507000110")
-      .then(data => setLstgList(data)) //interceptor에서 resp.data를 리턴해주기 때문에 바로 가능!
+      .then(data => {
+        setLstgList(data);
+        console.log(data);
+
+      }) //interceptor에서 resp.data를 리턴해주기 때문에 바로 가능!
       .catch(error => console.error("'lstgList' loading failed", error));
   }, [axios]);
 
@@ -21,7 +25,7 @@ function ListingMng() {
       <PageBreadcrumb pageTitle="Basic Tables" />
       <div className="space-y-6">
         <ComponentCard title="Basic Table 1">
-          <BasicTableOne />
+          <ListingTable lstgList={lstgList} />
         </ComponentCard>
       </div>
     </>
