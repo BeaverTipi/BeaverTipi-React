@@ -1,34 +1,45 @@
 import { useEffect, useState } from "react";
-import { useAxios } from "../../hooks/useAxios";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+
   const [logout, setLogout] = useState(false);
-  const axios = useAxios();
-  const showSwal = () => {
-    withReactContent(Swal).fire({
-      title: <i>Logout</i>,
-      text: '로그아웃 되었습니다.',
-    })
-  }
-  useEffect(()=>{
-    if (logout) {
-      axios.post('/account/logout', {})
-        .then(() => {
-          showSwal();
-        })
-        .then(() =>{
-          window.location.href = "http://localhost/"
-        })
-        .catch((err) => {
-          console.error("Logout error", err)
+  const doLogout = async () => {
+    try {
+      const resp = await axios.post("http://localhost/account/logout", {}
+        ,{withCredentials: true});
+      if (resp.status === 200) {
+        await withReactContent(Swal).fire({
+          icon: "success", // ✅ 체크 아이콘
+          title: "알림", // ✅ 제목
+          text: "로그아웃 되었습니다.", // ✅ 메시지
+          confirmButtonText: "확인", // ✅ 버튼 텍스트
+          buttonsStyling: true, // 기본 스타일 유지
+          customClass: {
+            popup: "swal2-rounded", // 원하는 경우 둥근 스타일 추가 가능
+            confirmButton: "custom-ok-button", // 버튼 스타일 커스터마이징하려면 추가
+          },
         });
+        window.location.href = "http://localhost/";
+      } else {
+        console.error("예상치 않은 응답 코드:", resp.status);
+      }
+    } catch (err) {
+      console.error("로그아웃 실패", err);
     }
-  },[logout])
+  };
+
+  useEffect(() => {
+    if (!logout) return;
+
+    doLogout();
+  }, [logout]);
+
   function toggleDropdown() {
     setIsOpen(!isOpen);
   }
@@ -36,7 +47,7 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
-  function logoutFn(){
+  function logoutFn() {
     setLogout(true);
   }
   return (
