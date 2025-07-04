@@ -30,6 +30,7 @@ import ContractNew from "./pages/ContractNew";
 import ContractProceeding from "./pages/ContractProceeding";
 import { AxiosProvider } from "./context/AxiosProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ListingDetail from "./pages/ListingDetail";
 
 export default function App() {
   return (
@@ -40,6 +41,8 @@ export default function App() {
 
           {/* 첫 진입 시 자동 리디렉션 */}
           <Route path="/" element={<Navigate to="/broker/myoffice" replace />} />
+          <Route path="/broker" element={<Navigate to="/broker/myoffice" replace />} />
+          <Route path="/broker/myoffice/listing-details" element={<ListingDetail />} />
 
           {/* 인증이 필요한 대시보드 라우트 */}
           <Route

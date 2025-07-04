@@ -9,10 +9,8 @@ export function AxiosProvider({ children }) {
     baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX
     , headers: {
       "Content-Type": "application/json"
-
     }
     , withCredentials: true
-    ,
   });
 
   // 서버에 요청 보내기 전에 실행되는 필터(interceptor)
