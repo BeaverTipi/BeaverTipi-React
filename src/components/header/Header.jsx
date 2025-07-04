@@ -79,11 +79,7 @@ const Header = ({ onClick, onToggle }) => {
               src="./images/logo/logo.svg"
               alt="Logo"
             />
-            <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
-              alt="Logo"
-            />
+          
           </Link>
 
           <button
@@ -142,7 +138,7 @@ const Header = ({ onClick, onToggle }) => {
         </div>
         <div
           className={`${isApplicationMenuOpen ? "flex" : "hidden"
-            } items-center justify-between w-full gap-4 px-5 py-4 flex shadow-theme-md`}
+          } items-center justify-between w-full gap-4 px-5 py-4 flex shadow-theme-md`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Dark Mode Toggler --> */}
