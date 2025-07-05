@@ -9,6 +9,7 @@ export function AxiosProvider({ children }) {
     baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX
     , headers: {
       "Content-Type": "application/json"
+      , "Accept": "application/json"
     }
     , withCredentials: true
   });

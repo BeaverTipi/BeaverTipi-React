@@ -21,26 +21,11 @@ export default function ListingDetails() {
       const { lstgId } = event.data;
       console.log("🔍 받은 lstgId:", lstgId);
       if (lstgId) {
-        axios.get(`/lstg/listing-details/${lstgId}`).then(resp => {
+        axios.post(`/lstg/listing-details`, { lstgId: lstgId },).then(resp => {
           setLstgDetail(resp.data);
         });
       }
     };
-    // const token = event.data.token;
-    // console.log("📨 자식이 token 받음", event.data.token);
-
-    // axios.get("/token"
-    //   , { headers: { Authorization: ``} }
-    // )
-
-    // const { lstgId } = event.data;
-    // console.log("🔍 받은 lstgId:", lstgId);
-    // if (lstgId) {
-    //   axios.get(`/lstg/listing-details/${lstgId}`).then(resp => {
-    //     setLstgDetail(resp.data);
-    //   });
-    // }
-
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
