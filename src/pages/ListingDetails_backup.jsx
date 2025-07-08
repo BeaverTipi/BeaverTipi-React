@@ -22,7 +22,7 @@ export default function ListingDetails() {
       console.log("🔍 받은 lstgId:", lstgId);
       if (lstgId) {
         axios.post(`/lstg/listing-details`, { lstgId: lstgId },).then(resp => {
-          setLstgDetail(resp.data);
+          setLstgDetail(data);
         });
       }
     };

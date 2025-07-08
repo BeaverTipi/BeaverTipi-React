@@ -4,15 +4,31 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import axios from "axios";
+import rawAxios from "axios";
+import { useAxios } from "../../hooks/useAxios"
 // 마이페이지 이동 내려오는거 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
 
+  /* KCY */
+  const [BROKER_INFO, setBROKER_INFO] = useState({});
+  const brokerAxios = useAxios();
+  useEffect(() => {
+    brokerAxios.get("/member/read")
+      .then(data => {
+        console.log("하하 ㅈ대로 되라", data);
+        setBROKER_INFO(data);
+      });
+    return;
+  }, [])
+
+
+  /* KAR */
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
     try {
       const resp = await axios.post("http://localhost/account/logout", {}
-        ,{withCredentials: true});
+        , { withCredentials: true });
       if (resp.status === 200) {
         await withReactContent(Swal).fire({
           icon: "success", // ✅ 체크 아이콘
@@ -60,11 +76,10 @@ export default function UserDropdown() {
           <img src="/images/user/e7e.jpg" alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">{BROKER_INFO.mbrNnm}</span>
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -88,10 +103,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {BROKER_INFO.mbrNm}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {BROKER_INFO.mbrEmlAddr !== null ? BROKER_INFO.mbrEmlAddr : "register your NEW EMAIL"}
           </span>
         </div>
 
