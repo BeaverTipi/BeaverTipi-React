@@ -298,7 +298,7 @@ const AppSidebar = () => {
       <div
         className="py-8 flex justify-center"
       >
-        <Link to="/">
+        <a href="http://localhost/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
@@ -326,7 +326,7 @@ const AppSidebar = () => {
               className={"block mx-auto"}
             />
           )}
-        </Link>
+        </a>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">

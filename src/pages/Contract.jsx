@@ -1,8 +1,11 @@
-import React from 'react'
+import { Outlet } from 'react-router'
 
 function Contract() {
   return (
-    <div>Contract</div>
+    <>
+      <div>Contract</div>
+      <Outlet />
+    </>
   )
 }
 
