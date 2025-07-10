@@ -1,0 +1,4 @@
+git checkout main
+git pull origin main
+git merge developer_KCY
+git push origin main
