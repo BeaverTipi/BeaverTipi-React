@@ -1,59 +1,61 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ContractListingSelect from "../components/myOfficeContract/ContractListingSelect";
-import ContractPartyLoader from "../components/myOfficeContract/ContractPartyLoader";
 import AddNonUserTenancy from "../components/myOfficeContract/AddNonUserTenancy";
 import AddLessee from "../components/myOfficeContract/AddLessee";
+import ContractTermsForm from "../components/myOfficeContract/ContractTermsForm";
 
 const STEP = {
-  SELECT: "select"
-  , ADD_TENANCY: "add-tenancy"
-  , ADD_LESSEE: "add-lessee"
-  , CONTRACT: "contract"
+  SELECT: "select",
+  ADD_TENANCY: "add-tenancy",
+  ADD_LESSEE: "add-lessee",
+  CONTRACT: "contract",
 };
 
 function ContractNew() {
   const [selectedListing, setSelectedListing] = useState(null);
-  const [step, setStep] = useState(STEP.SELECT); // "select", "add-tenancy", "contract"
-  const [direction, setDirection] = useState("forward"); // ✅ "forward" or "backward"
+  const [step, setStep] = useState(STEP.SELECT);
+  const [stepHistory, setStepHistory] = useState([]);
+  const [direction, setDirection] = useState("forward");
 
-  const handleSelect = (listing) => {
+  const goToStep = nextStep => {
+    setStepHistory((prev) => [...prev, step]); // 현재 단계 저장
+    setDirection("forward");
+    setStep(nextStep);
+  };
+
+  const handleSelect = listing => {
     setSelectedListing(listing);
     if (!listing.tenancyInfo) {
-      setDirection("forward");
-      setStep(STEP.ADD_TENANCY);
+      goToStep(STEP.ADD_TENANCY);
     } else {
-      setDirection("forward");
-      setStep(STEP.CONTRACT);
+      goToStep(STEP.ADD_LESSEE);
     }
   };
-
-  const handleTenancySaved = (updatedTenancyInfo) => {
+  const handleTenancySaved = updatedTenancyInfo => {
     setSelectedListing(prev => ({
       ...prev,
-      tenancyInfo: updatedTenancyInfo
+      tenancyInfo: updatedTenancyInfo,
     }));
-    setDirection("forward");
-    setStep(STEP.ADD_LESSEE);
+    goToStep(STEP.ADD_LESSEE);
   };
 
-  const handleLesseeSaved = (lesseeInfo) => {
-    console.log("입주자 정보:", lesseeInfo);
+  const handleLesseeSaved = lesseeInfo => {
     setSelectedListing(prev => ({
       ...prev,
-      lesseeInfo: lesseeInfo
+      lesseeInfo: lesseeInfo,
     }));
-    // 다음 단계로 전환
-    setDirection("forward");
-    setStep(STEP.CONTRACT);
+    goToStep(STEP.CONTRACT);
   };
 
   const handleBack = () => {
-    setDirection("backward"); // ✅ 뒤로 갈 땐 backward
-    setStep(STEP.SELECT);
+    if (stepHistory.length > 0) {
+      const prevStep = stepHistory[stepHistory.length - 1];
+      setStepHistory(prev => prev.slice(0, -1)); // pop
+      setDirection("backward");
+      setStep(prevStep);
+    }
   };
-
-
 
   const variants = {
     initial: (direction) => ({
@@ -74,38 +76,79 @@ function ContractNew() {
     }),
   };
 
+ return (
+  <div className="relative w-full min-h-screen"> {/* 브라우저 높이 기준으로 스크롤 */}
+    <AnimatePresence custom={direction} mode="wait">
+      {step === STEP.SELECT && (
+        <motion.div
+          key="select"
+          custom={direction}
+          variants={variants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="w-full" // ❌ absolute 제거!
+        >
+          <ContractListingSelect onSelect={handleSelect} />
+        </motion.div>
+      )}
 
-  return (
-    <>
-      <div className="relative w-full min-h-[800px] overflow-y-auto overflow-x-hidden">
-        <AnimatePresence custom={direction} mode="wait">
-          {step === STEP.SELECT && (
-            <motion.div key={`add-tenancy-${selectedListing?.lstgId}`} custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
-              <ContractListingSelect onSelect={handleSelect} />
-            </motion.div>
-          )}
-          {step === STEP.ADD_TENANCY && (
-            <motion.div key="add-tenancy" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
-              <AddNonUserTenancy onSave={handleTenancySaved} onBack={handleBack} selectedListing={selectedListing} />
-            </motion.div>
-          )}
-          {step === STEP.CONTRACT && (
-            <motion.div key="contract" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
-              <ContractPartyLoader selectedListing={selectedListing} onBack={handleBack} />
-            </motion.div>
-          )}
-          {step === "add-lessee" && (
-            <motion.div key="add-lessee" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
-              <AddLessee selectedListing={selectedListing} onSave={handleLesseeSaved}
-                onBack={() => { setDirection("backward"); setStep("add-tenancy"); }} />
-            </motion.div>
-          )}
+      {step === STEP.ADD_TENANCY && (
+        <motion.div
+          key="add-tenancy"
+          custom={direction}
+          variants={variants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="w-full"
+        >
+          <AddNonUserTenancy
+            selectedListing={selectedListing}
+            onSave={handleTenancySaved}
+            onBack={handleBack}
+          />
+        </motion.div>
+      )}
 
-        </AnimatePresence>
+      {step === STEP.ADD_LESSEE && (
+        <motion.div
+          key="add-lessee"
+          custom={direction}
+          variants={variants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="w-full"
+        >
+          <AddLessee
+            selectedListing={selectedListing}
+            onSave={handleLesseeSaved}
+            onBack={handleBack}
+          />
+        </motion.div>
+      )}
 
-      </div>
-    </>
-  );
+      {step === STEP.CONTRACT && (
+        <motion.div
+          key="contract"
+          custom={direction}
+          variants={variants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="w-full"
+        >
+          <ContractTermsForm
+            selectedListing={selectedListing}
+            onBack={handleBack}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
 }
 
 export default ContractNew;
