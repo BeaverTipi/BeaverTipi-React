@@ -5,7 +5,7 @@ export const Modal = ({
   onClose,
   children,
   className,
-  showCloseButton = true, // Default to true for backwards compatibility
+  showCloseButton = false, // Default to true for backwards compatibility
   isFullscreen = false,
 }) => {
   const modalRef = useRef(null);
@@ -42,7 +42,7 @@ export const Modal = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-full rounded-3xl bg-white  dark:bg-gray-900 z-10001";
+    : "relative w-full rounded-3xl  dark:bg-gray-900 z-10001";
 
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">

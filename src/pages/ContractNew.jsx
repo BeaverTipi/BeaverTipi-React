@@ -61,7 +61,7 @@ function ContractNew() {
 
   return (
     <>
-      <div className="relative w-full min-h-[600px] overflow-hidden bg-white">
+      <div className="relative w-full min-h-[800px] overflow-y-auto overflow-x-hidden">
         <AnimatePresence custom={direction} mode="wait">
           {step === "select" && (
             <motion.div key={`add-tenancy-${selectedListing?.lstgId}`} custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0">
