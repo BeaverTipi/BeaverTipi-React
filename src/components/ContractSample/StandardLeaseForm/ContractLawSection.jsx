@@ -3,7 +3,7 @@ import ComponentCard from "../../common/ComponentCard";
 import Textarea from "../../form/input/TextArea";
 import Checkbox from "../../form/input/CheckBox";
 
-export default function ContractLawSection() {
+export default function ContractLawSection({ formData, onChange }) {
   return (
     <ComponentCard
       title="법률 조항 및 의무"
@@ -22,11 +22,21 @@ export default function ContractLawSection() {
           <div className="mt-2 grid grid-cols-2 gap-4">
             <div>
               <label className="font-semibold">임대인 부담</label>
-              <Textarea name="landlordBurden" placeholder="임대인 부담 수선비 내용 입력" />
+              <Textarea
+                name="landlordBurden"
+                value={formData.landlordBurden}
+                onChange={onChange}
+                placeholder="임대인 부담 수선비 내용 입력"
+              />
             </div>
             <div>
               <label className="font-semibold">임차인 부담</label>
-              <Textarea name="tenantBurden" placeholder="임차인 부담 수선비 내용 입력" />
+              <Textarea
+                name="tenantBurden"
+                value={formData.tenantBurden}
+                onChange={onChange}
+                placeholder="임차인 부담 수선비 내용 입력"
+              />
             </div>
           </div>
         </div>
@@ -81,7 +91,12 @@ export default function ContractLawSection() {
 
         {/* 동의 체크 */}
         <div className="mt-6">
-          <Checkbox name="agreedTerms" label="상기 조항을 충분히 읽고 이해하였으며, 이에 동의합니다." />
+          <Checkbox
+            name="agreedTerms"
+            checked={formData.agreedTerms}
+            onChange={onChange}
+            label="상기 조항을 충분히 읽고 이해하였으며, 이에 동의합니다."
+          />
         </div>
       </div>
     </ComponentCard>
