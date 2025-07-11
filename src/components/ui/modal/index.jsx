@@ -7,6 +7,7 @@ export const Modal = ({
   className,
   showCloseButton = false, // Default to true for backwards compatibility
   isFullscreen = false,
+  closeOnOverlayClick = false,
 }) => {
   const modalRef = useRef(null);
 
@@ -56,7 +57,7 @@ export const Modal = ({
       <div
         ref={modalRef}
         className={`${contentClasses}  ${className}`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={closeOnOverlayClick ? undefined : (e) => e.stopPropagation()} // ✅ 조건부로 차단
       >
         {showCloseButton && (
           <button

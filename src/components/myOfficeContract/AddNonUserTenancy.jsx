@@ -5,11 +5,8 @@ import PhoneInput from "../form/group-input/PhoneInput";
 import Radio from "../form/input/Radio";
 import Select from "../form/Select";
 import Button from "../ui/button/Button";
-import { useAxios } from "../../hooks/useAxios";
-
-import { AESContext } from "../../context/AESContext";
-import rawAxios from "axios";
 import { useSecureAxios } from "../../hooks/useSecureAxios";
+import Label from "../form/Label";
 
 function AddNonUserTenancy({ tenancy, onSave, onBack }) {
   // const axios = useAxios();
@@ -20,7 +17,7 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
   const axios = useSecureAxios();
   useEffect(() => {
     axios
-      .post("/rest/broker/myoffice/form", {
+      .post("form", {
         codeGroup: {
           bankList: "BANK",
           lesserTypeList: "LSR",
@@ -72,7 +69,9 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
     >
       {/* 임대사업자등록번호 + 검증 */}
       <div className="flex gap-2">
+        <Label htmlFor={"rentalPtyId"}>임대사업자등록번호</Label>
         <Input
+          id="rentalPtyId"
           name="rentalPtyId"
           placeholder="임대사업자등록번호"
           value={nonUserTenancy?.rentalPtyId}
@@ -86,8 +85,9 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
       </div>
       {/* 사업자 형태 */}
       <div className="flex gap-6 pt-4">
+        <Label>임대 유형</Label>
         <Radio
-          id="solo"
+          id="lsrYnTypeCd001"
           label="1인 임대"
           name="lsrYnTypeCd"
           value="001"
@@ -97,7 +97,7 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
           }
         />
         <Radio
-          id="group"
+          id="lsrYnTypeCd002"
           label="공동 임대"
           name="lsrYnTypeCd"
           value="002"
@@ -108,17 +108,20 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
         />
         <div className="flex gap-6 pt-4">
           <Select
+            id={"lsrTypeCd"}
+            name={"lsrTypeCd"}
             options={lesserTypeList}
             placeholder={"상세"}
             defaultValue={"002"}
           />
-
         </div>
       </div>
 
       {/* 사업자 기본 정보 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="flex gap-6 pt-4">
+        <Label>임대인 이름</Label>
         <Input
+          id="mbrNm"
           name="mbrNm"
           placeholder="임대인 이름"
           value={nonUserTenancy?.mbrNm}
@@ -127,8 +130,10 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
           }
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      {/* <div className="flex flex-row gap-6 pt-4">
+        <Label className={"w-17"}>은행 계좌</Label>
         <Select
+          id=""
           options={bankList}
           placeholder={"은행명"}
           defaultValue=""
@@ -141,10 +146,12 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
             setNonUserTenancy({ ...nonUserTenancy, rentalPtyAcctNo: e.target.value })
           }
         />
-      </div>
+      </div> */}
       {/* 휴대폰 번호 */}
       <div className="pt-6">
         <PhoneInput
+          id="mbrTelno"
+          name="mbrTelno"
           countries={countries}
           value={nonUserTenancy?.mbrTelNo}
           onChange={(val) =>
@@ -156,6 +163,7 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
       {/* 주소 */}
       <div className="pt-6 space-y-3">
         <Input
+          id="mbrBasicAddr"
           name="mbrBasicAddr"
           placeholder="기본주소"
           value={nonUserTenancy?.mbrBasicAddr}
@@ -164,6 +172,7 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
           }
         />
         <Input
+          id="mbrDetailAddr"
           name="mbrDetailAddr"
           placeholder="상세주소 (주소 API 연동)"
           value={nonUserTenancy?.mbrDetailAddr}
@@ -176,6 +185,7 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
       {/* 이메일 주소 */}
       <div className="pt-6">
         <Input
+          id="mbrEmlAddr"
           name="mbrEmlAddr"
           placeholder="이메일 주소"
           value={nonUserTenancy?.mbrEmlAddr}

@@ -4,6 +4,8 @@ import { useState } from "react";
 import ComponentCard from "../common/ComponentCard";
 import Label from "../form/Label";
 import Button from "../ui/button/Button";
+import { Modal } from "../ui/modal";
+import ContractPDFRendererStatic from "../ContractPDFRendererStatic";
 
 const contractSamples = [
   {
@@ -20,13 +22,18 @@ const contractSamples = [
 
 export default function ContractSampleSelect({ onNext, onBack }) {
   const [selectedSample, setSelectedSample] = useState(null);
-
+  const [previewSample, setPreviewSample] = useState(null); // 모달용
   const handleProceed = () => {
     if (selectedSample) {
       onNext(selectedSample.id);
     }
   };
   console.log("contractSamples", contractSamples);
+
+  const handleRightClick = (e, sample) => {
+    e.preventDefault();
+    setPreviewSample(sample);
+  };
 
   return (
     <motion.div
@@ -47,6 +54,8 @@ export default function ContractSampleSelect({ onNext, onBack }) {
               <div
                 key={sample.id}
                 onClick={() => setSelectedSample(sample)}
+                onContextMenu={(e) => handleRightClick(e, sample)}
+
                 className={`p-4 rounded-xl border cursor-pointer shadow-sm bg-white hover:bg-gray-50 ${selectedSample?.id === sample.id
                   ? "border-amber-500 bg-blue-50"
                   : "border-gray-200"
@@ -71,7 +80,19 @@ export default function ContractSampleSelect({ onNext, onBack }) {
             선택 완료 →
           </Button>
         </div>
+
       </ComponentCard>
-    </motion.div>
+      {/* 모달 */}
+      <Modal isOpen={!!previewSample} onClose={() => setPreviewSample(null)} showCloseButton>
+        <div className="p-6 w-[720px] max-w-full max-h-[85vh] overflow-y-auto m-auto">
+          <h2 className="text-xl font-bold mb-4">{previewSample?.title} 미리보기</h2>
+          {previewSample?.id === "STANDARD_RENT_001" ? (
+            <ContractPDFRendererStatic />
+          ) : (
+            <p className="text-sm text-gray-600">PDF 미리보기를 준비 중입니다.</p>
+          )}
+        </div>
+      </Modal>
+    </motion.div >
   );
 }
