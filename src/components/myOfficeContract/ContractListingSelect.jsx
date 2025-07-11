@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAxios } from "../../hooks/useAxios";
+import { useSecureAxios } from "../../hooks/useSecureAxios";
 import ComponentCard from "../common/ComponentCard";
 
 import {
@@ -25,9 +26,15 @@ function ContractListingSelect({ onSelect }) {
         setLstgList(data);
       })
       .catch(error => console.log("안된다~", error))
-
-
   }, []);
+
+  const secureAxios = useSecureAxios();
+  useEffect(() => {
+    secureAxios.post("form", { lsr: "LSR" })
+      .then(data => {
+        console.log("gkgkkgkggkgkkgkgkg: ", data)
+      })
+  }, [secureAxios]);
 
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -105,7 +112,7 @@ function ContractListingSelect({ onSelect }) {
 
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {lstgList.map(lstg => (
+                {lstgList.map((lstg, idx) => (
                   <TableRow
                     key={lstg.lstgId}
                     className={"hover:bg-gray-100 dark:hover:bg-white/5"}
@@ -113,7 +120,7 @@ function ContractListingSelect({ onSelect }) {
                     <TableCell className="px-5 py-4 sm:px-6 text-start">
                       <div className="pointer-events-none flex items-center gap-3">
                         <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                          {lstg.indexNo}
+                          {idx + 1}
                         </span>
                       </div>
                     </TableCell>

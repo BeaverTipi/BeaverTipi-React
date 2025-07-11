@@ -14,5 +14,12 @@ export default defineConfig({
     }
     // 👇 이 설정이 핵심입니다!
     , historyApiFallback: true
+    , proxy: {
+      '/rest': {
+        target: 'http://localhost:80', // Spring 서버 주소
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 });

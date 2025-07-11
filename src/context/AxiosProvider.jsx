@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export function AxiosProvider({ children }) {
 
-  const SPRING_URL_ORIGIN = "http://localhost:80";
+  const SPRING_URL_ORIGIN = "http://localhost";
   const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const myofficeAPI = axios.create({
     baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX
