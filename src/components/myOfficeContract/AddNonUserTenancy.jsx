@@ -7,15 +7,15 @@ import Select from "../form/Select";
 import Button from "../ui/button/Button";
 import { useAxios } from "../../hooks/useAxios";
 
-import {AESContext} from "../../context/AESContext";
+import { AESContext } from "../../context/AESContext";
 import rawAxios from "axios";
-import {useSecureAxios} from "../../hooks/useSecureAxios";
+import { useSecureAxios } from "../../hooks/useSecureAxios";
 
-function AddNonUserTenancy({ selectedListing, onSave, onBack }) {
+function AddNonUserTenancy({ tenancy, onSave, onBack }) {
   // const axios = useAxios();
   const [bankList, setBankList] = useState();
   const [lesserTypeList, setLesserTypeList] = useState();
-
+  const [nonUserTenancy, setNonUserTenancy] = useState(tenancy);
 
   const axios = useSecureAxios();
   useEffect(() => {
@@ -48,26 +48,7 @@ function AddNonUserTenancy({ selectedListing, onSave, onBack }) {
         console.error("공통코드 오류 ⛔", err);
       });
   }, []);
-  // useEffect(() => {
-  //   axios.post("/form", { codeGroup: { bankList: "BANK", lesserTypeList: "LSR" } })
-  //     .then(data => {
-  //       console.log("AddNonUserTenancy공통코드: ", data);
-  //       const bankOpt = data.bankList.map(bank => ({
-  //         ...bank,
-  //         value: bank.codeValue,
-  //         label: bank.codeName,
-  //       }));
-  //       const lsrOpt = data.lesserTypeList.map(lsr => ({
-  //         ...lsr,
-  //         value: lsr.codeValue,
-  //         label: lsr.codeName
-  //       }))
-  //       setBankList(bankOpt);
-  //       setLesserTypeList(lsrOpt);
 
-  //       console.log("bankList", bankList);
-  //     });
-  // }, []);
 
   const countries = [
     { code: "KR", label: "+82" },
@@ -77,7 +58,6 @@ function AddNonUserTenancy({ selectedListing, onSave, onBack }) {
     { code: "AU", label: "+61" },
   ];
 
-  const [nonUserTenancy, setNonUserTenancy] = useState(selectedListing.tenancyInfo);
 
   const handleSubmit = () => {
     console.log("nonUserTenancy", nonUserTenancy);

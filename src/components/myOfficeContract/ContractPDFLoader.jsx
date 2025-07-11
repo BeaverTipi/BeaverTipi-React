@@ -5,7 +5,7 @@ import ComponentCard from "../common/ComponentCard";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const ContractPDFLoader = ({ selectedListing, uploadedFiles, onCrtfExtracted }) => {
+const ContractPDFLoader = ({ listing, uploadedFiles, onCrtfExtracted }) => {
   const canvasRefs = useRef([]);
 
   useEffect(() => {
