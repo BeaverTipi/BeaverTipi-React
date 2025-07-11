@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ComponentCard from "../common/ComponentCard";
 
-const ContractFileUpLoader = ({ selectedListing, uploadedFiles, setUploadedFiles }) => {
+const ContractFileUpLoader = ({ listing, uploadedFiles, setUploadedFiles }) => {
 
 
   const onDrop = acceptedFiles => {

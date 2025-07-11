@@ -4,8 +4,9 @@ import ContractPDFLoader from "./ContractPDFLoader";
 import ComponentCard from "../common/ComponentCard";
 import { useEffect, useState } from "react";
 
-function ContractTermsForm({ selectedListing, onBack, onFilesUploaded }) {
-  const [uploadedFiles, setUploadedFiles] = useState(selectedListing.files || []);
+function ContractTermsForm({ contractInfo, onBack, onFilesUploaded }) {
+  const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
+  const { listing, tenancy, lessee, broker, files } = contractInfo;
 
   // 파일 변경 시 부모에게도 알려줌
   useEffect(() => {
@@ -14,17 +15,23 @@ function ContractTermsForm({ selectedListing, onBack, onFilesUploaded }) {
 
   return (
     <ComponentCard
-      title="📄 계약 조건 입력"
-      desc="임대인, 계약서, 첨부파일을 확인 및 작성해주세요."
+      title="📄 새 계약 정보 등록"
+      desc="임대인, 계약서, 첨부파일을 마지막으로 확인해주세요."
       className="min-h-screen"
       onBack={onBack}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 좌측: 계약자 정보 및 파일 업로더 */}
         <div className="col-span-1 flex flex-col gap-6 h-[700px]">
-          <ContractPartyLoader selectedListing={selectedListing} />
+          <ContractPartyLoader
+            listing={listing}
+            tenancy={tenancy}
+            lessee={lessee}
+            broker={broker}
+          />
+
           <ContractFileUpLoader
-            selectedListing={selectedListing}
+            listing={contractInfo.listing}
             uploadedFiles={uploadedFiles}
             setUploadedFiles={setUploadedFiles}
           />
@@ -32,7 +39,7 @@ function ContractTermsForm({ selectedListing, onBack, onFilesUploaded }) {
 
         {/* 우측: PDF 미리보기 */}
         <ContractPDFLoader
-          selectedListing={selectedListing}
+          listing={listing}
           uploadedFiles={uploadedFiles}
           onCrtExtracted={crtfNo => console.log("자격증번호 추출:", crtfNo)}
         />

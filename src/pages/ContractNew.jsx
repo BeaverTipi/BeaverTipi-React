@@ -1,23 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ContractListingSelect from "../components/myOfficeContract/ContractListingSelect";
 import AddNonUserTenancy from "../components/myOfficeContract/AddNonUserTenancy";
 import AddLessee from "../components/myOfficeContract/AddLessee";
 import ContractTermsForm from "../components/myOfficeContract/ContractTermsForm";
-
+import ContractSampleSelect from "../components/myOfficeContract/ContractSampleSelect";
+import ContractWriterForm from "../components/myOfficeContract/ContractWriterForm";
+import ContractPartyLoader from "../components/myOfficeContract/ContractPartyLoader";
+import ContractPreview from "../components/myOfficeContract/ContractPreview.jsx";
 const STEP = {
   SELECT: "select",
   ADD_TENANCY: "add-tenancy",
   ADD_LESSEE: "add-lessee",
+  SAMPLE_SELECT: "sample-select",
+  SAMPLE_WRITE: "write",
+  PDF_PREVIEW: "pdf-preview",
   CONTRACT: "contract",
 };
 
 function ContractNew() {
+  const [contractInfo, setContractInfo] = useState({
+    listing: null,
+    broker: null,
+    tenancy: null,
+    lessee: null,
+    sampleId: null,
+    form: null,
+    files: [],
+  });
 
-  const [selectedListing, setSelectedListing] = useState(null);
+
   const [step, setStep] = useState(STEP.SELECT);
   const [stepHistory, setStepHistory] = useState([]);
   const [direction, setDirection] = useState("forward");
+  const generatePdfFromForm = async (formData) => {
+    const response = await axios.post("/rest/contract/pdf", formData, {
+      responseType: "blob",
+    });
+    return new File([response.data], "contract-preview.pdf", { type: "application/pdf" });
+  };
+
 
   const goToStep = nextStep => {
     setStepHistory((prev) => [...prev, step]); // 현재 단계 저장
@@ -25,34 +47,73 @@ function ContractNew() {
     setStep(nextStep);
   };
 
-  const handleSelect = listing => {
-    setSelectedListing(listing);
+  const handleSelect = (listing) => {
+    setContractInfo({
+      listing,
+      broker: listing.brokerInfo || null,
+      tenancy: listing.tenancyInfo || null,
+      lessee: listing.lesseeInfo || null,
+      sampleId: null,
+      form: null,
+      file: null, //<--writerform에서 작성한 파일
+      files: [],
+    });
+
     if (!listing.tenancyInfo) {
       goToStep(STEP.ADD_TENANCY);
     } else {
       goToStep(STEP.ADD_LESSEE);
     }
   };
-  const handleTenancySaved = updatedTenancyInfo => {
-    setSelectedListing(prev => ({
+  const handleTenancySaved = (updatedTenancyInfo) => {
+    setContractInfo(prev => ({
       ...prev,
-      tenancyInfo: updatedTenancyInfo,
+      tenancy: updatedTenancyInfo,
     }));
     goToStep(STEP.ADD_LESSEE);
   };
 
-  const handleLesseeSaved = lesseeInfo => {
-    setSelectedListing(prev => ({
+  const handleLesseeSaved = (lesseeInfo) => {
+    setContractInfo(prev => ({
       ...prev,
-      lesseeInfo: lesseeInfo,
+      lessee: lesseeInfo,
+    }));
+    goToStep(STEP.SAMPLE_SELECT);
+  };
+
+  const handleContractSampleSelected = (sampleId) => {
+    setContractInfo(prev => ({
+      ...prev,
+      sampleId,
+    }));
+    goToStep(STEP.SAMPLE_WRITE);
+  };
+
+  const handleContractSampleWritten = async (formData) => {
+    const file = await generatePdfFromForm(formData); // PDF Blob 만들기
+
+    setContractInfo(prev => ({
+      ...prev,
+      form: formData,
+      file, // ✅ 여기에 저장
+    }));
+
+    goToStep(STEP.PDF_PREVIEW);
+  };
+
+  const handleContractPreviewConfirmed = () => {
+    setContractInfo(prev => ({
+      ...prev,
+      confirmedAt: new Date(), // ✅ 확인 시간 추가 등 가능
     }));
     goToStep(STEP.CONTRACT);
   };
 
+
   const handleFilesUploaded = (files) => {
-    setSelectedListing(prev => ({
+    setContractInfo(prev => ({
       ...prev,
-      files: files, // 또는 [...prev.files, ...files] 로 append 가능
+      files,
     }));
   };
 
@@ -112,7 +173,7 @@ function ContractNew() {
             className="w-full"
           >
             <AddNonUserTenancy
-              selectedListing={selectedListing}
+              tenancy={contractInfo.tenancy}
               onSave={handleTenancySaved}
               onBack={handleBack}
             />
@@ -130,8 +191,60 @@ function ContractNew() {
             className="w-full"
           >
             <AddLessee
-              selectedListing={selectedListing}
+              lessee={contractInfo.lessee}
+              lstgId={contractInfo.listing?.lstgId}
               onSave={handleLesseeSaved}
+              onBack={handleBack}
+            />
+          </motion.div>
+        )}
+
+
+
+        {step === STEP.SAMPLE_SELECT && (
+          <motion.div
+            key="sample-select"
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+            <ContractSampleSelect onNext={handleContractSampleSelected} onBack={handleBack} />
+          </motion.div>
+        )}
+        {step === STEP.SAMPLE_WRITE && contractInfo.sampleId && (
+          <motion.div
+            key="sample-write"
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+            <ContractWriterForm
+              sampleId={contractInfo.sampleId}
+              onSave={handleContractSampleWritten}
+              onBack={handleBack}
+            />
+
+          </motion.div>
+        )}
+        {step === STEP.PDF_PREVIEW && (
+          <motion.div
+            key="pdf-preview"
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+            <ContractPreview
+              formData={contractInfo.form}
+              onConfirm={handleContractPreviewConfirmed}
               onBack={handleBack}
             />
           </motion.div>
@@ -148,15 +261,16 @@ function ContractNew() {
             className="w-full"
           >
             <ContractTermsForm
-              selectedListing={selectedListing}
+              contractInfo={contractInfo}
               onFilesUploaded={handleFilesUploaded}
-
               onBack={handleBack}
             />
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
+
   );
 
 }

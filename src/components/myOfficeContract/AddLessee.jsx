@@ -7,8 +7,8 @@ import Label from "../form/Label";
 import { Modal } from "../ui/modal";
 
 
-function AddLessee({ selectedListing, onSave, onBack }) {
-  const [lesseeInfo, setLesseeInfo] = useState({
+function AddLessee({ lessee, lstgId, onSave, onBack }) {
+  const [lesseeInfo, setLesseeInfo] = useState(lessee || {
     mbrCd: "",
     mbrNm: "",
     mbrTelno: "",
@@ -19,10 +19,10 @@ function AddLessee({ selectedListing, onSave, onBack }) {
     lesseeNote: "",
   });
   useEffect(() => {
-    if (selectedListing?.lesseeInfo) {
-      setLesseeInfo(selectedListing.lesseeInfo);
+    if (lessee) {
+      setLesseeInfo(lessee);
     }
-  }, [selectedListing?.lesseeInfo]);
+  }, [lessee]);
   const [wishlist, setWishlist] = useState([]);
   const [contextMenu, setContextMenu] = useState(null); // { x, y, item }
   const [modalData, setModalData] = useState(null);
@@ -38,9 +38,9 @@ function AddLessee({ selectedListing, onSave, onBack }) {
    */
   const axios = useAxios();
   useEffect(() => {
-    axios.post("cont/new/lessee", { lstgId: selectedListing.lstgId })
+    axios.post("cont/new/lessee", { lstgId: lstgId })
       .then(data => setWishlist(data))
-  }, [selectedListing?.lstgId, axios]);
+  }, [lstgId, axios]);
 
   const handleRightClick = (e, item) => {
     e.preventDefault();
@@ -225,7 +225,7 @@ function AddLessee({ selectedListing, onSave, onBack }) {
             value={lesseeInfo?.lesseeNote || ""}
             onChange={(e) => setLesseeInfo({ ...lesseeInfo, lesseeNote: e.target.value })}
           />
-          <input type="text" value={lesseeInfo?.mbrCd || ""} name="mbrCd" placeholder="회원코드" />
+          <input type="text" value={lesseeInfo?.mbrCd || ""} name="mbrCd" placeholder="회원코드" readonly />
         </div>
 
         <div className="flex justify-end pt-6">
