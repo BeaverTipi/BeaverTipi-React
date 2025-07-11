@@ -11,6 +11,11 @@ const contractSamples = [
     title: "📄 표준 임대차계약서",
     desc: "국토교통부 제공 표준 양식의 계약서입니다.",
   },
+  {
+    id: "STANDARD_SALE_001",
+    title: "📄 부동산 매매계약서",
+    desc: "국토교통부 제공 표준 양식의 계약서입니다.",
+  },
 ];
 
 export default function ContractSampleSelect({ onNext, onBack }) {
@@ -21,6 +26,7 @@ export default function ContractSampleSelect({ onNext, onBack }) {
       onNext(selectedSample.id);
     }
   };
+  console.log("contractSamples", contractSamples);
 
   return (
     <motion.div
@@ -37,13 +43,13 @@ export default function ContractSampleSelect({ onNext, onBack }) {
           <Label>사용 가능한 계약서 목록</Label>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {contractSamples.map((sample) => (
+            {contractSamples.map(sample => (
               <div
                 key={sample.id}
                 onClick={() => setSelectedSample(sample)}
                 className={`p-4 rounded-xl border cursor-pointer shadow-sm bg-white hover:bg-gray-50 ${selectedSample?.id === sample.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200"
+                  ? "border-amber-500 bg-blue-50"
+                  : "border-gray-200"
                   }`}
               >
                 <h3 className="font-bold text-gray-800">{sample.title}</h3>

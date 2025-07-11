@@ -1,4 +1,4 @@
-import ContractPDFRenderer from "./ContractPDFRenderer";
+import ContractPDFRenderer from "../ContractPDFRenderer";
 
 export default function ContractPreview({ file, onConfirm, onBack }) {
   if (!file) {

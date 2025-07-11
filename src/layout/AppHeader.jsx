@@ -151,20 +151,20 @@ const AppHeader = () => {
             </form>
           </div>
         </div>
-<div
-  className="items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none"
->
-  <div className="flex items-center gap-x-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-    <a href="#">공지사항</a>
-    <a href="#">지도</a>
-    <a href="#">상품등록</a>
-    <a href="http://localhost/account/read">마이페이지</a>
+        <div
+          className="items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none"
+        >
+          <div className="flex items-center gap-x-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
+            <a href="#">공지사항</a>
+            <a href="#">지도</a>
+            <a href="#">상품등록</a>
+            <a href="http://localhost/account/read">마이페이지</a>
 
-    <ThemeToggleButton />
-    <NotificationDropdown />
-  </div>
-  <UserDropdown />
-</div>
+            <ThemeToggleButton />
+            <NotificationDropdown />
+          </div>
+          <UserDropdown />
+        </div>
 
       </div>
     </header>
