@@ -2,10 +2,15 @@ import ContractPartyLoader from "./ContractPartyLoader";
 import ContractFileUpLoader from "./ContractFileUpLoader";
 import ContractPDFLoader from "./ContractPDFLoader";
 import ComponentCard from "../common/ComponentCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function ContractTermsForm({ selectedListing, onBack }) {
-    const [uploadedFiles, setUploadedFiles] = useState([]);
+function ContractTermsForm({ selectedListing, onBack, onFilesUploaded }) {
+  const [uploadedFiles, setUploadedFiles] = useState(selectedListing.files || []);
+
+  // 파일 변경 시 부모에게도 알려줌
+  useEffect(() => {
+    onFilesUploaded(uploadedFiles);
+  }, [uploadedFiles]);
 
   return (
     <ComponentCard
@@ -18,7 +23,7 @@ function ContractTermsForm({ selectedListing, onBack }) {
         {/* 좌측: 계약자 정보 및 파일 업로더 */}
         <div className="col-span-1 flex flex-col gap-6 h-[700px]">
           <ContractPartyLoader selectedListing={selectedListing} />
-          <ContractFileUpLoader 
+          <ContractFileUpLoader
             selectedListing={selectedListing}
             uploadedFiles={uploadedFiles}
             setUploadedFiles={setUploadedFiles}
@@ -27,10 +32,10 @@ function ContractTermsForm({ selectedListing, onBack }) {
 
         {/* 우측: PDF 미리보기 */}
         <ContractPDFLoader
-            selectedListing={selectedListing}
-            uploadedFiles={uploadedFiles}
-            onCrtExtracted={crtfNo => console.log("자격증번호 추출:", crtfNo)}
-          />
+          selectedListing={selectedListing}
+          uploadedFiles={uploadedFiles}
+          onCrtExtracted={crtfNo => console.log("자격증번호 추출:", crtfNo)}
+        />
 
 
       </div>

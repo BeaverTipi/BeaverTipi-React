@@ -5,9 +5,17 @@ import CryptoJS from "crypto-js";
 
 export function useSecureAxios() {
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
-
+  const SPRING_URL_ORIGIN = "http://localhost";
+  const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const secureAxios = useMemo(() => {
-    const instance = axios.create();
+    const instance = axios.create({
+      baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX
+      , headers: {
+        "Content-Type": "application/json"
+        , "Accept": "application/json"
+      }
+      , withCredentials: true
+    });
 
     // 요청 인터셉터: 랜덤 IV 기반 암호화
     instance.interceptors.request.use(config => {
