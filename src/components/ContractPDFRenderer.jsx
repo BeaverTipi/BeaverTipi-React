@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export default function ContractPDFRenderer({ file }) {
-  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
+  const [numPages, setNumPages] = useState(0);
 
   useEffect(() => {
     if (!file) return;
@@ -15,16 +16,27 @@ export default function ContractPDFRenderer({ file }) {
       reader.onload = async function () {
         const typedarray = new Uint8Array(this.result);
         const pdf = await pdfjsLib.getDocument(typedarray).promise;
-        const page = await pdf.getPage(1); // 첫 페이지만 예제로 렌더링
+        setNumPages(pdf.numPages);
 
-        const canvas = canvasRef.current;
-        const context = canvas.getContext("2d");
-        const viewport = page.getViewport({ scale: 1.5 });
+        // 기존 canvas 비우기
+        const container = containerRef.current;
+        container.innerHTML = "";
 
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.5 });
 
-        await page.render({ canvasContext: context, viewport }).promise;
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          const renderContext = { canvasContext: context, viewport };
+          await page.render(renderContext).promise;
+
+          canvas.className = "mb-6 border shadow";
+          container.appendChild(canvas);
+        }
       };
 
       reader.readAsArrayBuffer(file);
@@ -34,8 +46,9 @@ export default function ContractPDFRenderer({ file }) {
   }, [file]);
 
   return (
-    <div className="border rounded-lg overflow-hidden p-4">
-      <canvas ref={canvasRef} className="w-full max-w-4xl mx-auto border" />
-    </div>
+    <div
+      ref={containerRef}
+      className="max-h-[75vh] overflow-y-auto p-4 bg-white rounded-md border"
+    />
   );
 }
