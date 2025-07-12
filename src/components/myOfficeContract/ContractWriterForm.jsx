@@ -4,7 +4,7 @@ import ComponentCard from "../common/ComponentCard";
 import StandardLeaseForm from "../ContractSample/StandardLeaseForm";
 
 const FORM_SAMPLE_MAP = {
-  STANDARD_LEASE_001: {
+  STANDARD_RENT_001: {
     contractName: "",
     duration: "",
     amount: "",
@@ -72,12 +72,82 @@ const FORM_SAMPLE_MAP = {
   }
 };
 
-export default function ContractWriterForm({ sampleId, onSave, onBack }) {
+export default function ContractWriterForm({ sampleId, onSave, onBack, contractInfo }) {
+  console.log("contractInfo확인:", contractInfo);
   const [formData, setFormData] = useState({});
-
   useEffect(() => {
     if (FORM_SAMPLE_MAP[sampleId]) {
       setFormData(FORM_SAMPLE_MAP[sampleId]);
+      if (sampleId === "STANDARD_RENT_001") {
+        console.log();
+        setFormData(prev => {
+          return {
+            contractName: "",
+            duration: "",
+            amount: "",
+            location: "",
+            landPurpose: "",
+            buildingType: contractInfo.listing?.lstgTypeCode1 || "",
+            leasePart: "",
+            deposit: "",
+            monthlyRent: "",
+            contractPeriod: "",
+            confirmedDate: "",
+            specialTerms: "",
+            lessorName: contractInfo.tenancy?.mbrNm || "",
+            lessorPhone: contractInfo.tenancy?.mbrTelNo || "",
+            lessorAddr: contractInfo.tenancy?.mbrBasicAddr + contractInfo.tenancy?.mbrDetailAddr || "",
+            lesseeName: contractInfo.lessee?.mbrNm || "",
+            lesseePhone: contractInfo.lessee?.mbrTelno || "",
+            lesseeAddr: contractInfo.lessee?.mbrBasicAddr + contractInfo.lessee?.mbrDetailAddr || "",
+            contractType:
+              contractInfo.listing?.lstgTypeSale === 1 ? "전세"
+                : contractInfo.listing?.lstgTypeSale === 2 ? "월세"
+                  : contractInfo.listing?.lstgTypeSale === 3 ? "매매"
+                    : "",
+            land: "",
+            structure: "",
+            area: "",
+            rentedArea: "",
+            contractDeposit: "",
+            middlePayment: "",
+            balancePayment: "",
+            management1: "",
+            management2: "",
+            management3: "",
+            management4: "",
+            management5: "",
+            management6: "",
+            management7: "",
+            management8: "",
+            startDate: "",
+            endDate: "",
+            repairNeed: "",
+            repairDeadline: "",
+            repairCostCoveredBy: "",
+            landlordBurden: "",
+            tenantBurden: "",
+            agreedTerms: false,
+            moveInDeadline: "",
+            agreeMediation: false,
+            assetPlan: "",
+            detailedAddrFee: "",
+            contractYear: "",
+            contractMonth: "",
+            contractDay: "",
+            lessorRegNum: contractInfo.tenancy?.rentalPtyId || "",
+            lessorSign: null,
+            lesseeRegNum: "",
+            lesseeSign: null,
+            agentOffice: contractInfo.broker?.brokNm || "",
+            agentOfficeAddr: contractInfo.broker?.brokAddr1 + contractInfo.broker?.brokAddr2 || "",
+            agentRegNum: contractInfo.broker?.borkRegNo || "",
+            agentRep: "",
+            agentPhone: contractInfo.broker?.mbrTelno || "",
+            agentSign: null
+          }
+        });
+      }
     } else {
       setFormData({});
     }

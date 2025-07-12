@@ -8,9 +8,8 @@ import Button from "../ui/button/Button";
 import { useSecureAxios } from "../../hooks/useSecureAxios";
 import Label from "../form/Label";
 
-function AddNonUserTenancy({ tenancy, onSave, onBack }) {
-  // const axios = useAxios();
-  const [bankList, setBankList] = useState();
+function AddNonUserTenancy({ tenancy, onSave, onBack, contractInfo }) {
+  console.log("데이터 추가 확인-->", contractInfo);
   const [lesserTypeList, setLesserTypeList] = useState();
   const [nonUserTenancy, setNonUserTenancy] = useState(tenancy);
 
@@ -19,18 +18,12 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
     axios
       .post("form", {
         codeGroup: {
-          bankList: "BANK",
+          // bankList: "BANK",
           lesserTypeList: "LSR",
         },
       })
       .then(data => {
         console.log("복호화된 공통코드 응답 ✅", data);
-
-        const bankOpt = data.bankList.map(bank => ({
-          ...bank,
-          value: bank.codeValue,
-          label: bank.codeName,
-        }));
 
         const lsrOpt = data.lesserTypeList.map(lsr => ({
           ...lsr,
@@ -38,11 +31,10 @@ function AddNonUserTenancy({ tenancy, onSave, onBack }) {
           label: lsr.codeName,
         }));
 
-        setBankList(bankOpt);
         setLesserTypeList(lsrOpt);
       })
       .catch((err) => {
-        console.error("공통코드 오류 ⛔", err);
+        console.error("공통코드 오류남(AddNonUserTenancy)", err);
       });
   }, []);
 

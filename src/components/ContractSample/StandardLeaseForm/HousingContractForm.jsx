@@ -5,6 +5,7 @@ import Textarea from "../../form/input/TextArea";
 import ComponentCard from "../../common/ComponentCard";
 
 export default function HousingContractForm({ formData, onChange }) {
+  console.log("formData확인:", formData);
   return (
     <ComponentCard
       title="주택임대차표준계약서"
@@ -16,11 +17,11 @@ export default function HousingContractForm({ formData, onChange }) {
         <div className="grid grid-cols-3 gap-4 text-sm mb-4">
           <div className="col-span-1">
             <label className="font-semibold">임대인(ㅇ):</label>
-            <Input name="lessor" value={formData.lessor} onChange={onChange} placeholder="임대인 성명" />
+            <Input name="lessor" value={formData.lessorName} onChange={onChange} placeholder="임대인 성명" />
           </div>
           <div className="col-span-1">
             <label className="font-semibold">임차인(ㅇ):</label>
-            <Input name="lessee" value={formData.lessee} onChange={onChange} placeholder="임차인 성명" />
+            <Input name="lessee" value={formData.lesseeName} onChange={onChange} placeholder="임차인 성명" />
           </div>
           <div className="col-span-1">
             <label className="font-semibold">계약형태:</label>

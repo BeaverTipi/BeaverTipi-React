@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ContractListingSelect from "../components/myOfficeContract/ContractListingSelect";
 import AddNonUserTenancy from "../components/myOfficeContract/AddNonUserTenancy";
@@ -8,6 +8,7 @@ import ContractSampleSelect from "../components/myOfficeContract/ContractSampleS
 import ContractWriterForm from "../components/myOfficeContract/ContractWriterForm";
 import ContractPartyLoader from "../components/myOfficeContract/ContractPartyLoader";
 import ContractPreview from "../components/myOfficeContract/ContractPreview.jsx";
+import { useSecureAxios } from "../hooks/useSecureAxios.js";
 const STEP = {
   SELECT: "select",
   ADD_TENANCY: "add-tenancy",
@@ -19,7 +20,7 @@ const STEP = {
 };
 
 function ContractNew() {
-  const [contractInfo, setContractInfo] = useState({
+  const contractInfoReset = {
     listing: null,
     broker: null,
     tenancy: null,
@@ -27,14 +28,15 @@ function ContractNew() {
     sampleId: null,
     form: null,
     files: [],
-  });
-
-
+  }
+  const [contractInfo, setContractInfo] = useState(contractInfoReset);
   const [step, setStep] = useState(STEP.SELECT);
   const [stepHistory, setStepHistory] = useState([]);
   const [direction, setDirection] = useState("forward");
+
+  const secureAxios = useSecureAxios();
   const generatePdfFromForm = async (formData) => {
-    const response = await axios.post("/rest/contract/pdf", formData, {
+    const response = await secureAxios.post("/rest/contract/pdf", formData, {
       responseType: "blob",
     });
     return new File([response.data], "contract-preview.pdf", { type: "application/pdf" });
@@ -47,24 +49,21 @@ function ContractNew() {
     setStep(nextStep);
   };
 
-  const handleSelect = (listing) => {
-    setContractInfo({
-      listing,
-      broker: listing.brokerInfo || null,
-      tenancy: listing.tenancyInfo || null,
-      lessee: listing.lesseeInfo || null,
-      sampleId: null,
-      form: null,
-      file: null, //<--writerform에서 작성한 파일
-      files: [],
-    });
-
-    if (!listing.tenancyInfo) {
+  const handleListingSaved = selectedListing => {
+    setContractInfo(contractInfoReset);
+    setContractInfo(prev => ({
+      ...prev
+      , listing: selectedListing
+      , broker: selectedListing.brokerInfo
+      , tenancy: selectedListing.tenancyInfo
+    }));
+    if (!selectedListing.tenancyInfo) {
       goToStep(STEP.ADD_TENANCY);
     } else {
       goToStep(STEP.ADD_LESSEE);
     }
-  };
+  }
+
   const handleTenancySaved = (updatedTenancyInfo) => {
     setContractInfo(prev => ({
       ...prev,
@@ -91,7 +90,6 @@ function ContractNew() {
 
   const handleContractSampleWritten = async (formData) => {
     const file = await generatePdfFromForm(formData); // PDF Blob 만들기
-
     setContractInfo(prev => ({
       ...prev,
       form: formData,
@@ -108,7 +106,6 @@ function ContractNew() {
     }));
     goToStep(STEP.CONTRACT);
   };
-
 
   const handleFilesUploaded = (files) => {
     setContractInfo(prev => ({
@@ -158,7 +155,10 @@ function ContractNew() {
             exit="exit"
             className="w-full" // ❌ absolute 제거!
           >
-            <ContractListingSelect onSelect={handleSelect} />
+            <ContractListingSelect
+              onSave={handleListingSaved}
+              contractInfo={contractInfo}
+            />
           </motion.div>
         )}
 
@@ -176,6 +176,7 @@ function ContractNew() {
               tenancy={contractInfo.tenancy}
               onSave={handleTenancySaved}
               onBack={handleBack}
+              contractInfo={contractInfo}
             />
           </motion.div>
         )}
@@ -195,11 +196,10 @@ function ContractNew() {
               lstgId={contractInfo.listing?.lstgId}
               onSave={handleLesseeSaved}
               onBack={handleBack}
+              contractInfo={contractInfo}
             />
           </motion.div>
         )}
-
-
 
         {step === STEP.SAMPLE_SELECT && (
           <motion.div
@@ -211,9 +211,14 @@ function ContractNew() {
             exit="exit"
             className="w-full"
           >
-            <ContractSampleSelect onNext={handleContractSampleSelected} onBack={handleBack} />
+            <ContractSampleSelect
+              onNext={handleContractSampleSelected}
+              onBack={handleBack}
+              contractInfo={contractInfo}
+            />
           </motion.div>
         )}
+
         {step === STEP.SAMPLE_WRITE && contractInfo.sampleId && (
           <motion.div
             key="sample-write"
@@ -228,10 +233,12 @@ function ContractNew() {
               sampleId={contractInfo.sampleId}
               onSave={handleContractSampleWritten}
               onBack={handleBack}
+              contractInfo={contractInfo}
             />
 
           </motion.div>
         )}
+
         {step === STEP.PDF_PREVIEW && (
           <motion.div
             key="pdf-preview"
@@ -246,6 +253,7 @@ function ContractNew() {
               formData={contractInfo.form}
               onConfirm={handleContractPreviewConfirmed}
               onBack={handleBack}
+              contractInfo={contractInfo}
             />
           </motion.div>
         )}
