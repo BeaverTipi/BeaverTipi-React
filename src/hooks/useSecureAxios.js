@@ -5,7 +5,10 @@ import CryptoJS from "crypto-js";
 
 export function useSecureAxios() {
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
-  const SPRING_URL_ORIGIN = "http://localhost";
+    const BACKEND_PORT = 80;
+    const PROTOCOL = window.location.protocol; // 'http:'
+    const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
+  const SPRING_URL_ORIGIN = HOSTNAME +"//"+ PROTOCOL +":"+ BACKEND_PORT;
   const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const secureAxios = useMemo(() => {
     const instance = axios.create({
