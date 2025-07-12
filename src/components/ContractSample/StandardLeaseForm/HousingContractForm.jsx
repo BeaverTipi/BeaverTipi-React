@@ -5,6 +5,15 @@ import Textarea from "../../form/input/TextArea";
 import ComponentCard from "../../common/ComponentCard";
 
 export default function HousingContractForm({ formData, onChange }) {
+  const onChangeA = e => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  console.log("formData확인:", formData);
   return (
     <ComponentCard
       title="주택임대차표준계약서"
@@ -16,33 +25,41 @@ export default function HousingContractForm({ formData, onChange }) {
         <div className="grid grid-cols-3 gap-4 text-sm mb-4">
           <div className="col-span-1">
             <label className="font-semibold">임대인(ㅇ):</label>
-            <Input name="lessor" value={formData.lessor} onChange={onChange} placeholder="임대인 성명" />
+            <Input name="lessor" value={formData.lessorName} onChange={onChange} placeholder="임대인 성명" />
           </div>
           <div className="col-span-1">
             <label className="font-semibold">임차인(ㅇ):</label>
-            <Input name="lessee" value={formData.lessee} onChange={onChange} placeholder="임차인 성명" />
+            <Input name="lessee" value={formData.lesseeName} onChange={onChange} placeholder="임차인 성명" />
           </div>
           <div className="col-span-1">
             <label className="font-semibold">계약형태:</label>
             <Select
               name="contractType"
               value={formData.contractType}
-              onChange={onChange}
+              onChange={onChangeA}
               options={[
-                { value: "monthly", label: "월세" },
-                { value: "jeonse", label: "전세" },
+                { value: "전세", label: "전세" },
+                { value: "월세", label: "월세" },
+                { value: "매매", label: "매매" }
               ]}
             />
           </div>
         </div>
         <div className="pt-5">
-          <p className="font-bold text-sm mb-2">[입차주택의 표시]</p>
+          <p className="font-bold text-sm mb-2">[임차주택의 표시]</p>
           <div className="grid grid-cols-4 gap-4 mb-2">
             <label className="col-span-1 font-semibold">소재지</label>
             <Input
               name="location"
               className="col-span-3"
-              value={formData.location}
+              value={formData.locationBasic}
+              onChange={onChange}
+              placeholder="도로명주소"
+            />
+            <Input
+              name="location"
+              className="col-span-3"
+              value={formData.locationDetail}
               onChange={onChange}
               placeholder="도로명주소"
             />
