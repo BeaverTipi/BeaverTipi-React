@@ -24,6 +24,7 @@ export function useSecureAxios() {
         config.data = { iv, encrypted };
         config.headers["Content-Type"] = "application/json";
       }
+      console.log(`%c[요청승인]`, "color:green; font-weight:bold;", config.method?.toUpperCase(), config.url);
       return config;
     }, error => Promise.reject(error));
 
@@ -34,6 +35,7 @@ export function useSecureAxios() {
         try {
           const decrypted = decryptWithIV(encrypted, iv);
           response.data = JSON.parse(decrypted);
+          console.log(`%c[복호화된 응답 ✅]`, "color: dodgerblue; font-weight: bold;", response.config?.url, response.data);
         } catch (e) {
           console.error("[복호화 실패]", e);
         }
