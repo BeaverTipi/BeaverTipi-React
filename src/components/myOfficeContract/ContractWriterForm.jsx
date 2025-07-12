@@ -85,7 +85,8 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
             contractName: "",
             duration: "",
             amount: "",
-            location: "",
+            locationBasic: contractInfo.listing?.lstgAdd || "",
+            locationDetail: contractInfo.listing?.lstgAdd2 || "",
             landPurpose: "",
             buildingType: contractInfo.listing?.lstgTypeCode1 || "",
             leasePart: "",
@@ -105,7 +106,7 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
                 : contractInfo.listing?.lstgTypeSale === 2 ? "월세"
                   : contractInfo.listing?.lstgTypeSale === 3 ? "매매"
                     : "",
-            land: "",
+            land: "주거",
             structure: "",
             area: "",
             rentedArea: "",
