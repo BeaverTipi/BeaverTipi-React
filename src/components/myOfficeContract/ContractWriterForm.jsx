@@ -65,26 +65,32 @@ const FORM_SAMPLE_MAP = {
     agentRegNum: "",
     agentRep: "",
     agentPhone: "",
-    agentSign: null
+    agentSign: null,
   },
   SALE_CONTRACT_002: {
     // 추후 매매 계약 양식 정의 시 여기에 기본값 추가 예정
-  }
+  },
 };
 
-export default function ContractWriterForm({ sampleId, onSave, onBack, contractInfo }) {
+export default function ContractWriterForm({
+  sampleId,
+  onSave,
+  onBack,
+  contractInfo,
+}) {
   console.log("contractInfo확인:", contractInfo);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ lessor: {} });
   useEffect(() => {
     if (FORM_SAMPLE_MAP[sampleId]) {
       setFormData(FORM_SAMPLE_MAP[sampleId]);
       if (sampleId === "STANDARD_RENT_001") {
         console.log();
-        setFormData(prev => {
+        setFormData((prev) => {
           return {
             contractName: "",
             duration: "",
             amount: "",
+            location: "",
             locationBasic: contractInfo.listing?.lstgAdd || "",
             locationDetail: contractInfo.listing?.lstgAdd2 || "",
             landPurpose: "",
@@ -95,20 +101,46 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
             contractPeriod: "",
             confirmedDate: "",
             specialTerms: "",
+            lessor: { ...(contractInfo.tenancy || {}) },
             lessorName: contractInfo.tenancy?.mbrNm || "",
             lessorPhone: contractInfo.tenancy?.mbrTelNo || "",
-            lessorAddr: contractInfo.tenancy?.mbrBasicAddr + contractInfo.tenancy?.mbrDetailAddr || "",
+            lessorAddr:
+              contractInfo.tenancy?.mbrBasicAddr +
+                contractInfo.tenancy?.mbrDetailAddr || "",
+            lessorBankNm: contractInfo.tenancy?.lessorBankNm || "",
+            lessorBankAcc: contractInfo.tenancy?.lessorBankAcc || "",
             lesseeName: contractInfo.lessee?.mbrNm || "",
             lesseePhone: contractInfo.lessee?.mbrTelno || "",
-            lesseeAddr: contractInfo.lessee?.mbrBasicAddr + contractInfo.lessee?.mbrDetailAddr || "",
+            lesseeAddr:
+              contractInfo.lessee?.mbrBasicAddr +
+                contractInfo.lessee?.mbrDetailAddr || "",
             contractType:
-              contractInfo.listing?.lstgTypeSale === 1 ? "전세"
-                : contractInfo.listing?.lstgTypeSale === 2 ? "월세"
-                  : contractInfo.listing?.lstgTypeSale === 3 ? "매매"
-                    : "",
+              contractInfo.listing?.lstgTypeSale === 1
+                ? "전세"
+                : contractInfo.listing?.lstgTypeSale === 2
+                ? "월세"
+                : contractInfo.listing?.lstgTypeSale === 3
+                ? "매매"
+                : "",
             land: "주거",
-            structure: "",
-            area: "",
+            structure:
+              contractInfo.listing?.lstgTypeCode1 === 1
+                ? "아파트"
+                : contractInfo.listing?.lstgTypeCode1 === 2
+                ? "빌라"
+                : contractInfo.listing?.lstgTypeCode1 === 3
+                ? "오피스텔"
+                : contractInfo.listing?.lstgTypeCode1 === 4
+                ? "단독주택"
+                : contractInfo.listing?.lstgTypeCode1 === 5
+                ? "상가주택"
+                : contractInfo.listing?.lstgTypeCode1 === 6
+                ? "상가"
+                : contractInfo.listing?.lstgTypeCode1 === 7
+                ? "사무실"
+                : "",
+            lstgExArea: contractInfo.listing?.lstgExArea || "",
+            lstgGrArea: contractInfo.listing?.lstgGrArea || "",
             rentedArea: "",
             contractDeposit: "",
             middlePayment: "",
@@ -140,13 +172,16 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
             lessorSign: null,
             lesseeRegNum: "",
             lesseeSign: null,
+            agentName: contractInfo.broker?.mbrNm || "",
             agentOffice: contractInfo.broker?.brokNm || "",
-            agentOfficeAddr: contractInfo.broker?.brokAddr1 + contractInfo.broker?.brokAddr2 || "",
+            agentOfficeAddr:
+              contractInfo.broker?.brokAddr1 + contractInfo.broker?.brokAddr2 ||
+              "",
             agentRegNum: contractInfo.broker?.borkRegNo || "",
             agentRep: "",
             agentPhone: contractInfo.broker?.mbrTelno || "",
-            agentSign: null
-          }
+            agentSign: null,
+          };
         });
       }
     } else {
@@ -178,6 +213,7 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
             onChange={handleChange}
             onNext={handleSave}
             onBack={onBack}
+            handleChangeLessorField={handleChangeLessorField}
           />
         );
       case "SALE_CONTRACT_002":
@@ -192,7 +228,18 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
         );
     }
   };
-
+  const handleChangeLessorField = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      lessor: {
+        ...prev.lessor,
+        [index]: {
+          ...prev.lessor?.[index],
+          [field]: value,
+        },
+      },
+    }));
+  };
   return (
     <motion.div
       initial={{ opacity: 0, x: 50 }}

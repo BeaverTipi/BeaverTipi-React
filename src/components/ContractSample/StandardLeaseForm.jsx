@@ -9,20 +9,37 @@ import ContractLawSection from "./StandardLeaseForm/ContractLawSection";
 import ContractSpecialTerms from "./StandardLeaseForm/ContractSpecialTerms";
 import ContractSignSection from "./StandardLeaseForm/ContractSignSection";
 
-export default function StandardLeaseForm({ formData, onChange, onNext, onBack }) {
+export default function StandardLeaseForm({
+  formData,
+  onChange,
+  onNext,
+  onBack,
+  handleChangeLessorField,
+}) {
   return (
     <ComponentCard
       title="🏠 주택임대차표준계약서"
       desc="실제 계약서를 기준으로 작성된 UI입니다."
       onBack={onBack}
     >
-      <HousingContractForm formData={formData} onChange={onChange} />
-      <ContractTermsSection formData={formData} onChange={onChange} />
+      <HousingContractForm
+        formData={formData}
+        onChange={onChange}
+        handleChangeLessorField={handleChangeLessorField}
+      />
+      <ContractTermsSection
+        formData={formData}
+        onChange={onChange}
+        handleChangeLessorField={handleChangeLessorField}
+      />
       <ContractLawSection formData={formData} onChange={onChange} />
       <ContractSpecialTerms formData={formData} onChange={onChange} />
       <ContractSignSection formData={formData} onChange={onChange} />
       <div className="mt-6 flex justify-end">
-        <Button onClick={onNext} className="bg-blue-500 text-white hover:bg-blue-600">
+        <Button
+          onClick={onNext}
+          className="bg-blue-500 text-white hover:bg-blue-600"
+        >
           계약서 저장
         </Button>
       </div>

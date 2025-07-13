@@ -103,40 +103,32 @@ const AppHeader = () => {
           <button
             onClick={toggleApplicationMenu}
             className="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
-          >
-            
-          </button>
+          ></button>
 
-          <div className="hidden lg:block">
-            
-          </div>
+          <div className="hidden lg:block"></div>
         </div>
-        <div
-          className="items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none"
-        >
+        <div className="items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none">
           <div className="flex items-center gap-x-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-            <a href="http://localhost:80/resident/chat">채팅</a>
             <a href="#">공지사항</a>
             <a href="#">지도</a>
             <a href="#">상품등록</a>
             <a href={`${baseURL}/account/read`}>마이페이지</a>
             <button
-  onClick={() =>
-    window.open(
-      `${baseURL}/resident/chat`,
-      'chatPopup',
-      'height=100vh,left=100,top=50,scrollbars=yes,resizable=yes'
-    )
-  }
->
-    채팅
-  </button>
+              onClick={() =>
+                window.open(
+                  `${baseURL}/resident/chat`,
+                  "chatPopup",
+                  "height=100vh,left=100,top=50,scrollbars=yes,resizable=yes"
+                )
+              }
+            >
+              채팅
+            </button>
             <ThemeToggleButton />
             <NotificationDropdown />
           </div>
           <UserDropdown />
         </div>
-
       </div>
     </header>
   );

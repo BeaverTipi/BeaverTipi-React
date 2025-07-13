@@ -6,18 +6,19 @@ import { useAxios } from "../../hooks/useAxios";
 import Label from "../form/Label";
 import { Modal } from "../ui/modal";
 
-
 function AddLessee({ lessee, lstgId, onSave, onBack }) {
-  const [lesseeInfo, setLesseeInfo] = useState(lessee || {
-    mbrCd: "",
-    mbrNm: "",
-    mbrTelno: "",
-    mbrEmlAddr: "",
-    mbrBasicAddr: "",
-    mbrDetailAddr: "",
-    mbrProfilImage: "",
-    lesseeNote: "",
-  });
+  const [lesseeInfo, setLesseeInfo] = useState(
+    lessee || {
+      mbrCd: "",
+      mbrNm: "",
+      mbrTelno: "",
+      mbrEmlAddr: "",
+      mbrBasicAddr: "",
+      mbrDetailAddr: "",
+      mbrProfilImage: "",
+      lesseeNote: "",
+    }
+  );
   useEffect(() => {
     if (lessee) {
       setLesseeInfo(lessee);
@@ -38,8 +39,9 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
    */
   const axios = useAxios();
   useEffect(() => {
-    axios.post("cont/new/lessee", { lstgId: lstgId })
-      .then(data => setWishlist(data))
+    axios
+      .post("cont/new/lessee", { lstgId: lstgId })
+      .then((data) => setWishlist(data));
   }, [lstgId, axios]);
 
   const handleRightClick = (e, item) => {
@@ -47,7 +49,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
     setContextMenu({
       x: e.pageX,
       y: e.pageY,
-      item
+      item,
     });
   };
   const handleCloseContextMenu = () => setContextMenu(null);
@@ -66,7 +68,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
       mbrBasicAddr: modalData.mbrBasicAddr || "",
       mbrDetailAddr: modalData.mbrDetailAddr || "",
       mbrProfilImage: modalData.mbrProfilImage || "",
-      lesseeNote: lesseeInfo?.lesseeNote || "" // 기존 메모는 유지
+      lesseeNote: lesseeInfo?.lesseeNote || "", // 기존 메모는 유지
     });
 
     setModalData(null); // 모달 닫기
@@ -77,14 +79,18 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
 
   return (
     <>
-      <div className="relative">
-      </div>
+      <div className="relative"></div>
       <ComponentCard
         title="🧑🏻‍💼 계약 임차인 정보"
-        desc="임차인의 정보를 확인해주세요."
+        desc={
+          <>
+            <span className="text-gray-300">{"매물선택>"}</span>{" "}
+            <span className="text-gray-400">{"임대인선택>"}</span>{" "}
+            <span className="text-gray-600">{"임차인 선택>"}</span>
+          </>
+        }
         onBack={onBack}
       >
-
         {/* 상단: 좋아요 회원 리스트 */}
         <div className="mb-6 p-4 rounded border bg-gray-50">
           <Label>입주희망 회원 목록</Label>
@@ -124,7 +130,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
               className="fixed bg-white border rounded-md shadow-lg px-4 py-2 text-sm z-[1000] hover:bg-gray-100 cursor-pointer"
               style={{
                 top: `${contextMenu.y}px`,
-                left: `${contextMenu.x}px`
+                left: `${contextMenu.x}px`,
               }}
             >
               상세보기
@@ -152,7 +158,9 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                   {modalData.mbrNm}
                 </p>
                 <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
-                  {modalData.mbrBasicAddr}<br />{modalData.mbrDetailAddr}
+                  {modalData.mbrBasicAddr}
+                  <br />
+                  {modalData.mbrDetailAddr}
                 </p>
                 <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
                   {modalData.mbrTelno}
@@ -174,7 +182,6 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                   >
                     임차인 선택
                   </button>
-
                 </div>
               </div>
             </Modal>
@@ -182,50 +189,107 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
         </div>
 
         {/* 입력 폼 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
+        <div className="grid grid-cols-4 gap-4">
+          <div className="flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 실명
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrNm"
+              placeholder="임차인 실명"
+              value={lesseeInfo?.mbrNm || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrNm: e.target.value })
+              }
+            />
+          </div>
+          <div></div>
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 주소
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrBasicAddr"
+              placeholder="임차인 기본주소"
+              value={lesseeInfo?.mbrBasicAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
+              }
+            />
+            <Button className="w-[120px]">주소찾기</Button>
+          </div>
+          <div className=" flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 번호
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrTelno"
+              placeholder="임차인 전화번호"
+              value={lesseeInfo?.mbrTelno || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrTelno: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 이메일
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrEmlAddr"
+              placeholder="임차인 이메일"
+              value={lesseeInfo?.mbrEmlAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrEmlAddr: e.target.value })
+              }
+            />
+          </div>{" "}
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe"></Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrDetailAddr"
+              placeholder="임차인 상세주소"
+              value={lesseeInfo?.mbrBasicAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
+              }
+            />
+            <Button className="w-[120px] invisible" disabled />
+          </div>
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              계약관련 메모{" "}
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name=""
+              placeholder="계약 관련 메모"
+              value={lesseeInfo?.lesseeNote || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, lesseeNote: e.target.value })
+              }
+            />
+          </div>
+          <input
+            className="invisible"
             type="text"
-            name="mbrNm"
-            placeholder="임차인 실명"
-            value={lesseeInfo?.mbrNm || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, mbrNm: e.target.value })}
+            value={lesseeInfo?.mbrCd || ""}
+            name="mbrCd"
+            placeholder="회원코드"
+            readOnly
+            disabled
           />
-          <Input
-            type="text"
-            name="mbrBasicAddr"
-            placeholder="임차인 기본주소"
-            value={lesseeInfo?.mbrBasicAddr || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })}
-          />
-          <Input
-            type="text"
-            name="mbrDetailAddr"
-            placeholder="임차인 상세주소"
-            value={lesseeInfo?.mbrDetailAddr || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, mbrDetailAddr: e.target.value })}
-          />
-          <Input
-            type="text"
-            name="mbrTelno"
-            placeholder="임차인 전화번호"
-            value={lesseeInfo?.mbrTelno || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, mbrTelno: e.target.value })}
-          />
-          <Input
-            type="text"
-            name="mbrEmlAddr"
-            placeholder="임차인 이메일"
-            value={lesseeInfo?.mbrEmlAddr || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, mbrEmlAddr: e.target.value })}
-          />
-          <Input
-            type="text"
-            name=""
-            placeholder="계약 관련 메모"
-            value={lesseeInfo?.lesseeNote || ""}
-            onChange={(e) => setLesseeInfo({ ...lesseeInfo, lesseeNote: e.target.value })}
-          />
-          <input type="text" value={lesseeInfo?.mbrCd || ""} name="mbrCd" placeholder="회원코드" readonly />
         </div>
 
         <div className="flex justify-end pt-6">

@@ -1,7 +1,41 @@
+/*
+ContractNew.jsx (최상위)
+│
+├── STEP.SELECT
+│   └── ContractListingSelect
+│
+├── STEP.ADD_TENANCY
+│   └── AddTenancy
+│
+├── STEP.ADD_LESSEE
+│   └── AddLessee
+│
+├── STEP.SAMPLE_SELECT
+│   └── ContractSampleSelect
+│
+├── STEP.SAMPLE_WRITE
+│   └── ContractWriterForm
+│       └── StandardLeaseForm.jsx (sampleId 기준 렌더링)
+│           ├── HousingContractForm
+│           ├── ContractTermsSection
+│           ├── ContractLawSection
+│           ├── ContractSpecialTerms
+│           ├── ContractSignSection
+│
+├── STEP.PDF_PREVIEW
+│   └── ContractPreview (→ ContractPDFRenderer 내부 사용)
+│
+└── STEP.CONTRACT
+    └── ContractTermsForm
+        ├── ContractPartyLoader
+        ├── ContractFileUpLoader
+        └── ContractPDFLoader
+ */
+
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ContractListingSelect from "../components/myOfficeContract/ContractListingSelect";
-import AddNonUserTenancy from "../components/myOfficeContract/AddNonUserTenancy";
+import AddTenancy from "../components/myOfficeContract/AddTenancy.jsx";
 import AddLessee from "../components/myOfficeContract/AddLessee";
 import ContractTermsForm from "../components/myOfficeContract/ContractTermsForm";
 import ContractSampleSelect from "../components/myOfficeContract/ContractSampleSelect";
@@ -23,57 +57,59 @@ function ContractNew() {
   const contractInfoReset = {
     listing: null,
     broker: null,
-    tenancy: null,
+    tenancy: { 0: {} },
     lessee: null,
     sampleId: null,
     form: null,
     files: [],
-  }
+  };
   const [contractInfo, setContractInfo] = useState(contractInfoReset);
   const [step, setStep] = useState(STEP.SELECT);
   const [stepHistory, setStepHistory] = useState([]);
   const [direction, setDirection] = useState("forward");
+  const [tenancyNo, setTenancyNo] = useState(0);
 
   const secureAxios = useSecureAxios();
   const generatePdfFromForm = async (formData) => {
     const response = await secureAxios.post("/rest/contract/pdf", formData, {
       responseType: "blob",
     });
-    return new File([response.data], "contract-preview.pdf", { type: "application/pdf" });
+    return new File([response.data], "contract-preview.pdf", {
+      type: "application/pdf",
+    });
   };
 
-
-  const goToStep = nextStep => {
+  const goToStep = (nextStep) => {
     setStepHistory((prev) => [...prev, step]); // 현재 단계 저장
     setDirection("forward");
     setStep(nextStep);
   };
 
-  const handleListingSaved = selectedListing => {
+  const handleListingSaved = (selectedListing) => {
     setContractInfo(contractInfoReset);
-    setContractInfo(prev => ({
-      ...prev
-      , listing: selectedListing
-      , broker: selectedListing.brokerInfo
-      , tenancy: selectedListing.tenancyInfo
+    setContractInfo((prev) => ({
+      ...prev,
+      listing: selectedListing,
+      broker: selectedListing.brokerInfo,
+      tenancy: { 0: selectedListing.tenancyInfo },
     }));
     if (!selectedListing.tenancyInfo) {
       goToStep(STEP.ADD_TENANCY);
     } else {
       goToStep(STEP.ADD_LESSEE);
     }
-  }
+  };
 
-  const handleTenancySaved = (updatedTenancyInfo) => {
-    setContractInfo(prev => ({
+  const handleTenancySaved = (TenancyInfo) => {
+    setContractInfo((prev) => ({
       ...prev,
-      tenancy: updatedTenancyInfo,
+      tenancy: TenancyInfo,
     }));
     goToStep(STEP.ADD_LESSEE);
   };
 
   const handleLesseeSaved = (lesseeInfo) => {
-    setContractInfo(prev => ({
+    setContractInfo((prev) => ({
       ...prev,
       lessee: lesseeInfo,
     }));
@@ -81,7 +117,7 @@ function ContractNew() {
   };
 
   const handleContractSampleSelected = (sampleId) => {
-    setContractInfo(prev => ({
+    setContractInfo((prev) => ({
       ...prev,
       sampleId,
     }));
@@ -90,7 +126,7 @@ function ContractNew() {
 
   const handleContractSampleWritten = async (formData) => {
     const file = await generatePdfFromForm(formData); // PDF Blob 만들기
-    setContractInfo(prev => ({
+    setContractInfo((prev) => ({
       ...prev,
       form: formData,
       file, // ✅ 여기에 저장
@@ -100,7 +136,7 @@ function ContractNew() {
   };
 
   const handleContractPreviewConfirmed = () => {
-    setContractInfo(prev => ({
+    setContractInfo((prev) => ({
       ...prev,
       confirmedAt: new Date(), // ✅ 확인 시간 추가 등 가능
     }));
@@ -108,7 +144,7 @@ function ContractNew() {
   };
 
   const handleFilesUploaded = (files) => {
-    setContractInfo(prev => ({
+    setContractInfo((prev) => ({
       ...prev,
       files,
     }));
@@ -117,7 +153,7 @@ function ContractNew() {
   const handleBack = () => {
     if (stepHistory.length > 0) {
       const prevStep = stepHistory[stepHistory.length - 1];
-      setStepHistory(prev => prev.slice(0, -1)); // pop
+      setStepHistory((prev) => prev.slice(0, -1)); // pop
       setDirection("backward");
       setStep(prevStep);
     }
@@ -143,7 +179,9 @@ function ContractNew() {
   };
 
   return (
-    <div className="relative w-full min-h-screen"> {/* 브라우저 높이 기준으로 스크롤 */}
+    <div className="relative w-full min-h-screen">
+      {" "}
+      {/* 브라우저 높이 기준으로 스크롤 */}
       <AnimatePresence custom={direction} mode="wait">
         {step === STEP.SELECT && (
           <motion.div
@@ -172,11 +210,13 @@ function ContractNew() {
             exit="exit"
             className="w-full"
           >
-            <AddNonUserTenancy
+            <AddTenancy
               tenancy={contractInfo.tenancy}
               onSave={handleTenancySaved}
               onBack={handleBack}
               contractInfo={contractInfo}
+              tenancyNo={tenancyNo}
+              setTenancyNo={setTenancyNo}
             />
           </motion.div>
         )}
@@ -235,7 +275,6 @@ function ContractNew() {
               onBack={handleBack}
               contractInfo={contractInfo}
             />
-
           </motion.div>
         )}
 
@@ -276,11 +315,8 @@ function ContractNew() {
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
-
   );
-
 }
 
 export default ContractNew;
