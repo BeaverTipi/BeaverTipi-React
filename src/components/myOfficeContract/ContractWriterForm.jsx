@@ -107,7 +107,7 @@ export default function ContractWriterForm({ sampleId, onSave, onBack, contractI
                   : contractInfo.listing?.lstgTypeSale === 3 ? "매매"
                     : "",
             land: "주거",
-            structure: "",
+            structure: contractInfo,
             area: "",
             rentedArea: "",
             contractDeposit: "",
