@@ -71,21 +71,6 @@ export default function ContractTermsSection({
             className="col-span-3"
             placeholder="원정(W) 매월 ○일 지급, 계좌 포함"
           />
-        </div>{" "}
-        <div className="grid grid-cols-4 gap-4">
-          <label className="col-span-1 font-semibold">입금계좌</label>
-          {formData.lessor?.["0"] && (
-            <Input
-              name="lessorBankNm"
-              value={formData.lessor["0"].lessorBankNm}
-              onChange={(e) => {
-                // handleChangeLessorField("0", "lessorBankNm", e.target.value);
-                onChange(e);
-              }}
-              className="col-span-3"
-              placeholder="입금 계좌"
-            />
-          )}
         </div>
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">입금계좌</label>

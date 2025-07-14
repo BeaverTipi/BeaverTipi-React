@@ -82,8 +82,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
           lstgProdStat === 1
             ? "success"
             : lstgProdStat === 2
-            ? "warning"
-            : "error"
+              ? "warning"
+              : "error"
         }
       >
         {lstgProdStat === 1 ? "활성" : lstgProdStat === 2 ? "비활성" : "숨김"}
@@ -95,11 +95,6 @@ function ContractListingSelect({ onSave, contractInfo }) {
     <>
       <ComponentCard
         title="📝 계약할 매물 선택"
-        desc={
-          <>
-            <span className="text-gray-600">{"매물선택>"}</span>
-          </>
-        }
       >
         {/* 검색요소 */}
         <div className="flex flex-row">
@@ -131,8 +126,6 @@ function ContractListingSelect({ onSave, contractInfo }) {
             검색
           </button>
         </div>
-
-        {/* 테이블 요소 */}
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
           <div className="max-w-full overflow-x-auto">
             <Table>
@@ -247,9 +240,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
       >
         <ComponentCard
           title={selectedListing?.lstgNm || "선택된 매물"}
-          desc={`${selectedListing?.lstgAdd || ""} ${
-            selectedListing?.lstgAdd2 || ""
-          }`}
+          desc={`${selectedListing?.lstgAdd || ""} ${selectedListing?.lstgAdd2 || ""
+            }`}
         >
           <div className="p-6 space-y-6">
             <div className="flex items-start justify-between">
@@ -266,8 +258,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
                   selectedListing?.lstgStatCode === "ACTIVE"
                     ? "success"
                     : selectedListing?.lstgStatCode === "CONTRACTED"
-                    ? "warning"
-                    : "error"
+                      ? "warning"
+                      : "error"
                 }
               >
                 {selectedListing?.lstgProdStat}
@@ -349,11 +341,10 @@ function ContractListingSelect({ onSave, contractInfo }) {
                 onClick={handleGoToContract}
                 disabled={!selectedListing?.tenancyInfo}
                 className={`px-6 text-white 
-                ${
-                  selectedListing?.tenancyInfo
+                ${selectedListing?.tenancyInfo
                     ? "bg-amber-600 hover:bg-amber-800"
                     : "bg-gray-300 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 계약으로 이동
               </Button>

@@ -43,6 +43,8 @@ import ContractWriterForm from "../components/myOfficeContract/ContractWriterFor
 import ContractPartyLoader from "../components/myOfficeContract/ContractPartyLoader";
 import ContractPreview from "../components/myOfficeContract/ContractPreview.jsx";
 import { useSecureAxios } from "../hooks/useSecureAxios.js";
+import NewContractInfoLayout from "../components/myOfficeContract/NewContractInfoLayout.jsx";
+import ContractNewStepNavigation from "../components/myOfficeContract/ContractNewStepNavigation.jsx";
 const STEP = {
   SELECT: "select",
   ADD_TENANCY: "add-tenancy",
@@ -124,12 +126,12 @@ function ContractNew() {
     goToStep(STEP.SAMPLE_WRITE);
   };
 
-  const handleContractSampleWritten = async (formData) => {
-    const file = await generatePdfFromForm(formData); // PDF Blob 만들기
+  const handleContractSampleWritten = /*async*/ (formData) => {
+    //const file = await generatePdfFromForm(formData); // PDF Blob 만들기
     setContractInfo((prev) => ({
       ...prev,
       form: formData,
-      file, // ✅ 여기에 저장
+      //file, // ✅ 여기에 저장
     }));
 
     goToStep(STEP.PDF_PREVIEW);
@@ -179,143 +181,146 @@ function ContractNew() {
   };
 
   return (
-    <div className="relative w-full min-h-screen">
-      {" "}
-      {/* 브라우저 높이 기준으로 스크롤 */}
-      <AnimatePresence custom={direction} mode="wait">
-        {step === STEP.SELECT && (
-          <motion.div
-            key="select"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full" // ❌ absolute 제거!
-          >
-            <ContractListingSelect
-              onSave={handleListingSaved}
-              contractInfo={contractInfo}
-            />
-          </motion.div>
-        )}
+    <>
+      <ContractNewStepNavigation step={step} STEP={STEP} />
+      <div className="relative w-full min-h-screen">
+        {" "}
+        {/* 브라우저 높이 기준으로 스크롤 */}
+        <AnimatePresence custom={direction} mode="wait">
+          {step === STEP.SELECT && (
+            <motion.div
+              key="select"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full" // ❌ absolute 제거!
+            >
+              <ContractListingSelect
+                onSave={handleListingSaved}
+                contractInfo={contractInfo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.ADD_TENANCY && (
-          <motion.div
-            key="add-tenancy"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <AddTenancy
-              tenancy={contractInfo.tenancy}
-              onSave={handleTenancySaved}
-              onBack={handleBack}
-              contractInfo={contractInfo}
-              tenancyNo={tenancyNo}
-              setTenancyNo={setTenancyNo}
-            />
-          </motion.div>
-        )}
+          {step === STEP.ADD_TENANCY && (
+            <motion.div
+              key="add-tenancy"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <AddTenancy
+                tenancy={contractInfo.tenancy}
+                onSave={handleTenancySaved}
+                onBack={handleBack}
+                contractInfo={contractInfo}
+                tenancyNo={tenancyNo}
+                setTenancyNo={setTenancyNo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.ADD_LESSEE && (
-          <motion.div
-            key="add-lessee"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <AddLessee
-              lessee={contractInfo.lessee}
-              lstgId={contractInfo.listing?.lstgId}
-              onSave={handleLesseeSaved}
-              onBack={handleBack}
-              contractInfo={contractInfo}
-            />
-          </motion.div>
-        )}
+          {step === STEP.ADD_LESSEE && (
+            <motion.div
+              key="add-lessee"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <AddLessee
+                lessee={contractInfo.lessee}
+                lstgId={contractInfo.listing?.lstgId}
+                onSave={handleLesseeSaved}
+                onBack={handleBack}
+                contractInfo={contractInfo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.SAMPLE_SELECT && (
-          <motion.div
-            key="sample-select"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <ContractSampleSelect
-              onNext={handleContractSampleSelected}
-              onBack={handleBack}
-              contractInfo={contractInfo}
-            />
-          </motion.div>
-        )}
+          {step === STEP.SAMPLE_SELECT && (
+            <motion.div
+              key="sample-select"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <ContractSampleSelect
+                onNext={handleContractSampleSelected}
+                onBack={handleBack}
+                contractInfo={contractInfo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.SAMPLE_WRITE && contractInfo.sampleId && (
-          <motion.div
-            key="sample-write"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <ContractWriterForm
-              sampleId={contractInfo.sampleId}
-              onSave={handleContractSampleWritten}
-              onBack={handleBack}
-              contractInfo={contractInfo}
-            />
-          </motion.div>
-        )}
+          {step === STEP.SAMPLE_WRITE && contractInfo.sampleId && (
+            <motion.div
+              key="sample-write"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <ContractWriterForm
+                sampleId={contractInfo.sampleId}
+                onSave={handleContractSampleWritten}
+                onBack={handleBack}
+                contractInfo={contractInfo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.PDF_PREVIEW && (
-          <motion.div
-            key="pdf-preview"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <ContractPreview
-              formData={contractInfo.form}
-              onConfirm={handleContractPreviewConfirmed}
-              onBack={handleBack}
-              contractInfo={contractInfo}
-            />
-          </motion.div>
-        )}
+          {step === STEP.PDF_PREVIEW && (
+            <motion.div
+              key="pdf-preview"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <ContractPreview
+                formData={contractInfo.form}
+                onConfirm={handleContractPreviewConfirmed}
+                onBack={handleBack}
+                contractInfo={contractInfo}
+              />
+            </motion.div>
+          )}
 
-        {step === STEP.CONTRACT && (
-          <motion.div
-            key="contract"
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            <ContractTermsForm
-              contractInfo={contractInfo}
-              onFilesUploaded={handleFilesUploaded}
-              onBack={handleBack}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          {step === STEP.CONTRACT && (
+            <motion.div
+              key="contract"
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              <NewContractInfoLayout
+                contractInfo={contractInfo}
+                onFilesUploaded={handleFilesUploaded}
+                onBack={handleBack}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   );
 }
 

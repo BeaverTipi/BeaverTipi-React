@@ -1,34 +1,43 @@
+import ComponentCard from "../common/ComponentCard";
 import ContractPDFRenderer from "../ContractPDFRenderer";
+import Button from "../ui/button/Button";
 
 export default function ContractPreview({ file, onConfirm, onBack }) {
   if (!file) {
     return (
-      <div className="text-center text-gray-500 p-6">
-        PDF 미리보기를 생성할 수 없습니다. 파일이 없습니다.
-      </div>
+      <>
+        <ComponentCard
+          title="📄 계약서류 프리뷰"
+          onBack={onBack}>
+          <div className="text-center text-gray-500 p-6">
+            PDF 미리보기를 생성할 수 없습니다. 파일이 없습니다.
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button
+              onClick={onConfirm}>
+              다음 →
+            </Button>
+          </div>
+        </ComponentCard >
+      </>
     );
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <h2 className="text-lg font-bold">📄 계약서 미리보기</h2>
-
-      <ContractPDFRenderer file={file} />
-
-      <div className="flex justify-end gap-3 mt-4">
-        <button
-          onClick={onBack}
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-        >
-          ← 수정
-        </button>
-        <button
-          onClick={onConfirm}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          계약 조건 입력하기 →
-        </button>
+    <ComponentCard
+      onBack={onBack}>
+      <div className="space-y-6 p-6">
+        <h2 className="text-lg font-bold">📄 계약서 미리보기</h2>
+        <div>
+          <ContractPDFRenderer file={file} />
+        </div>
+        <div className="flex justify-end gap-3 mt-4">
+          <Button
+            onClick={onConfirm}>
+            다음 →
+          </Button>
+        </div>
       </div>
-    </div>
+    </ComponentCard>
   );
 }

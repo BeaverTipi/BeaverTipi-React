@@ -104,12 +104,6 @@ function AddNonUserTenancy({
     <>
       <ComponentCard
         title="📝 임대인 정보 입력"
-        desc={
-          <>
-            <span className="text-gray-400">{"매물선택>"}</span>{" "}
-            <span className="text-gray-600">{"임대인선택>"}</span>
-          </>
-        }
         onBack={onBack}
       >
         {/* 임대사업자등록번호 + 검증 */}
@@ -133,9 +127,10 @@ function AddNonUserTenancy({
                 setRentalPtyIdInput(e.target.value);
               }}
             />
-            <Button className="bg-amber-600 text-white hover:bg-amber-800 whitespace-nowrap">
-              검증
-            </Button>
+            <button
+              className="w-[100px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+
+            >검증</button>
           </div>
           <div className="flex flex-row items-center gap-3 w-full">
             <Label
@@ -163,7 +158,8 @@ function AddNonUserTenancy({
             >
               공동사업자 추가
             </Label>
-            <Button
+            <button
+              className="text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
               ref={addButtonRef}
               onClick={(e) => handleAddTenancy()}
               disabled={
@@ -171,7 +167,8 @@ function AddNonUserTenancy({
               }
             >
               +
-            </Button>
+            </button>
+
           </div>
           <div></div>
           <div className="col-span-4">
@@ -321,9 +318,8 @@ function AddNonUserTenancy({
         <div className="flex justify-end pt-6">
           <Button
             onClick={handleSubmit}
-            className="bg-amber-600 text-white hover:bg-amber-700"
           >
-            저장
+            다음 →
           </Button>
         </div>
       </ComponentCard>

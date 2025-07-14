@@ -38,9 +38,9 @@ export default function StandardLeaseForm({
       <div className="mt-6 flex justify-end">
         <Button
           onClick={onNext}
-          className="bg-blue-500 text-white hover:bg-blue-600"
+          className="bg-amber-500 text-white hover:bg-amber-600"
         >
-          계약서 저장
+          다음 →
         </Button>
       </div>
     </ComponentCard>

@@ -79,7 +79,6 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
 
   return (
     <>
-      <div className="relative"></div>
       <ComponentCard
         title="🧑🏻‍💼 계약 임차인 정보"
         desc={
@@ -220,7 +219,11 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                 setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
               }
             />
-            <Button className="w-[120px]">주소찾기</Button>
+            <button
+              className="w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+            >
+              주소찾기
+            </button>
           </div>
           <div className=" flex items-center gap-3">
             <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
@@ -264,7 +267,10 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                 setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
               }
             />
-            <Button className="w-[120px] invisible" disabled />
+            <button
+              className="invisible w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+              disabled
+            />
           </div>
           <div className="col-span-2 flex items-center gap-3">
             <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
@@ -295,9 +301,8 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
         <div className="flex justify-end pt-6">
           <Button
             onClick={handleSubmit}
-            className="bg-amber-600 text-white hover:bg-amber-800"
           >
-            저장 및 다음
+            다음 →
           </Button>
         </div>
       </ComponentCard>

@@ -1,36 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ContractPartyLoader from "./ContractPartyLoader";
 import ContractFileUpLoader from "./ContractFileUpLoader";
 import ContractPDFLoader from "./ContractPDFLoader";
+import ComponentCard from "../common/ComponentCard";
+import Button from "../ui/button/Button";
 
-function NewContractInfoLayout() {
+function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded }) {
+  const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
+  const { listing, tenancy, lessee, broker, files } = contractInfo;
+
+  // 파일 변경 시 부모에게도 알려줌
+  useEffect(() => {
+    onFilesUploaded(uploadedFiles);
+  }, [uploadedFiles]);
+
   return (
-    <div className="flex flex-col gap-6 px-6 py-4">
-      {/* 1번 계약자 정보 입력 */}
-      <ContractPartyLoader />
+    <>
+      <ComponentCard
+        title="📄 새 계약 정보 등록"
+        desc="임대인, 계약서, 첨부파일을 마지막으로 확인해주세요."
+        className="min-h-screen"
+        onBack={onBack}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 좌측: 계약자 정보 및 파일 업로더 */}
+          <div className="col-span-1 flex flex-col gap-6 h-[700px]">
+            <ContractPartyLoader
+              listing={listing}
+              tenancy={tenancy}
+              lessee={lessee}
+              broker={broker}
+            />
 
-      <div className="flex flex-row gap-6 w-full">
-        {/* 3번: 계약 폼 영역 */}
-        <div className="flex-1 space-y-6">
-          <ContractFileUpLoader />
-        </div>
+            <ContractFileUpLoader
+              listing={contractInfo.listing}
+              uploadedFiles={uploadedFiles}
+              setUploadedFiles={setUploadedFiles}
+            />
+          </div>
 
-        {/* 2번: 계약서 PDF 미리보기 */}
-        <div className="w-[600px] border rounded-md overflow-hidden shadow-md bg-white">
-          <ContractPDFLoader />
+          {/* 우측: PDF 미리보기 */}
+          <ContractPDFLoader
+            listing={listing}
+            uploadedFiles={uploadedFiles}
+            onCrtExtracted={crtfNo => console.log("자격증번호 추출:", crtfNo)}
+          />
         </div>
-      </div>
+        <div className="flex justify-end gap-3 mt-4">
+          <Button>새 계약 등록</Button>
 
-      {/* 5번: 버튼 */}
-      <div className="flex justify-between pt-4">
-        <div></div>
-        <div className="flex gap-3">
-          <button className="bg-orange-400 text-white px-5 py-2 rounded-md hover:bg-orange-500">확인</button>
-          <button className="bg-pink-400 text-white px-5 py-2 rounded-md hover:bg-pink-500">리셋</button>
-          <button className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600">계약서 등록</button>
         </div>
-      </div>
-    </div>
+      </ComponentCard>
+    </>
   );
 }
 

@@ -119,7 +119,7 @@ export default function HousingContractForm({
                 <Input
                   name="rentedArea"
                   className="col-span-3"
-                  value={formData.rentedArea}
+                  value={formData.locationDetail}
                   onChange={onChange}
                   placeholder="층수, 호수 등 상세"
                 />
