@@ -20,21 +20,26 @@ import SidebarWidget from "./SidebarWidget";
 
 const navItems = [
   {
-    icon: <GridIcon />,
+    icon: <PieChartIcon />,
+    name: "대시보드",
+    path: "/broker/myoffice",
+  },
+  {
+    icon: <UserCircleIcon />,
     name: "오피스 관리",
     subItems: [
       { name: "사무소 정보", path: "/broker/myoffice/info/text", pro: false }
       , { name: "지도 UI", path: "/broker/myoffice/info/map", pro: false }],
   },
   {
-    icon: <GridIcon />,
+    icon: <PageIcon />,
     name: "상품 관리",
     subItems: [
       { name: "신규 매물 등록", path: "/broker/myoffice/lstg/new", pro: false }
       , { name: "등록 매물", path: "/broker/myoffice/lstg/mng", pro: false }],
   },
   {
-    icon: <GridIcon />,
+    icon: <ListIcon />,
     name: "계약 정보",
     subItems: [
       { name: "내 계약 관리", path: "/broker/myoffice/cont/mng", pro: false }
@@ -42,14 +47,14 @@ const navItems = [
       , { name: "진행중인 계약", path: "/broker/myoffice/cont/proceeding", pro: false }],
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/broker/myoffice/calendar",
-  },
-  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/broker/myoffice/profile",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Calendar",
+    path: "/broker/myoffice/calendar",
   },
   {
     name: "Forms",

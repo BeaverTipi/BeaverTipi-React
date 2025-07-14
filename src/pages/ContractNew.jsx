@@ -34,17 +34,18 @@ ContractNew.jsx (최상위)
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import ContractListingSelect from "../components/myOfficeContract/ContractListingSelect";
-import AddTenancy from "../components/myOfficeContract/AddTenancy.jsx";
-import AddLessee from "../components/myOfficeContract/AddLessee";
-import ContractTermsForm from "../components/myOfficeContract/ContractTermsForm";
-import ContractSampleSelect from "../components/myOfficeContract/ContractSampleSelect";
-import ContractWriterForm from "../components/myOfficeContract/ContractWriterForm";
-import ContractPartyLoader from "../components/myOfficeContract/ContractPartyLoader";
-import ContractPreview from "../components/myOfficeContract/ContractPreview.jsx";
 import { useSecureAxios } from "../hooks/useSecureAxios.js";
-import NewContractInfoLayout from "../components/myOfficeContract/NewContractInfoLayout.jsx";
-import ContractNewStepNavigation from "../components/myOfficeContract/ContractNewStepNavigation.jsx";
+import ContractListingSelect from "../components/myOfficeContract/contractNew/ContractListingSelect";
+import AddTenancy from "../components/myOfficeContract/contractNew/AddTenancy.jsx";
+import AddLessee from "../components/myOfficeContract/contractNew/AddLessee";
+import ContractSampleSelect from "../components/myOfficeContract/contractNew/ContractSampleSelect";
+import ContractWriterForm from "../components/myOfficeContract/contractNew/ContractWriterForm";
+import ContractPreview from "../components/myOfficeContract/contractNew/ContractPreview.jsx";
+import NewContractInfoLayout from "../components/myOfficeContract/contractNew/NewContractInfoLayout.jsx";
+import ContractNewStepNavigation from "../components/myOfficeContract/contractNew/ContractNewStepNavigation.jsx";
+import { fillPdfStandardLeaseFormWithFormData } from "../components/ContractSample/StandardLeaseForm/fillPdfStandardLeaseForm";
+import pdfTemplate from "../components/ContractSample/표준임대차계약서.pdf"; // Vite/Webpack 설정에 따라 import 방식 다를 수 있음
+
 const STEP = {
   SELECT: "select",
   ADD_TENANCY: "add-tenancy",
@@ -54,17 +55,17 @@ const STEP = {
   PDF_PREVIEW: "pdf-preview",
   CONTRACT: "contract",
 };
-
+const contractInfoReset = {
+  listing: null,
+  broker: null,
+  tenancy: { 0: {} },
+  lessee: null,
+  sampleId: null,
+  form: null,
+  files: [],
+};
 function ContractNew() {
-  const contractInfoReset = {
-    listing: null,
-    broker: null,
-    tenancy: { 0: {} },
-    lessee: null,
-    sampleId: null,
-    form: null,
-    files: [],
-  };
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const [contractInfo, setContractInfo] = useState(contractInfoReset);
   const [step, setStep] = useState(STEP.SELECT);
   const [stepHistory, setStepHistory] = useState([]);
@@ -72,6 +73,12 @@ function ContractNew() {
   const [tenancyNo, setTenancyNo] = useState(0);
 
   const secureAxios = useSecureAxios();
+  useEffect(() => {
+    if (step === STEP.SELECT) {
+      setIsFirstRender(false);
+    }
+  }, [step]);
+
   const generatePdfFromForm = async (formData) => {
     const response = await secureAxios.post("/rest/contract/pdf", formData, {
       responseType: "blob",
@@ -126,12 +133,10 @@ function ContractNew() {
     goToStep(STEP.SAMPLE_WRITE);
   };
 
-  const handleContractSampleWritten = /*async*/ (formData) => {
-    //const file = await generatePdfFromForm(formData); // PDF Blob 만들기
+  const handleContractSampleWritten = (formData) => {
     setContractInfo((prev) => ({
       ...prev,
       form: formData,
-      //file, // ✅ 여기에 저장
     }));
 
     goToStep(STEP.PDF_PREVIEW);
@@ -179,6 +184,9 @@ function ContractNew() {
       transition: { duration: 0.4, ease: "easeInOut" },
     }),
   };
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // 부드럽게 최상단으로 스크롤
+  }, [step]);
 
   return (
     <>
@@ -188,20 +196,29 @@ function ContractNew() {
         {/* 브라우저 높이 기준으로 스크롤 */}
         <AnimatePresence custom={direction} mode="wait">
           {step === STEP.SELECT && (
-            <motion.div
-              key="select"
-              custom={direction}
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full" // ❌ absolute 제거!
-            >
-              <ContractListingSelect
-                onSave={handleListingSaved}
-                contractInfo={contractInfo}
-              />
-            </motion.div>
+            isFirstRender ? (
+              <div key="select" className="w-full">
+                <ContractListingSelect
+                  onSave={handleListingSaved}
+                  contractInfo={contractInfo}
+                />
+              </div>
+            ) : (
+              <motion.div
+                key="select"
+                custom={direction}
+                variants={variants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="w-full"
+              >
+                <ContractListingSelect
+                  onSave={handleListingSaved}
+                  contractInfo={contractInfo}
+                />
+              </motion.div>
+            )
           )}
 
           {step === STEP.ADD_TENANCY && (

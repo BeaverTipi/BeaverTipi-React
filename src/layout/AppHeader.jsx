@@ -116,9 +116,9 @@ const AppHeader = () => {
             <button
               onClick={() =>
                 window.open(
-                  `${baseURL}/resident/chat`,
+                  `${baseURL}/resident/chat?popup=true`,
                   "chatPopup",
-                  "height=100vh,left=100,top=50,scrollbars=yes,resizable=yes"
+                  "height=600, width=400,scrollbars=yes,resizable=yes"
                 )
               }
             >

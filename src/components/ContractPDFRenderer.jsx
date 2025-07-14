@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+import worker from "pdfjs-dist/build/pdf.worker?worker";
+pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
 export default function ContractPDFRenderer({ file }) {
   const containerRef = useRef(null);
@@ -11,35 +11,43 @@ export default function ContractPDFRenderer({ file }) {
     if (!file) return;
 
     const renderPDF = async () => {
-      const reader = new FileReader();
+      let pdfData;
 
-      reader.onload = async function () {
-        const typedarray = new Uint8Array(this.result);
-        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-        setNumPages(pdf.numPages);
+      if (file instanceof File) {
+        const reader = new FileReader();
+        pdfData = await new Promise((resolve) => {
+          reader.onload = () => resolve(new Uint8Array(reader.result));
+          reader.readAsArrayBuffer(file);
+        });
+      } else if (typeof file === "string") {
+        const response = await fetch(file);
+        const buffer = await response.arrayBuffer();
+        pdfData = new Uint8Array(buffer);
+      } else {
+        console.error("지원하지 않는 file 타입:", file);
+        return;
+      }
 
-        // 기존 canvas 비우기
-        const container = containerRef.current;
-        container.innerHTML = "";
+      const pdf = await pdfjsLib.getDocument(pdfData).promise;
+      setNumPages(pdf.numPages);
 
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const viewport = page.getViewport({ scale: 1.5 });
+      const container = containerRef.current;
+      container.innerHTML = "";
 
-          const canvas = document.createElement("canvas");
-          const context = canvas.getContext("2d");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
 
-          const renderContext = { canvasContext: context, viewport };
-          await page.render(renderContext).promise;
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
 
-          canvas.className = "mb-6 border shadow";
-          container.appendChild(canvas);
-        }
-      };
+        await page.render({ canvasContext: context, viewport }).promise;
 
-      reader.readAsArrayBuffer(file);
+        canvas.className = "mb-6 border shadow";
+        container.appendChild(canvas);
+      }
     };
 
     renderPDF();
