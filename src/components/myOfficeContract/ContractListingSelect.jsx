@@ -5,31 +5,39 @@ import Badge from "../ui/badge/Badge";
 import Button from "../ui/button/Button";
 import ResponsiveImage from "../ui/images/ResponsiveImage";
 import { Modal } from "../ui/modal";
-import { Table, TableBody, TableCell, TableHeader, TableRow, } from "../ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 
 function ContractListingSelect({ onSave, contractInfo }) {
   console.log("데이터 추가 확인-->", contractInfo);
   const [lstgList, setLstgList] = useState([]);
   const [lesserTypeList, setLesserTypeList] = useState([]);
+  const axios = useSecureAxios();
 
   useEffect(() => {
-    axios.get("/cont/new/listing")
-      .then(data => setLstgList(data))
-      .catch(error => console.log("안된다~", error))
+    axios
+      .get("/cont/new/listing")
+      .then((data) => setLstgList(data))
+      .catch((error) => console.log("안된다~", error));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const axios = useSecureAxios();
   useEffect(() => {
-    axios.post("/form", { codeGroup: { lesserTypeList: "LSR", } })
-      .then(data => setLesserTypeList(data.lesserTypeList))
+    axios
+      .post("/form", { codeGroup: { lesserTypeList: "LSR" } })
+      .then((data) => setLesserTypeList(data.lesserTypeList));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const handleSelectListing = (lstgId) => {
-    const target = lstgList.find(lstgTarget => lstgTarget.lstgId === lstgId);
+    const target = lstgList.find((lstgTarget) => lstgTarget.lstgId === lstgId);
     setSelectedListing(target);
     setModalOpen(true);
   };
@@ -40,12 +48,11 @@ function ContractListingSelect({ onSave, contractInfo }) {
     setModalOpen(false);
   };
 
-
-  const [filterType, setFilterType] = useState("");      // 선택된 매물유형
-  const [filterName, setFilterName] = useState("");      // 입력된 매물명
-  const [filteredList, setFilteredList] = useState(lstgList);  // 필터링된 결과 리스트
+  const [filterType, setFilterType] = useState(""); // 선택된 매물유형
+  const [filterName, setFilterName] = useState(""); // 입력된 매물명
+  const [filteredList, setFilteredList] = useState(lstgList); // 필터링된 결과 리스트
   useEffect(() => {
-    const filtered = lstgList.filter(item => {
+    const filtered = lstgList.filter((item) => {
       const matchesType = filterType ? item.lstgTypeSale === filterType : true;
       const matchesName = filterName
         ? item.lstgNm?.toLowerCase().includes(filterName.toLowerCase())
@@ -55,7 +62,7 @@ function ContractListingSelect({ onSave, contractInfo }) {
     setFilteredList(filtered);
   }, [filterType, filterName, lstgList]);
 
-  const getListingTypeCode1Name = lstgTypeCode1 => {
+  const getListingTypeCode1Name = (lstgTypeCode1) => {
     if (lstgTypeCode1 === 1) return "아파트";
     else if (lstgTypeCode1 === 2) return "빌라";
     else if (lstgTypeCode1 === 3) return "오피스텔";
@@ -65,40 +72,64 @@ function ContractListingSelect({ onSave, contractInfo }) {
     else if (lstgTypeCode1 === 7) return "오피스";
     else if (lstgTypeCode1 === 8) return "기타";
     else return "기타";
-  }
+  };
 
-  const getListingProdStatName = lstgProdStat => {
+  const getListingProdStatName = (lstgProdStat) => {
     return (
       <Badge
         size="sm"
-        color={lstgProdStat === 1 ? "success" : lstgProdStat === 2 ? "warning" : "error"}
+        color={
+          lstgProdStat === 1
+            ? "success"
+            : lstgProdStat === 2
+            ? "warning"
+            : "error"
+        }
       >
         {lstgProdStat === 1 ? "활성" : lstgProdStat === 2 ? "비활성" : "숨김"}
       </Badge>
     );
-  }
+  };
 
   return (
     <>
-      <ComponentCard desc={":"}>
-        <h2 className="text-xl font-bold">📝 계약할 매물 선택</h2>
-
+      <ComponentCard
+        title="📝 계약할 매물 선택"
+        desc={
+          <>
+            <span className="text-gray-600">{"매물선택>"}</span>
+          </>
+        }
+      >
         {/* 검색요소 */}
         <div className="flex flex-row">
           <div>
             <label htmlFor="lsr">매물유형</label>
-            <select id="lsr" name="lsr" value={filterType || ''} onChange={e => setFilterType(e.target.value)}>
-              {lesserTypeList.map(opt => (
-                <option key={opt.codeValue} value={opt.codeValue}>{opt.codeName}</option>
-              ))
-              }
+            <select
+              id="lsr"
+              name="lsr"
+              value={filterType || ""}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              {lesserTypeList.map((opt) => (
+                <option key={opt.codeValue} value={opt.codeValue}>
+                  {opt.codeName}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label htmlFor="lstgNm">매물명</label>
-            <input id="lstgNm" type="text" defaultValue="" onChange={e => setFilterName(e.target.value)} />
+            <input
+              id="lstgNm"
+              type="text"
+              defaultValue=""
+              onChange={(e) => setFilterName(e.target.value)}
+            />
           </div>
-          <button type="button" onClick={e => setFilterName(e.target.value)}>검색</button>
+          <button type="button" onClick={(e) => setFilterName(e.target.value)}>
+            검색
+          </button>
         </div>
 
         {/* 테이블 요소 */}
@@ -173,20 +204,25 @@ function ContractListingSelect({ onSave, contractInfo }) {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                      <div className="cursor-pointer text-gray-500 hover:underline flex -space-x-2"
-                        onClick={() => { console.log("📣 Row clicked!", lstg.lstgId); handleSelectListing(lstg.lstgId); }}>
+                      <div
+                        className="cursor-pointer text-gray-500 hover:underline flex -space-x-2"
+                        onClick={() => {
+                          console.log("📣 Row clicked!", lstg.lstgId);
+                          handleSelectListing(lstg.lstgId);
+                        }}
+                      >
                         {lstg.lstgNm}
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                       <div className="pointer-events-none flex -space-x-2 text-center">
-                        {lstg.tenancyInfo !== null ? lstg.tenancyInfo.mbrNm : "-"}
+                        {lstg.tenancyInfo !== null
+                          ? lstg.tenancyInfo.mbrNm
+                          : "-"}
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-theme-sm text-center dark:text-gray-400">
-                      <div className="pointer-events-none ">
-                        ^0^
-                      </div>
+                      <div className="pointer-events-none ">^0^</div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                       <div className="pointer-events-none">
@@ -194,8 +230,7 @@ function ContractListingSelect({ onSave, contractInfo }) {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none">
-                      </div>
+                      <div className="pointer-events-none"></div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -203,17 +238,25 @@ function ContractListingSelect({ onSave, contractInfo }) {
             </Table>
           </div>
         </div>
-      </ComponentCard >
+      </ComponentCard>
 
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} className="max-w-2xl p-4">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        className="max-w-2xl p-4"
+      >
         <ComponentCard
           title={selectedListing?.lstgNm || "선택된 매물"}
-          desc={`${selectedListing?.lstgAdd || ""} ${selectedListing?.lstgAdd2 || ""}`}
+          desc={`${selectedListing?.lstgAdd || ""} ${
+            selectedListing?.lstgAdd2 || ""
+          }`}
         >
           <div className="p-6 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{selectedListing?.lstgNm}</h2>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                  {selectedListing?.lstgNm}
+                </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-300">
                   {selectedListing?.lstgAdd} {selectedListing?.lstgAdd2}
                 </p>
@@ -223,8 +266,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
                   selectedListing?.lstgStatCode === "ACTIVE"
                     ? "success"
                     : selectedListing?.lstgStatCode === "CONTRACTED"
-                      ? "warning"
-                      : "error"
+                    ? "warning"
+                    : "error"
                 }
               >
                 {selectedListing?.lstgProdStat}
@@ -234,33 +277,50 @@ function ContractListingSelect({ onSave, contractInfo }) {
             {/* 이미지 */}
             {selectedListing?.thumbnailUrl && (
               <div className="w-full overflow-hidden rounded-lg">
-                <ResponsiveImage src={selectedListing.thumbnailUrl} alt="매물 이미지" />
+                <ResponsiveImage
+                  src={selectedListing.thumbnailUrl}
+                  alt="매물 이미지"
+                />
               </div>
             )}
 
             {/* 상세 정보 그리드 */}
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">전용면적</span><br />
+                <span className="font-medium text-gray-600 dark:text-gray-300">
+                  전용면적
+                </span>
+                <br />
                 {selectedListing?.lstgExArea}㎡
               </div>
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">공급면적</span><br />
+                <span className="font-medium text-gray-600 dark:text-gray-300">
+                  공급면적
+                </span>
+                <br />
                 {selectedListing?.lstgGrArea}㎡
               </div>
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">임대인</span><br />
+                <span className="font-medium text-gray-600 dark:text-gray-300">
+                  임대인
+                </span>
+                <br />
                 {selectedListing?.tenancyInfo?.mbrNm || "정보 없음"}
               </div>
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-300">방 번호</span><br />
+                <span className="font-medium text-gray-600 dark:text-gray-300">
+                  방 번호
+                </span>
+                <br />
                 {selectedListing?.lstgRoomNum || "-"}
               </div>
             </div>
 
             {/* 상세 설명 */}
             <div className="pt-4 border-t border-gray-100 dark:border-white/10">
-              <h3 className="font-medium text-gray-800 dark:text-white mb-1">상세 설명</h3>
+              <h3 className="font-medium text-gray-800 dark:text-white mb-1">
+                상세 설명
+              </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
                 {selectedListing?.lstgDst || "설명 없음"}
               </p>
@@ -289,7 +349,11 @@ function ContractListingSelect({ onSave, contractInfo }) {
                 onClick={handleGoToContract}
                 disabled={!selectedListing?.tenancyInfo}
                 className={`px-6 text-white 
-                ${selectedListing?.tenancyInfo ? 'bg-amber-600 hover:bg-amber-800' : 'bg-gray-300 cursor-not-allowed'}`}
+                ${
+                  selectedListing?.tenancyInfo
+                    ? "bg-amber-600 hover:bg-amber-800"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
               >
                 계약으로 이동
               </Button>
@@ -297,10 +361,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
           </div>
         </ComponentCard>
       </Modal>
-
-
     </>
-  )
+  );
 }
 
-export default ContractListingSelect
+export default ContractListingSelect;

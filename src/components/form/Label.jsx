@@ -8,7 +8,7 @@ const Label = ({ htmlFor, children, className }) => {
       htmlFor={htmlFor}
       className={clsx(
         twMerge(
-          "inline-flex items-center mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-400",
+          "h-11 inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-400",
           className
         )
       )}

@@ -3,8 +3,6 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import axios from "axios";
-import rawAxios from "axios";
 import { useAxios } from "../../hooks/useAxios"
 // 마이페이지 이동 내려오는거 
 export default function UserDropdown() {
@@ -27,8 +25,7 @@ export default function UserDropdown() {
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
     try {
-      const resp = await axios.post("http://localhost/account/logout", {}
-        , { withCredentials: true });
+      const resp = await brokerAxios.post("/account/logout", {});
       if (resp.status === 200) {
         await withReactContent(Swal).fire({
           icon: "success", // ✅ 체크 아이콘
