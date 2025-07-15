@@ -32,6 +32,7 @@ import { AxiosProvider } from "./context/AxiosProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 //import ListingDetails from "./pages/ListingDetails_backup";
 import { AESProvider } from "./context/AESProvider";
+import PdfCoordinatePicker from "./components/PdfCoordinatePicker";
 
 export default function App() {
   return (
@@ -83,7 +84,7 @@ export default function App() {
 
               {/* Forms */}
               <Route path="form-elements" element={<FormElements />} />
-
+              <Route path="pdf-coor" element={<PdfCoordinatePicker pdfFile="/표준임대차계약서.pdf" />} />
               {/* Tables */}
               <Route path="basic-tables" element={<BasicTables />} />
 

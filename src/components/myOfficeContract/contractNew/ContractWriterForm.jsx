@@ -142,6 +142,7 @@ export default function ContractWriterForm({
                             : "",
             lstgExArea: contractInfo.listing?.lstgExArea || "",
             lstgGrArea: contractInfo.listing?.lstgGrArea || "",
+            lstgLandArea: 663,
             rentedArea: "",
             contractDeposit: "",
             middlePayment: "",
@@ -182,6 +183,9 @@ export default function ContractWriterForm({
             agentRep: "",
             agentPhone: contractInfo.broker?.mbrTelno || "",
             agentSign: null,
+            year: "2025",
+            month: "8",
+            day: "5"
           };
         });
       }

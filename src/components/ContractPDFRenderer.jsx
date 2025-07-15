@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
-import worker from "pdfjs-dist/build/pdf.worker?worker";
-pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import "../worker/pdfjsWorkerWrapper"; // workerSrc 설정됨
+
+
 
 export default function ContractPDFRenderer({ file }) {
   const containerRef = useRef(null);
@@ -36,7 +37,7 @@ export default function ContractPDFRenderer({ file }) {
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: 1.0 });
 
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -45,7 +46,7 @@ export default function ContractPDFRenderer({ file }) {
 
         await page.render({ canvasContext: context, viewport }).promise;
 
-        canvas.className = "mb-6 border shadow";
+        canvas.className = "mb-6 border shadow max-w-[800px]";
         container.appendChild(canvas);
       }
     };
@@ -56,7 +57,7 @@ export default function ContractPDFRenderer({ file }) {
   return (
     <div
       ref={containerRef}
-      className="max-h-[75vh] overflow-y-auto p-4 bg-white rounded-md border"
+      className="flex flex-col items-center max-h-[800px] overflow-y-auto p-4 bg-white rounded-md border"
     />
   );
 }

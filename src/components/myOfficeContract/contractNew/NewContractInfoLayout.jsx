@@ -5,19 +5,33 @@ import ContractPDFLoader from "./ContractPDFLoader";
 import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 import { useSecureAxios } from "../../../hooks/useSecureAxios";
-
-function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded }) {
+/*
+  사용자가 모든 계약데이터를 입력한 뒤, 마지막 확인 및 파일 첨부를 하는 단계
+  폼 제출 버튼이 존재하고 contractInfo 상태를 최종적으로 서버에 전송하는 위치
+ */
+function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attachedFile }) {
   const axios = useSecureAxios();
   const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
   const { listing, tenancy, lessee, broker, files } = contractInfo;
 
   const handleSubmitProceedingContract = () => {
-    axios.post("/cont/new/submit", {})
-      .then(data => {
-        console.log("계약등록 성공했닭!!!!! ", data);
-      });
-  }
+    //   const formData = new FormData();
 
+    //   contractInfo.files.forEach((file, i) => {
+    //     formData.append(`files[${i}]`, file);
+    //   });
+
+    //   // 필요시 계약 정보도 함께 포함
+    //   formData.append("contractJson", JSON.stringify(contractInfo));
+
+    //   const response = await fetch("/rest/contract/submit", {
+    //     method: "POST",
+    //     body: formData,
+    //   });
+
+    //   const result = await response.json();
+    //   console.log("✅ 제출 완료:", result);
+  }
 
   // 파일 변경 시 부모에게도 알려줌
   useEffect(() => {

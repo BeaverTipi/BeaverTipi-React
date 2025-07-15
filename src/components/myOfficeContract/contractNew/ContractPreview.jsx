@@ -6,7 +6,7 @@ import pdfTemplate from "../../ContractSample/표준임대차계약서.pdf";
 import { fillPdfStandardLeaseFormWithFormData } from "../../ContractSample/StandardLeaseForm/fillPdfStandardLeaseForm";
 
 
-export default function ContractPreview({ formData, onConfirm, onBack }) {
+export default function ContractPreview({ formData, onConfirm, onBack, onExtract }) {
   const [pdfUrl, setPdfUrl] = useState(null);
   useEffect(() => {
     const generatePdf = async () => {

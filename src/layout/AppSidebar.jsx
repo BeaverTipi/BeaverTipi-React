@@ -62,6 +62,11 @@ const navItems = [
     subItems: [{ name: "Form Elements", path: "/broker/myoffice/form-elements", pro: false }],
   },
   {
+    name: "PDF-Coordinates",
+    icon: <GridIcon />,
+    path: "/broker/myoffice/pdf-coor"
+  },
+  {
     name: "Tables",
     icon: <TableIcon />,
     subItems: [{ name: "Basic Tables", path: "/broker/myoffice/basic-tables", pro: false }],

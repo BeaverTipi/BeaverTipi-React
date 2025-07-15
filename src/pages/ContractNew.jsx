@@ -67,6 +67,7 @@ const contractInfoReset = {
 function ContractNew() {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [contractInfo, setContractInfo] = useState(contractInfoReset);
+  const [contractFileWritten, setContractFileWritten] = useState(null);
   const [step, setStep] = useState(STEP.SELECT);
   const [stepHistory, setStepHistory] = useState([]);
   const [direction, setDirection] = useState("forward");
@@ -314,6 +315,7 @@ function ContractNew() {
                 onConfirm={handleContractPreviewConfirmed}
                 onBack={handleBack}
                 contractInfo={contractInfo}
+                onExtract={(file) => setContractFileWritten(file)}
               />
             </motion.div>
           )}
@@ -332,6 +334,7 @@ function ContractNew() {
                 contractInfo={contractInfo}
                 onFilesUploaded={handleFilesUploaded}
                 onBack={handleBack}
+                attachedFile={contractFileWritten}
               />
             </motion.div>
           )}
