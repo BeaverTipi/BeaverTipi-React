@@ -44,7 +44,7 @@ function AddNonUserTenancy({
         },
       })
       .then((data) => {
-        console.log("복호화된 공통코드 응답 ✅", data);
+        console.log("✅", data);
         const bankOpt = data.bankList.map((bank) => ({
           ...bank,
           value: bank.codeValue,

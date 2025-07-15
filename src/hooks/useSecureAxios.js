@@ -5,10 +5,10 @@ import CryptoJS from "crypto-js";
 
 export function useSecureAxios() {
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
-    const BACKEND_PORT = 80;
-    const PROTOCOL = window.location.protocol; // 'http:'
-    const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
-  const SPRING_URL_ORIGIN = PROTOCOL +"//"+ HOSTNAME +":"+ BACKEND_PORT;
+  const BACKEND_PORT = 80;
+  const PROTOCOL = window.location.protocol; // 'http:'
+  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
+  const SPRING_URL_ORIGIN = PROTOCOL + "//" + HOSTNAME + ":" + BACKEND_PORT;
   const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const secureAxios = useMemo(() => {
     const instance = axios.create({
@@ -22,11 +22,10 @@ export function useSecureAxios() {
 
     // 요청 인터셉터: 랜덤 IV 기반 암호화
     instance.interceptors.request.use(config => {
-      if (config.data) {
-        const { iv, encrypted } = encryptWithRandomIV(JSON.stringify(config.data));
-        config.data = { iv, encrypted };
-        config.headers["Content-Type"] = "application/json";
-      }
+      const { iv, encrypted } = encryptWithRandomIV(JSON.stringify(config.data));
+      config.data = { iv, encrypted };
+      config.headers["Content-Type"] = "application/json";
+
       console.log(`%c[요청승인]`, "color:green; font-weight:bold;", config.method?.toUpperCase(), config.url);
       return config;
     }, error => Promise.reject(error));
@@ -38,9 +37,9 @@ export function useSecureAxios() {
         try {
           const decrypted = decryptWithIV(encrypted, iv);
           response.data = JSON.parse(decrypted);
-          console.log(`%c[복호화된 응답 ✅]`, "color: dodgerblue; font-weight: bold;", response.config?.url, response.data);
+          console.log(`%c[응답 ✅]`, "color: dodgerblue; font-weight: bold;", response.config?.url, response.data);
         } catch (e) {
-          console.error("[복호화 실패]", e);
+          console.error("%c[복호화 실패]", "color: darkred; font-weight: bold;", e);
         }
       }
       return response.data;

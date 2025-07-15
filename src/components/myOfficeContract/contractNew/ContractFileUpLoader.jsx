@@ -36,19 +36,18 @@ const ContractFileUpLoader = ({ listing, uploadedFiles, setUploadedFiles }) => {
         </div>
 
         {/* 드롭 문구 - 파일 없을 때만 노출 */}
-        {uploadedFiles.length === 0 && (
-          <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
-              📁
-            </div>
-            <h4 className="mt-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
-              {isDragActive ? "Drop Files Here" : "Drag & Drop Files Here"}
-            </h4>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              PNG, JPG, PDF, DOCX 등 가능
-            </span>
+        <div className={`absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none duration-300 ${uploadedFiles.length > 0 ? "blur-xs opacity-40" : "blur-0 opacity-100"}`}>
+          <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
+            📁
           </div>
-        )}
+          <h4 className="mt-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
+            {isDragActive ? "Drop Files Here" : "Drag & Drop Files Here"}
+          </h4>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            PNG, JPG, PDF, DOCX 등 가능
+          </span>
+        </div>
+
 
         {/* 파일 리스트 */}
         <div className="relative z-20 p-5 space-y-2 overflow-y-auto max-h-[250px]">
