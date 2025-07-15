@@ -8,6 +8,7 @@ import { fillPdfStandardLeaseFormWithFormData } from "../../ContractSample/Stand
 
 export default function ContractPreview({ formData, onConfirm, onBack, onExtract }) {
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
   useEffect(() => {
     const generatePdf = async () => {
       try {
@@ -16,7 +17,9 @@ export default function ContractPreview({ formData, onConfirm, onBack, onExtract
         const pdfBytes = await fillPdfStandardLeaseFormWithFormData(formData, templateBytes);
 
         const blob = new Blob([pdfBytes], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
+        const file = new File([blob], "표준임대차계약서.pdf", { type: "application/pdf" });
+        const url = URL.createObjectURL(file);
+        setPdfFile(file);
         setPdfUrl(url);
       } catch (err) {
         console.error("PDF 생성 ㅅ ㅣㄹ패!!!!", err);
@@ -52,7 +55,7 @@ export default function ContractPreview({ formData, onConfirm, onBack, onExtract
         </div>
         <div className="flex justify-end gap-3 mt-4">
           <Button
-            onClick={onConfirm}>
+            onClick={() => onConfirm(pdfFile)}>
             다음 →
           </Button>
         </div>

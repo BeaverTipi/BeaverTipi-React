@@ -62,7 +62,7 @@ const contractInfoReset = {
   lessee: null,
   sampleId: null,
   form: null,
-  files: [],
+  files: null,
 };
 function ContractNew() {
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -102,6 +102,10 @@ function ContractNew() {
       listing: selectedListing,
       broker: selectedListing.brokerInfo,
       tenancy: { 0: selectedListing.tenancyInfo },
+      lstgId: selectedListing.lstgId,
+      contTypeCode1: selectedListing.contTypeCode1,
+      deposit: selectedListing.lstgLease ? selectedListing.lstgLease : selectedListing.lstgLeaseAmt,
+      depositM: selectedListing.lstgLeaseM,
     }));
     if (!selectedListing.tenancyInfo) {
       goToStep(STEP.ADD_TENANCY);
@@ -122,6 +126,7 @@ function ContractNew() {
     setContractInfo((prev) => ({
       ...prev,
       lessee: lesseeInfo,
+      lesseeCd: lesseeInfo.mbrCd,
     }));
     goToStep(STEP.SAMPLE_SELECT);
   };
@@ -143,11 +148,12 @@ function ContractNew() {
     goToStep(STEP.PDF_PREVIEW);
   };
 
-  const handleContractPreviewConfirmed = () => {
+  const handleContractPreviewConfirmed = (pdfFile) => {
     setContractInfo((prev) => ({
       ...prev,
       confirmedAt: new Date(), // ✅ 확인 시간 추가 등 가능
     }));
+    setContractFileWritten(pdfFile);
     goToStep(STEP.CONTRACT);
   };
 

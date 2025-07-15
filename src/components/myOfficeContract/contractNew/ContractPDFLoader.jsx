@@ -1,62 +1,69 @@
 import React, { useEffect, useRef } from "react";
-import * as pdfjsLib from "pdfjs-dist";
+import "../../../worker/pdfjsWorkerWrapper"; // workerSrc 설정됨
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import axios from "axios";
 import ComponentCard from "../../common/ComponentCard";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-
 const ContractPDFLoader = ({ listing, uploadedFiles, onCrtfExtracted }) => {
-  const canvasRefs = useRef([]);
+  const containerRefs = useRef([]);
 
   useEffect(() => {
-    uploadedFiles.forEach((file, idx) => {
+    uploadedFiles.forEach((file, fileIdx) => {
       if (file.type === "application/pdf") {
         const reader = new FileReader();
+
         reader.onload = async function () {
-          const typedarray = new Uint8Array(this.result);
-          const pdf = await pdfjsLib.getDocument(typedarray).promise;
-          const page = await pdf.getPage(1);
+          try {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
 
-          const viewport = page.getViewport({ scale: 1.3 });
-          const canvas = canvasRefs.current[idx];
-          const context = canvas.getContext("2d");
+            const container = containerRefs.current[fileIdx];
+            container.innerHTML = ""; // 초기화
 
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum);
+              const viewport = page.getViewport({ scale: 1.3 });
 
-          await page.render({ canvasContext: context, viewport }).promise;
+              const canvas = document.createElement("canvas");
+              const context = canvas.getContext("2d");
+              canvas.width = viewport.width;
+              canvas.height = viewport.height;
 
-          // 🔍 첫 번째 PDF에 대해 OCR 수행
-          if (idx === 0 && onCrtfExtracted) {
-            const formData = new FormData();
-            formData.append("file", file);
+              await page.render({ canvasContext: context, viewport }).promise;
 
-            axios
-              .post("/ajax/pdf/extract-crtfno", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-              })
-              .then((resp) => {
-                if (resp.data.success) {
-                  onCrtfExtracted(resp.data.crtfNo);
-                } else {
-                  console.warn("자격증 번호를 찾지 못했습니다.");
-                }
-              })
-              .catch((err) => {
-                console.error("자격증 추출 실패", err);
-              });
+              canvas.className = "mb-6 border rounded shadow";
+              container.appendChild(canvas);
+            }
+
+            // OCR (첫 번째 PDF만)
+            if (fileIdx === 0 && onCrtfExtracted) {
+              const formData = new FormData();
+              formData.append("file", file);
+
+              axios
+                .post("/ajax/pdf/extract-crtfno", formData)
+                .then((resp) => {
+                  if (resp.data.success) {
+                    onCrtfExtracted(resp.data.crtfNo);
+                  } else {
+                    console.warn("자격증 번호를 찾지 못했습니다.");
+                  }
+                })
+                .catch((err) => {
+                  console.error("자격증 추출 실패", err);
+                });
+            }
+          } catch (err) {
+            console.error("PDF 렌더링 중 오류 발생:", err);
           }
         };
+
         reader.readAsArrayBuffer(file);
       }
     });
   }, [uploadedFiles, onCrtfExtracted]);
-
   return (
-
     <div className="col-span-2 max-h-[800px] overflow-y-auto pr-2">
-
-
       {uploadedFiles.length === 0 ? (
         <p className="text-gray-400 text-center">첨부된 파일이 없습니다.</p>
       ) : (
@@ -65,9 +72,9 @@ const ContractPDFLoader = ({ listing, uploadedFiles, onCrtfExtracted }) => {
             <h4 className="text-sm font-semibold mb-2">{file.name}</h4>
 
             {file.type === "application/pdf" ? (
-              <canvas
-                ref={(el) => (canvasRefs.current[idx] = el)}
-                className="w-full border rounded"
+              <div
+                ref={(el) => (containerRefs.current[idx] = el)}
+                className="flex flex-col gap-4 items-center"
               />
             ) : file.type.startsWith("image/") ? (
               <img
