@@ -4,14 +4,10 @@ import Textarea from "../../form/input/TextArea";
 import ComponentCard from "../../common/ComponentCard";
 
 export default function ContractTermsSection({
-  formData,
-  onChange,
-  handleChangeLessorField,
+  contractInfo,
+  setContractInfo,
+  handleChange,
 }) {
-  console.log(
-    "formData.lessor['0'].lessorBankAcc",
-    formData?.lessor["0"]?.lessorBankAcc
-  );
   return (
     <ComponentCard
       title="계약 내용"
@@ -25,9 +21,9 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">보증금</label>
           <Input
-            name="deposit"
-            value={formData.deposit}
-            onChange={onChange}
+            name="lstgLeaseAmt"
+            value={contractInfo?.lstgLeaseAmt || ""}
+            onChange={handleChange}
             placeholder="원정(W)"
             className="col-span-3"
           />
@@ -35,19 +31,19 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">계약금</label>
           <Input
-            name="contractDeposit"
-            value={formData.contractDeposit}
-            onChange={onChange}
+            name="contDeposit"
+            value={contractInfo?.contDeposit || ""}
+            onChange={handleChange}
             className="col-span-3"
-            placeholder="원정(W) 및 영수인 성명"
+            placeholder="원정(W)"
           />
         </div>
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">중도금</label>
           <Input
             name="middlePayment"
-            value={formData.middlePayment}
-            onChange={onChange}
+            value={contractInfo?.middlePayment}
+            onChange={handleChange}
             className="col-span-3"
             placeholder="원정(W), 지급일 입력"
           />
@@ -56,8 +52,8 @@ export default function ContractTermsSection({
           <label className="col-span-1 font-semibold">잔금</label>
           <Input
             name="balancePayment"
-            value={formData.balancePayment}
-            onChange={onChange}
+            value={contractInfo?.balancePayment}
+            onChange={handleChange}
             className="col-span-3"
             placeholder="원정(W), 지급일 입력"
           />
@@ -65,9 +61,9 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">차임 (월세)</label>
           <Input
-            name="monthlyRent"
-            value={formData.monthlyRent}
-            onChange={onChange}
+            name="lstgLeaseM"
+            value={contractInfo?.lstgLeaseM}
+            onChange={handleChange}
             className="col-span-3"
             placeholder="원정(W) 매월 ○일 지급, 계좌 포함"
           />
@@ -77,11 +73,8 @@ export default function ContractTermsSection({
           {formData.lessor?.["0"] && (
             <Input
               name="lessorBankAcc"
-              value={formData.lessor["0"].lessorBankAcc}
-              onChange={(e) => {
-                handleChangeLessorField("0", "lessorBankAcc", e.target.value);
-                onChange(e);
-              }}
+              value={contractInfo?.lessor["0"].lessorBankAcc}
+              onChange={handleChange}
               className="col-span-3"
               placeholder="입금 계좌"
             />
@@ -93,52 +86,79 @@ export default function ContractTermsSection({
           <div className="grid grid-cols-2 gap-2">
             <Input
               name="management1"
-              value={formData.management1}
-              onChange={onChange}
+              value={contractInfo?.management1 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="1. 일반관리비 원정(W)"
             />
             <Input
               name="management2"
-              value={formData.management2}
-              onChange={onChange}
+              value={contractInfo?.management2 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="2. 전기료 원정(W)"
             />
             <Input
               name="management3"
-              value={formData.management3}
-              onChange={onChange}
+              value={contractInfo?.management3 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="3. 수도료 원정(W)"
             />
             <Input
               name="management4"
-              value={formData.management4}
-              onChange={onChange}
+              value={contractInfo?.management4 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="4. 가스 사용료 원정(W)"
             />
             <Input
               name="management5"
-              value={formData.management5}
-              onChange={onChange}
+              value={contractInfo?.management5 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="5. 난방비 원정(W)"
             />
             <Input
               name="management6"
-              value={formData.management6}
-              onChange={onChange}
+              value={contractInfo?.management6 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="6. 인터넷 사용료 원정(W)"
             />
             <Input
               name="management7"
-              value={formData.management7}
-              onChange={onChange}
+              value={contractInfo?.management7 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="7. TV 사용료 원정(W)"
             />
             <Input
               name="management8"
-              value={formData.management8}
-              onChange={onChange}
+              value={contractInfo?.management8 || ""}
+              onChange={(e) => {
+                handleChange(e);
+                handleManagement(e);
+              }}
               placeholder="8. 기타관리비 원정(W)"
             />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            관리비 TOTAL && 관리비 청구일자
           </div>
         </div>
       </div>
@@ -150,15 +170,15 @@ export default function ContractTermsSection({
           <label className="col-span-1">임대기간 시작일</label>
           <Input
             name="startDate"
-            value={formData.startDate}
-            onChange={onChange}
+            value={contractInfo?.startDate || ""}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
           <label className="col-span-1">종료일</label>
           <Input
             name="endDate"
-            value={formData.endDate}
-            onChange={onChange}
+            value={contractInfo?.endDate || ""}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
           />
         </div>
@@ -170,23 +190,23 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-1 gap-2">
           <Textarea
             name="repairNeed"
-            value={formData.repairNeed}
-            onChange={onChange}
+            value={contractInfo?.repairNeed || ""}
+            onChange={handleChange}
             placeholder="수리 필요 시설명 / 수리 범위 입력"
           />
           <div className="grid grid-cols-4 gap-4">
             <label className="col-span-1">수리 완료 시기</label>
             <Input
               name="repairDeadline"
-              value={formData.repairDeadline}
-              onChange={onChange}
+              value={contractInfo?.repairDeadline || ""}
+              onChange={handleChange}
               placeholder="YYYY-MM-DD 또는 기타"
             />
             <label className="col-span-1">임대인이 부담</label>
             <Input
               name="repairCostCoveredBy"
-              value={formData.repairCostCoveredBy}
-              onChange={onChange}
+              value={contractInfo?.repairCostCoveredBy || ""}
+              onChange={handleChange}
               placeholder="보증금 또는 차임에서 공제"
             />
           </div>

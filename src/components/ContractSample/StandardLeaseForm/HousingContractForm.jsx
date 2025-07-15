@@ -6,19 +6,10 @@ import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 
 export default function HousingContractForm({
-  formData,
-  onChange,
-  handleChangeLessorField,
+  contractInfo,
+  setContractInfo,
+  handleChange,
 }) {
-  const onChangeA = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  console.log("formData확인:", formData);
   return (
     <ComponentCard
       title="주택임대차표준계약서"
@@ -34,20 +25,18 @@ export default function HousingContractForm({
             <div className="col-span-1">
               <label className="font-semibold">중개인 대표(ㅇ):</label>
               <Input
-                name="broker"
-                value={formData.agentName}
-                onChange={onChange}
+                name="agentName"
+                value={contractInfo?.agentName || ""}
+                onChange={handleChange}
                 placeholder="중개인 성명"
               />
             </div>
             <div className="col-span-1">
               <label className="font-semibold">임대인 대표(ㅇ):</label>
               <Input
-                name="mbrNm"
-                value={formData.lessor["0"]?.mbrNm || ""}
-                onChange={(e) =>
-                  handleChangeLessorField("0", "mbrNm", e.target.value)
-                }
+                name="lessorName"
+                value={contractInfo?.lessorName || ""}
+                onChange={handleChange}
                 placeholder="임대인 성명"
               />
             </div>
@@ -55,8 +44,8 @@ export default function HousingContractForm({
               <label className="font-semibold">임차인 대표(ㅇ):</label>
               <Input
                 name="lesseeName"
-                value={formData.lesseeName}
-                onChange={onChange}
+                value={contractInfo?.lesseeName || ""}
+                onChange={handleChange}
                 placeholder="임차인 성명"
               />
             </div>
@@ -65,8 +54,8 @@ export default function HousingContractForm({
               <br />
               <SelectBasicStyle
                 name="contractType"
-                value={formData.contractType}
-                onChange={onChange}
+                value={contractInfo?.contractType || ""}
+                onChange={handleChange}
                 placeholder="--임대 유형--"
                 options={[
                   { value: "전세", label: "전세" },
@@ -88,8 +77,8 @@ export default function HousingContractForm({
                 <Input
                   name="locationBasic"
                   className="flex-1"
-                  value={formData.locationBasic}
-                  onChange={onChange}
+                  value={contractInfo?.locationBasic || ""}
+                  onChange={handleChange}
                   placeholder="임차주택 기본주소"
                 />
                 <Button className="invisible" disabled:true></Button>
@@ -103,14 +92,15 @@ export default function HousingContractForm({
                 <Input
                   name="location"
                   className="flex-1"
-                  // value={formData.locationDetail} KakaoMapGeocoder
-                  onChange={onChange}
+                  value={contractInfo?.location || ""}
+                  onChange={handleChange}
                   placeholder="임차주택 도로명주소"
                 />
                 <Button className="invisible" disabled:true></Button>
               </div>
             </div>
           </div>
+
           <div className="pt-5">
             <p className="font-semibold">[토지 / 건물]</p>
             <div className="grid grid-cols-4 gap-4 mb-2">
@@ -119,8 +109,8 @@ export default function HousingContractForm({
                 <Input
                   name="rentedArea"
                   className="col-span-3"
-                  value={formData.locationDetail}
-                  onChange={onChange}
+                  value={contractInfo.rentedArea || ""}
+                  onChange={handleChange}
                   placeholder="층수, 호수 등 상세"
                 />
               </div>
@@ -128,8 +118,8 @@ export default function HousingContractForm({
                 <label className="text-sm font-bold mb-2">지목</label>
                 <Input
                   name="land"
-                  value={formData.land}
-                  onChange={onChange}
+                  value={contractInfo.land || ""}
+                  onChange={handleChange}
                   placeholder="지목"
                 />
               </div>
@@ -137,8 +127,8 @@ export default function HousingContractForm({
                 <label className="text-sm font-bold mb-2">구조·용도</label>
                 <Input
                   name="structure"
-                  value={formData.structure}
-                  onChange={onChange}
+                  value={contractInfo.structure || ""}
+                  onChange={handleChange}
                   placeholder="구조·용도"
                 />
               </div>
@@ -146,8 +136,8 @@ export default function HousingContractForm({
                 <label className="text-sm font-bold mb-2">전용면적(m²)</label>
                 <Input
                   name="lstgExArea"
-                  value={formData.lstgExArea}
-                  onChange={onChange}
+                  value={contractInfo.lstgExArea || ""}
+                  onChange={handleChange}
                   placeholder="전용면적(m²)"
                 />
               </div>
@@ -155,8 +145,8 @@ export default function HousingContractForm({
                 <label className="text-sm font-bold mb-2">공급면적(m²)</label>
                 <Input
                   name="lstgGrArea"
-                  value={formData.lstgGrArea}
-                  onChange={onChange}
+                  value={contractInfo.lstgGrArea || ""}
+                  onChange={handleChange}
                   placeholder="공급면적(m²)"
                 />
               </div>

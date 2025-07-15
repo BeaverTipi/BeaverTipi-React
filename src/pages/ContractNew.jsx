@@ -104,7 +104,9 @@ function ContractNew() {
       tenancy: { 0: selectedListing.tenancyInfo },
       lstgId: selectedListing.lstgId,
       contTypeCode1: selectedListing.contTypeCode1,
-      deposit: selectedListing.lstgLease ? selectedListing.lstgLease : selectedListing.lstgLeaseAmt,
+      deposit: selectedListing.lstgLease
+        ? selectedListing.lstgLease
+        : selectedListing.lstgLeaseAmt,
       depositM: selectedListing.lstgLeaseM,
     }));
     if (!selectedListing.tenancyInfo) {
@@ -202,8 +204,8 @@ function ContractNew() {
         {" "}
         {/* 브라우저 높이 기준으로 스크롤 */}
         <AnimatePresence custom={direction} mode="wait">
-          {step === STEP.SELECT && (
-            isFirstRender ? (
+          {step === STEP.SELECT &&
+            (isFirstRender ? (
               <div key="select" className="w-full">
                 <ContractListingSelect
                   onSave={handleListingSaved}
@@ -225,8 +227,7 @@ function ContractNew() {
                   contractInfo={contractInfo}
                 />
               </motion.div>
-            )
-          )}
+            ))}
 
           {step === STEP.ADD_TENANCY && (
             <motion.div
@@ -302,6 +303,7 @@ function ContractNew() {
                 onSave={handleContractSampleWritten}
                 onBack={handleBack}
                 contractInfo={contractInfo}
+                setContractInfo={setContractInfo}
               />
             </motion.div>
           )}

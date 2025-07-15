@@ -10,11 +10,11 @@ import ContractSpecialTerms from "./StandardLeaseForm/ContractSpecialTerms";
 import ContractSignSection from "./StandardLeaseForm/ContractSignSection";
 
 export default function StandardLeaseForm({
-  formData,
-  onChange,
+  handleChange,
   onNext,
   onBack,
-  handleChangeLessorField,
+  contractInfo,
+  setContractInfo,
 }) {
   return (
     <ComponentCard
@@ -23,18 +23,30 @@ export default function StandardLeaseForm({
       onBack={onBack}
     >
       <HousingContractForm
-        formData={formData}
-        onChange={onChange}
-        handleChangeLessorField={handleChangeLessorField}
+        contractInfo={contractInfo}
+        setContractInfo={setContractInfo}
+        handleChange={handleChange}
       />
       <ContractTermsSection
+        contractInfo={contractInfo}
+        setContractInfo={setContractInfo}
+        handleChange={handleChange}
+      />
+      <ContractLawSection
         formData={formData}
         onChange={onChange}
-        handleChangeLessorField={handleChangeLessorField}
+        handleChange={handleChange}
       />
-      <ContractLawSection formData={formData} onChange={onChange} />
-      <ContractSpecialTerms formData={formData} onChange={onChange} />
-      <ContractSignSection formData={formData} onChange={onChange} />
+      <ContractSpecialTerms
+        formData={formData}
+        onChange={onChange}
+        handleChange={handleChange}
+      />
+      <ContractSignSection
+        formData={formData}
+        onChange={onChange}
+        handleChange={handleChange}
+      />
       <div className="mt-6 flex justify-end">
         <Button
           onClick={onNext}

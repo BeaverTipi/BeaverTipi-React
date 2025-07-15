@@ -5,7 +5,14 @@ import Textarea from "../../form/input/TextArea";
 import Radio from "../../form/input/Radio";
 import Checkbox from "../../form/input/CheckBox";
 
-export default function ContractSpecialTerms({ formData, onChange }) {
+export default function ContractSpecialTerms({
+  contractInfo,
+  setContractInfo,
+  handleChange,
+}) {
+  const now = new Date();
+  const moveInDeadline = new Date(now);
+  moveInDeadline.setDate(now.getDate() + 14);
   return (
     <ComponentCard
       title="특약사항"
@@ -17,7 +24,7 @@ export default function ContractSpecialTerms({ formData, onChange }) {
           <label className="col-span-1 font-semibold">전입신고 마감일</label>
           <Input
             name="moveInDeadline"
-            value={formData.moveInDeadline}
+            value={contractInfo?.moveInDeadline || moveInDeadline}
             onChange={onChange}
             placeholder="YYYY-MM-DD"
             className="col-span-2"
@@ -27,7 +34,7 @@ export default function ContractSpecialTerms({ formData, onChange }) {
         {/* 특약사항 텍스트 */}
         <Textarea
           name="specialTerms"
-          value={formData.specialTerms}
+          value={contractInfo?.specialTerms || ""}
           onChange={onChange}
           placeholder="예: 임차인이 전입신고 및 확정일자를 기한 내 완료하지 않을 경우 임대차계약이 해지될 수 있습니다."
           rows={6}
@@ -38,7 +45,7 @@ export default function ContractSpecialTerms({ formData, onChange }) {
           <label className="font-semibold block mb-2">조정 신청 여부</label>
           <Checkbox
             name="agreeMediation"
-            checked={formData.agreeMediation}
+            checked={contractInfo?.agreeMediation || ""}
             onChange={onChange}
             label="조정 신청에 동의합니다 (그릇된 분쟁 방지 목적)"
           />
@@ -49,7 +56,7 @@ export default function ContractSpecialTerms({ formData, onChange }) {
           <label className="font-semibold">추후 자산 계획</label>
           <Textarea
             name="assetPlan"
-            value={formData.assetPlan}
+            value={contractInfo?.assetPlan || ""}
             onChange={onChange}
             placeholder="예: 매물 2호점 구축 계획 등..."
             rows={2}
@@ -65,14 +72,14 @@ export default function ContractSpecialTerms({ formData, onChange }) {
             <Radio
               name="detailedAddrFee"
               value="agree"
-              checked={formData.detailedAddrFee === "agree"}
+              checked={contractInfo?.detailedAddrFee === "agree"}
               onChange={onChange}
               label="동의"
             />
             <Radio
               name="detailedAddrFee"
               value="disagree"
-              checked={formData.detailedAddrFee === "disagree"}
+              checked={contractInfo?.detailedAddrFee === "disagree"}
               onChange={onChange}
               label="미동의"
             />
