@@ -4,9 +4,14 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import { useAxios } from "../../hooks/useAxios"
+import axios from "axios";
 // 마이페이지 이동 내려오는거 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
+  const BACKEND_PORT = 80;
+  const PROTOCOL = window.location.protocol; // 'http:'
+  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
+  const baseURL = `${PROTOCOL}//${HOSTNAME}:${BACKEND_PORT}`;
 
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
@@ -25,7 +30,9 @@ export default function UserDropdown() {
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
     try {
-      const resp = await brokerAxios.post("/account/logout", {});
+      const resp = await axios.post(`${baseURL}/account/logout`, {},
+        { withCredentials: true }
+      );
       if (resp.status === 200) {
         await withReactContent(Swal).fire({
           icon: "success", // ✅ 체크 아이콘
@@ -38,7 +45,7 @@ export default function UserDropdown() {
             confirmButton: "custom-ok-button", // 버튼 스타일 커스터마이징하려면 추가
           },
         });
-        window.location.href = "http://localhost/";
+        window.location.href = baseURL;
       } else {
         console.error("예상치 않은 응답 코드:", resp.status);
       }

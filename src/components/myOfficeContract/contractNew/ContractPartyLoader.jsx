@@ -16,7 +16,7 @@ function ContractPartyLoader({ listing, tenancy, lessee, broker, onBack }) {
 
         <div className="space-y-2 text-gray-700 dark:text-gray-200">
           <div><strong>매물명:</strong> {listing?.lstgNm || ""}</div>
-          <div><strong>주소:</strong> {listing?.lstgAdd || ""} {listing.lstgAdd2}</div>
+          <div><strong>주소:</strong> {NewContractInfoLayout.lstg}</div>
           <div><strong>임대인:</strong> {tenancy?.mbrNm || ""}</div>
           <div><strong>임차인:</strong>{lessee.lesseeInfo?.mbrNm || ""}</div>
           <div><strong>중개인:</strong> {broker.brokerInfo?.mbrNm || ""}</div>

@@ -33,18 +33,18 @@ export default function StandardLeaseForm({
         handleChange={handleChange}
       />
       <ContractLawSection
-        formData={formData}
-        onChange={onChange}
+        contractInfo={contractInfo}
+        setContractInfo={setContractInfo}
         handleChange={handleChange}
       />
       <ContractSpecialTerms
-        formData={formData}
-        onChange={onChange}
+        contractInfo={contractInfo}
+        setContractInfo={setContractInfo}
         handleChange={handleChange}
       />
       <ContractSignSection
-        formData={formData}
-        onChange={onChange}
+        contractInfo={contractInfo}
+        setContractInfo={setContractInfo}
         handleChange={handleChange}
       />
       <div className="mt-6 flex justify-end">

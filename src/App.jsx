@@ -61,6 +61,7 @@ export default function App() {
     return () => document.removeEventListener("contextmenu", blockDefaultContext);
   }, []);
   return (
+
     <ContextMenuProvider>
       <AxiosProvider>
         <AESProvider>
@@ -136,6 +137,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
+
         </AESProvider>
       </AxiosProvider >
     </ContextMenuProvider>

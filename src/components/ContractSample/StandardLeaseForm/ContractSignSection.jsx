@@ -8,6 +8,7 @@ export default function ContractSignSection({
   setContractInfo,
   handleChange,
 }) {
+  console.log("ContractSignSection.jsx: ", contractInfo);
   return (
     <ComponentCard
       title="서명 및 날인"

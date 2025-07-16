@@ -70,15 +70,13 @@ export default function ContractTermsSection({
         </div>
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">입금계좌</label>
-          {formData.lessor?.["0"] && (
-            <Input
-              name="lessorBankAcc"
-              value={contractInfo?.lessor["0"].lessorBankAcc}
-              onChange={handleChange}
-              className="col-span-3"
-              placeholder="입금 계좌"
-            />
-          )}
+          <Input
+            name="lessorBankAcc"
+            value={contractInfo?.lessorBankAcc}
+            onChange={handleChange}
+            className="col-span-3"
+            placeholder="입금 계좌"
+          />
         </div>
         {/* 관리비 */}
         <div>
@@ -87,73 +85,49 @@ export default function ContractTermsSection({
             <Input
               name="management1"
               value={contractInfo?.management1 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="1. 일반관리비 원정(W)"
             />
             <Input
               name="management2"
               value={contractInfo?.management2 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="2. 전기료 원정(W)"
             />
             <Input
               name="management3"
               value={contractInfo?.management3 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="3. 수도료 원정(W)"
             />
             <Input
               name="management4"
               value={contractInfo?.management4 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="4. 가스 사용료 원정(W)"
             />
             <Input
               name="management5"
               value={contractInfo?.management5 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="5. 난방비 원정(W)"
             />
             <Input
               name="management6"
               value={contractInfo?.management6 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="6. 인터넷 사용료 원정(W)"
             />
             <Input
               name="management7"
               value={contractInfo?.management7 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="7. TV 사용료 원정(W)"
             />
             <Input
               name="management8"
               value={contractInfo?.management8 || ""}
-              onChange={(e) => {
-                handleChange(e);
-                handleManagement(e);
-              }}
+              onChange={handleChange}
               placeholder="8. 기타관리비 원정(W)"
             />
           </div>

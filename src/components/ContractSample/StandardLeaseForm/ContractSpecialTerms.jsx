@@ -25,7 +25,7 @@ export default function ContractSpecialTerms({
           <Input
             name="moveInDeadline"
             value={contractInfo?.moveInDeadline || moveInDeadline}
-            onChange={onChange}
+            onChange={handleChange}
             placeholder="YYYY-MM-DD"
             className="col-span-2"
           />
@@ -35,7 +35,7 @@ export default function ContractSpecialTerms({
         <Textarea
           name="specialTerms"
           value={contractInfo?.specialTerms || ""}
-          onChange={onChange}
+          onChange={handleChange}
           placeholder="예: 임차인이 전입신고 및 확정일자를 기한 내 완료하지 않을 경우 임대차계약이 해지될 수 있습니다."
           rows={6}
         />
@@ -46,7 +46,7 @@ export default function ContractSpecialTerms({
           <Checkbox
             name="agreeMediation"
             checked={contractInfo?.agreeMediation || ""}
-            onChange={onChange}
+            onChange={handleChange}
             label="조정 신청에 동의합니다 (그릇된 분쟁 방지 목적)"
           />
         </div>
@@ -57,7 +57,7 @@ export default function ContractSpecialTerms({
           <Textarea
             name="assetPlan"
             value={contractInfo?.assetPlan || ""}
-            onChange={onChange}
+            onChange={handleChange}
             placeholder="예: 매물 2호점 구축 계획 등..."
             rows={2}
           />
@@ -73,14 +73,14 @@ export default function ContractSpecialTerms({
               name="detailedAddrFee"
               value="agree"
               checked={contractInfo?.detailedAddrFee === "agree"}
-              onChange={onChange}
+              onChange={handleChange}
               label="동의"
             />
             <Radio
               name="detailedAddrFee"
               value="disagree"
               checked={contractInfo?.detailedAddrFee === "disagree"}
-              onChange={onChange}
+              onChange={handleChange}
               label="미동의"
             />
           </div>

@@ -16,12 +16,14 @@ import {
   TableRow,
 } from "../../ui/table";
 import Label from "../../form/Label";
+import { useContractInfo } from "../../../context/ContractInfoContext";
 
-function ContractListingSelect({ onSave, contractInfo }) {
+function ContractListingSelect({ onSave, }) {
   const axios = useSecureAxios();
   const [lstgList, setLstgList] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
+  const { contractInfo, setContractInfo } = useContractInfo();
 
   // 공통코드 옵션, 검색어, 페이지네이션
   const [listingTypeOptions, setListingTypeOptions] = useState([]);
@@ -74,8 +76,8 @@ function ContractListingSelect({ onSave, contractInfo }) {
       .catch((err) => {
         console.error("공통코드 오류남(ContractListingSelect)", err);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   const handleSelectListing = (lstgId) => {
     const target = lstgList.find((lstgTarget) => lstgTarget.lstgId === lstgId);
@@ -88,7 +90,6 @@ function ContractListingSelect({ onSave, contractInfo }) {
     onSave(selectedListing); // 부모에 선택값 전달!
     setModalOpen(false);
   };
-
 
   const getListingTypeCode1Name = (lstgTypeCode1) => {
     const matched = listingTypeOptions.find(opt => opt.value === lstgTypeCode1);
@@ -140,6 +141,7 @@ function ContractListingSelect({ onSave, contractInfo }) {
     lstgList, searchCategory, searchText, backspaceUsed,
     filterListingTypeValue, filterTypeSaleValue, filterProdStatValue
   ]);
+
   const handleResetFilters = () => {
     setFilterListingTypeValue("000");
     setFilterTypeSaleValue("000");
@@ -149,8 +151,6 @@ function ContractListingSelect({ onSave, contractInfo }) {
     setBackspaceUsed(false);
     setCurrentPage(1);
   };
-
-
 
   const paginatedList = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -267,7 +267,7 @@ function ContractListingSelect({ onSave, contractInfo }) {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[400px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>

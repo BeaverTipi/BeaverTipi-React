@@ -11,116 +11,119 @@ export default function ContractWriterForm({
   setContractInfo,
 }) {
   useEffect(() => {
-    if (FORM_SAMPLE_MAP[sampleId]) {
-      setFormData(FORM_SAMPLE_MAP[sampleId]);
-      if (sampleId === "STANDARD_RENT_001") {
-        console.log();
-        setFormData((prev) => {
-          return {
-            contractName: "",
-            duration: "",
-            amount: "",
-            location: "",
-            locationBasic: contractInfo.listing?.lstgAdd || "",
-            locationDetail: contractInfo.listing?.lstgAdd2 || "",
-            landPurpose: "",
-            buildingType: contractInfo.listing?.lstgTypeCode1 || "",
-            leasePart: "",
-            deposit: contractInfo.listing?.lstgLeaseAmt || "",
-            monthlyRent: "",
-            contractPeriod: "",
-            confirmedDate: "",
-            specialTerms: "",
-            lessor: { ...(contractInfo.tenancy || {}) },
-            lessorName: contractInfo.tenancy?.mbrNm || "",
-            lessorPhone: contractInfo.tenancy?.mbrTelNo || "",
-            lessorAddr:
-              contractInfo.tenancy?.mbrBasicAddr +
-                contractInfo.tenancy?.mbrDetailAddr || "",
-            lessorBankNm: contractInfo.tenancy?.lessorBankNm || "",
-            lessorBankAcc: contractInfo.tenancy?.lessorBankAcc || "",
-            lesseeName: contractInfo.lessee?.mbrNm || "",
-            lesseePhone: contractInfo.lessee?.mbrTelno || "",
-            lesseeAddr:
-              contractInfo.lessee?.mbrBasicAddr +
-                contractInfo.lessee?.mbrDetailAddr || "",
-            contractType:
-              contractInfo.listing?.lstgTypeSale === 1
-                ? "전세"
-                : contractInfo.listing?.lstgTypeSale === 2
+    if (sampleId === "STANDARD_RENT_001") {
+      console.log();
+      setContractInfo((prev) => {
+        return {
+          ...prev,
+          contractName: "",
+          duration: "",
+          amount: "",
+          location: "",
+          locationBasic: contractInfo.listing?.lstgAdd || "",
+          locationDetail: contractInfo.listing?.lstgAdd2 || "",
+          landPurpose: "",
+          buildingType: contractInfo.listing?.lstgTypeCode1 || "",
+          leasePart: "",
+          deposit: contractInfo.listing?.lstgLeaseAmt || "",
+          monthlyRent: "",
+          contractPeriod: "",
+          confirmedDate: "",
+          specialTerms: "",
+          lessor: { ...(contractInfo.tenancy || {}) },
+          lessorName: contractInfo.tenancy?.mbrNm || "",
+          lessorPhone: contractInfo.tenancy?.mbrTelNo || "",
+          lessorAddr:
+            contractInfo.tenancy?.mbrBasicAddr + " " +
+            contractInfo.tenancy?.mbrDetailAddr || "",
+          lessorBankNm: contractInfo.tenancy?.lessorBankNm || "",
+          lessorBankAcc: contractInfo.tenancy?.lessorBankAcc || "",
+          lesseeName: contractInfo.lessee?.mbrNm || "",
+          lesseePhone: contractInfo.lessee?.mbrTelno || "",
+          lesseeAddr:
+            contractInfo.lessee?.mbrBasicAddr +
+            contractInfo.lessee?.mbrDetailAddr || "",
+          contractType:
+            contractInfo.listing?.lstgTypeSale === 1
+              ? "전세"
+              : contractInfo.listing?.lstgTypeSale === 2
                 ? "월세"
                 : contractInfo.listing?.lstgTypeSale === 3
-                ? "매매"
-                : "",
-            land: "주거",
+                  ? "매매"
+                  : "",
+          land: contractInfo.land,
 
-            structure:
-              contractInfo.listing?.lstgTypeCode1 === 1
-                ? "아파트"
-                : contractInfo.listing?.lstgTypeCode1 === 2
+          structureKorean:
+            contractInfo.listing?.lstgTypeCode1 === 1
+              ? "아파트"
+              : contractInfo.listing?.lstgTypeCode1 === 2
                 ? "빌라"
                 : contractInfo.listing?.lstgTypeCode1 === 3
-                ? "오피스텔"
-                : contractInfo.listing?.lstgTypeCode1 === 4
-                ? "단독주택"
-                : contractInfo.listing?.lstgTypeCode1 === 5
-                ? "상가주택"
-                : contractInfo.listing?.lstgTypeCode1 === 6
-                ? "상가"
-                : contractInfo.listing?.lstgTypeCode1 === 7
-                ? "사무실"
-                : "",
-            lstgExArea: contractInfo.listing?.lstgExArea || "",
-            lstgGrArea: contractInfo.listing?.lstgGrArea || "",
-            lstgLandArea: 663,
-            rentedArea: "",
-            contractDeposit: "",
-            middlePayment: "",
-            balancePayment: "",
-            management1: "",
-            management2: "",
-            management3: "",
-            management4: "",
-            management5: "",
-            management6: "",
-            management7: "",
-            management8: "",
-            startDate: "",
-            endDate: "",
-            repairNeed: "",
-            repairDeadline: "",
-            repairCostCoveredBy: "",
-            landlordBurden: "",
-            tenantBurden: "",
-            agreedTerms: false,
-            moveInDeadline: "",
-            agreeMediation: false,
-            assetPlan: "",
-            detailedAddrFee: "",
-            contractYear: "",
-            contractMonth: "",
-            contractDay: "",
-            lessorRegNum: contractInfo.tenancy?.rentalPtyId || "",
-            lessorSign: null,
-            lesseeRegNum: "",
-            lesseeSign: null,
-            agentName: contractInfo.broker?.mbrNm || "",
-            agentOffice: contractInfo.broker?.brokNm || "",
-            agentOfficeAddr:
-              contractInfo.broker?.brokAddr1 + contractInfo.broker?.brokAddr2 ||
-              "",
-            agentRegNum: contractInfo.broker?.borkRegNo || "",
-            agentRep: "",
-            agentPhone: contractInfo.broker?.mbrTelno || "",
-            agentSign: null,
-            year: "2025",
-            month: "8",
-            day: "5",
-          };
-        });
-      }
-    } else {
-      setFormData({});
+                  ? "오피스텔"
+                  : contractInfo.listing?.lstgTypeCode1 === 4
+                    ? "단독주택"
+                    : contractInfo.listing?.lstgTypeCode1 === 5
+                      ? "상가주택"
+                      : contractInfo.listing?.lstgTypeCode1 === 6
+                        ? "상가"
+                        : contractInfo.listing?.lstgTypeCode1 === 7
+                          ? "사무실"
+                          : "",
+          lstgExArea: contractInfo.listing?.lstgExArea || "",
+          lstgGrArea: contractInfo.listing?.lstgGrArea || "",
+          lstgLandArea: 663,
+          rentedArea: "",
+          contractDeposit: "",
+          middlePayment: "",
+          balancePayment: "",
+          management1: "",
+          management2: "",
+          management3: "",
+          management4: "",
+          management5: "",
+          management6: "",
+          management7: "",
+          management8: "",
+          startDate: "",
+          endDate: "",
+          repairNeed: "",
+          repairDeadline: "",
+          repairCostCoveredBy: "",
+          landlordBurden: "",
+          tenantBurden: "",
+          agreedTerms: false,
+          moveInDeadline: "",
+          agreeMediation: false,
+          assetPlan: "",
+          detailedAddrFee: "",
+          contractYear: "",
+          contractMonth: "",
+          contractDay: "",
+          lessorRegNum: contractInfo.tenancy?.rentalPtyId || "",
+          lessorSign: null,
+          lesseeRegNum: "",
+          lesseeSign: null,
+
+          agentSign: null,
+          year: "2025",
+          month: "8",
+          day: "5",
+
+
+
+          //contractInfo.selectedListing.lstgTypeSale를 기준으로 값 바꾸기.
+
+          agentName: contractInfo.selectedListing.brokerInfo?.mbrNm || "",
+          agentOfficeName: contractInfo.selectedListing.brokerInfo?.brokNm || "",
+          agentOfficeAddr:
+            contractInfo.selectedListing.brokerInfo?.brokAddr1 + " " + contractInfo.selectedListing.broker?.brokAddr2 ||
+            "",
+          agentRegNo: contractInfo.selectedListing.brokerInfo?.borkRegNo || "",
+          agentRep: "",
+          agentCrtfNo: contractInfo.selectedListing.brokerInfo?.borkCrtfNo || "",
+          agentTelNo: contractInfo.selectedListing.brokerInfo?.mbrTelno || "",
+        };
+      });
     }
   }, [sampleId]);
 
@@ -146,7 +149,7 @@ export default function ContractWriterForm({
   };
 
   const handleSave = () => {
-    onSave(formData);
+    onSave(contractInfo);
   };
 
   const renderFormBySampleId = () => {
