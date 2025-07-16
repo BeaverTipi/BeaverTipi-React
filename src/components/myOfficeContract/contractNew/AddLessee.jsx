@@ -31,7 +31,8 @@ function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
         console.log("setWishlist(data);", wishlist);
         //없을 수 있어
       });
-  }, [lstgId, axios]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRightClick = (e, item) => {
     e.preventDefault();
@@ -73,231 +74,231 @@ function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
       , mbrDetailAddr: "모던하우스 203호"
       , mbrZip: 34167
     });
+  }
+  return (
+    <>
+      <ComponentCard
+        title="🧑🏻‍💼 계약 임차인 정보"
+        onBack={onBack}
+      >
+        {/* 상단: 좋아요 회원 리스트 */}
+        <div className="mb-6 p-4 rounded border bg-gray-50">
+          <Label>입주희망 회원 목록</Label>
 
-    return (
-      <>
-        <ComponentCard
-          title="🧑🏻‍💼 계약 임차인 정보"
-          onBack={onBack}
-        >
-          {/* 상단: 좋아요 회원 리스트 */}
-          <div className="mb-6 p-4 rounded border bg-gray-50">
-            <Label>입주희망 회원 목록</Label>
-
-            {/* 3열 그리드 */}
-            <div className="grid grid-cols-3 gap-4 overflow-y-auto max-h-[300px]">
-              {wishlist.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setLesseeInfo({ ...item })}
-                  onContextMenu={(e) => handleRightClick(e, item)}
-                  className="flex flex-row items-center p-3 border rounded-lg bg-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer shadow-sm"
-                >
-                  <div className="w-10 h-10 overflow-hidden rounded-full">
-                    <img
-                      src={item.mbrProfilImage || "/images/재윤비버.png"}
-                      alt={item.mbrNnm}
-                      width={40}
-                      height={40}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <span className="mt-2 font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                      {item.mbrNm}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 우클릭 메뉴 */}
-            {contextMenu && (
+          {/* 3열 그리드 */}
+          <div className="grid grid-cols-3 gap-4 overflow-y-auto max-h-[300px]">
+            {wishlist.map((item, idx) => (
               <div
-                onClick={handleOpenModal}
-                onMouseLeave={handleCloseContextMenu}
-                className="fixed bg-white border rounded-md shadow-lg px-4 py-2 text-sm z-[1000] hover:bg-gray-100 cursor-pointer"
-                style={{
-                  top: `${contextMenu.y}px`,
-                  left: `${contextMenu.x}px`,
-                }}
+                key={idx}
+                onClick={() => setLesseeInfo({ ...item })}
+                onContextMenu={(e) => handleRightClick(e, item)}
+                className="flex flex-row items-center p-3 border rounded-lg bg-white hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer shadow-sm"
               >
-                상세보기
-              </div>
-            )}
-
-            {/* 모달 */}
-            {modalData && (
-              <Modal
-                isOpen={!!modalData}
-                onClose={() => setModalData(null)}
-                showCloseButton
-                className="max-w-md p-6 rounded-xl bg-white dark:bg-gray-800 shadow-xl"
-              >
-                <div className="text-center">
-                  <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-white">
-                    회원 상세 정보
-                  </h2>
+                <div className="w-10 h-10 overflow-hidden rounded-full">
                   <img
-                    src={modalData.profileImgUrl || "/images/재윤비버.png"}
-                    alt="프로필"
-                    className="w-24 h-24 rounded-full object-cover mx-auto"
+                    src={item.mbrProfilImage || "/images/재윤비버.png"}
+                    alt={item.mbrNnm}
+                    width={40}
+                    height={40}
+                    className="w-16 h-16 rounded-full object-cover"
                   />
-                  <p className="mt-3 text-base font-semibold text-gray-700 dark:text-gray-200">
-                    {modalData.mbrNm}
-                  </p>
-                  <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
-                    {modalData.mbrBasicAddr}
-                    <br />
-                    {modalData.mbrDetailAddr}
-                  </p>
-                  <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
-                    {modalData.mbrTelno}
-                  </p>
-                  <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
-                    {modalData.mbrEmlAddr}
-                  </p>
-
-                  <div className="mt-5 flex justify-center gap-3">
-                    <button
-                      onClick={() => setModalData(null)}
-                      className="px-5 py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-500 hover:text-white"
-                    >
-                      닫기
-                    </button>
-                    <button
-                      onClick={handleSelectLessee}
-                      className="px-5 py-1.5 text-sm rounded bg-amber-600 text-white hover:bg-amber-800 hover:text-shadow-amber-200"
-                    >
-                      임차인 선택
-                    </button>
-                  </div>
                 </div>
-              </Modal>
-            )}
+                <div>
+                  <span className="mt-2 font-semibold text-gray-800 text-theme-sm dark:text-white/90">
+                    {item.mbrNm}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* 입력 폼 */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
-                임차인 실명
-              </Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name="mbrNm"
-                placeholder="임차인 실명"
-                value={lesseeInfo?.mbrNm || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, mbrNm: e.target.value })
-                }
-              />
+          {/* 우클릭 메뉴 */}
+          {contextMenu && (
+            <div
+              onClick={handleOpenModal}
+              onMouseLeave={handleCloseContextMenu}
+              className="fixed bg-white border rounded-md shadow-lg px-4 py-2 text-sm z-[1000] hover:bg-gray-100 cursor-pointer"
+              style={{
+                top: `${contextMenu.y}px`,
+                left: `${contextMenu.x}px`,
+              }}
+            >
+              상세보기
             </div>
-            <div></div>
-            <div className="col-span-2 flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
-                임차인 주소
-              </Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name="mbrBasicAddr"
-                placeholder="임차인 기본주소"
-                value={lesseeInfo?.mbrBasicAddr || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
-                }
-              />
-              <button
-                className="w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-              >
-                주소찾기
-              </button>
-            </div>
-            <div className=" flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
-                임차인 번호
-              </Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name="mbrTelno"
-                placeholder="임차인 전화번호"
-                value={lesseeInfo?.mbrTelno || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, mbrTelno: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
-                임차인 이메일
-              </Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name="mbrEmlAddr"
-                placeholder="임차인 이메일"
-                value={lesseeInfo?.mbrEmlAddr || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, mbrEmlAddr: e.target.value })
-                }
-              />
-            </div>{" "}
-            <div className="col-span-2 flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe"></Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name="mbrDetailAddr"
-                placeholder="임차인 상세주소"
-                value={lesseeInfo?.mbrDetailAddr || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, mbrDetailAddr: e.target.value })
-                }
-              />
-              <button
-                className="invisible w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-                disabled
-              />
-            </div>
-            <div className="col-span-2 flex items-center gap-3">
-              <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
-                계약관련 메모{" "}
-              </Label>
-              <Input
-                className="flex-1"
-                type="text"
-                name=""
-                placeholder="계약 관련 메모"
-                value={lesseeInfo?.lesseeNote || ""}
-                onChange={(e) =>
-                  setLesseeInfo({ ...lesseeInfo, lesseeNote: e.target.value })
-                }
-              />
-            </div>
-            <input
-              className="invisible"
+          )}
+
+          {/* 모달 */}
+          {modalData && (
+            <Modal
+              isOpen={!!modalData}
+              onClose={() => setModalData(null)}
+              showCloseButton
+              className="max-w-md p-6 rounded-xl bg-white dark:bg-gray-800 shadow-xl"
+            >
+              <div className="text-center">
+                <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-white">
+                  회원 상세 정보
+                </h2>
+                <img
+                  src={modalData.profileImgUrl || "/images/재윤비버.png"}
+                  alt="프로필"
+                  className="w-24 h-24 rounded-full object-cover mx-auto"
+                />
+                <p className="mt-3 text-base font-semibold text-gray-700 dark:text-gray-200">
+                  {modalData.mbrNm}
+                </p>
+                <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
+                  {modalData.mbrBasicAddr}
+                  <br />
+                  {modalData.mbrDetailAddr}
+                </p>
+                <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
+                  {modalData.mbrTelno}
+                </p>
+                <p className="mt-3 text-base text-gray-700 dark:text-gray-200">
+                  {modalData.mbrEmlAddr}
+                </p>
+
+                <div className="mt-5 flex justify-center gap-3">
+                  <button
+                    onClick={() => setModalData(null)}
+                    className="px-5 py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-500 hover:text-white"
+                  >
+                    닫기
+                  </button>
+                  <button
+                    onClick={handleSelectLessee}
+                    className="px-5 py-1.5 text-sm rounded bg-amber-600 text-white hover:bg-amber-800 hover:text-shadow-amber-200"
+                  >
+                    임차인 선택
+                  </button>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </div>
+
+        {/* 입력 폼 */}
+        <div className="grid grid-cols-4 gap-4">
+          <div className="flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 실명
+            </Label>
+            <Input
+              className="flex-1"
               type="text"
-              value={lesseeInfo?.mbrCd || ""}
-              name="mbrCd"
-              placeholder="회원코드"
-              readOnly
+              name="mbrNm"
+              placeholder="임차인 실명"
+              value={lesseeInfo?.mbrNm || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrNm: e.target.value })
+              }
+            />
+          </div>
+          <div></div>
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 주소
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrBasicAddr"
+              placeholder="임차인 기본주소"
+              value={lesseeInfo?.mbrBasicAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
+              }
+            />
+            <button
+              className="w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+            >
+              주소찾기
+            </button>
+          </div>
+          <div className=" flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 번호
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrTelno"
+              placeholder="임차인 전화번호"
+              value={lesseeInfo?.mbrTelno || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrTelno: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              임차인 이메일
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrEmlAddr"
+              placeholder="임차인 이메일"
+              value={lesseeInfo?.mbrEmlAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrEmlAddr: e.target.value })
+              }
+            />
+          </div>{" "}
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe"></Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name="mbrDetailAddr"
+              placeholder="임차인 상세주소"
+              value={lesseeInfo?.mbrDetailAddr || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, mbrDetailAddr: e.target.value })
+              }
+            />
+            <button
+              className="invisible w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
               disabled
             />
           </div>
-
-          <div className="flex justify-end pt-6">
-            <Button
-              onClick={onSave}
-            >
-              다음 →
-            </Button>
+          <div className="col-span-2 flex items-center gap-3">
+            <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+              계약관련 메모{" "}
+            </Label>
+            <Input
+              className="flex-1"
+              type="text"
+              name=""
+              placeholder="계약 관련 메모"
+              value={lesseeInfo?.lesseeNote || ""}
+              onChange={(e) =>
+                setLesseeInfo({ ...lesseeInfo, lesseeNote: e.target.value })
+              }
+            />
           </div>
-        </ComponentCard>
-      </>
-    );
-  }
+          <input
+            className="invisible"
+            type="text"
+            value={lesseeInfo?.mbrCd || ""}
+            name="mbrCd"
+            placeholder="회원코드"
+            readOnly
+            disabled
+          />
+        </div>
+
+        <div className="flex justify-end pt-6">
+          <Button
+            onClick={onSave}
+          >
+            다음 →
+          </Button>
+        </div>
+      </ComponentCard>
+    </>
+  );
 }
+
 export default AddLessee;
