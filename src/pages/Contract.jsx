@@ -1,9 +1,13 @@
 import { Outlet } from 'react-router'
+import { ContractInfoProvider } from '../context/ContractInfoContext'
 
 function Contract() {
   return (
     <>
-      <Outlet />
+
+      <ContractInfoProvider>
+        <Outlet />
+      </ContractInfoProvider>
     </>
   )
 }

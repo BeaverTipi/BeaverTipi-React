@@ -7,20 +7,10 @@ import Label from "../../form/Label";
 import { Modal } from "../../ui/modal";
 
 function AddLessee({ lessee, lstgId, onSave, onBack }) {
-  const [lesseeInfo, setLesseeInfo] = useState(
-    lessee || {
-      mbrCd: "",
-      mbrNm: "",
-      mbrTelno: "",
-      mbrEmlAddr: "",
-      mbrBasicAddr: "",
-      mbrDetailAddr: "",
-      mbrProfilImage: "",
-      lesseeNote: "",
-    }
-  );
+  const axios = useAxios();
+  const [lesseeInfo, setLesseeInfo] = useState(/*lessee || */null);
   useEffect(() => {
-    if (lessee) {
+    if (lessee && !lesseeInfo) {
       setLesseeInfo(lessee);
     }
   }, [lessee]);
@@ -37,12 +27,16 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
     *임차인상세주소 mbrDetailAddr
     *임차인우편주소 mbrZip
    */
-  const axios = useAxios();
   useEffect(() => {
     axios
       .post("cont/new/lessee", { lstgId: lstgId })
-      .then((data) => setWishlist(data));
-  }, [lstgId, axios]);
+      .then((data) => {
+        setWishlist(data);
+        console.log("setWishlist(data);", wishlist);
+        //없을 수 있어
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRightClick = (e, item) => {
     e.preventDefault();
@@ -68,15 +62,23 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
       mbrBasicAddr: modalData.mbrBasicAddr || "",
       mbrDetailAddr: modalData.mbrDetailAddr || "",
       mbrProfilImage: modalData.mbrProfilImage || "",
-      lesseeNote: lesseeInfo?.lesseeNote || "", // 기존 메모는 유지
+      lesseeNote: lesseeInfo?.lesseeNote || "",
     });
-
-    setModalData(null); // 모달 닫기
-  };
-  const handleSubmit = () => {
-    onSave(lesseeInfo);
+    setModalData(null);
   };
 
+  const testDummyData = () => {
+    setLesseeInfo({
+      mbrCd: "M2507000112"
+      , mbrNm: "배비"
+      , mbrTelno: "010-3333-4444"
+      , mbrEmlAddr: "sajaboys3@ddit.or.kr"
+      , mbrBasicAddr: "대전광역시 중구 계룡로 846"
+      , mbrDetailAddr: "3층 304호"
+      , mbrProfilImage: ""
+      , lesseeNote: "오늘 저녁은 마라탕^0^"
+    });
+  }
   return (
     <>
       <ComponentCard
@@ -106,7 +108,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                   />
                 </div>
                 <div>
-                  <span className="mt-2 text-sm font-semibold text-gray-800 text-theme-sm dark:text-white/90">
+                  <span className="mt-2 font-semibold text-gray-800 text-theme-sm dark:text-white/90">
                     {item.mbrNm}
                   </span>
                 </div>
@@ -255,9 +257,9 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
               type="text"
               name="mbrDetailAddr"
               placeholder="임차인 상세주소"
-              value={lesseeInfo?.mbrBasicAddr || ""}
+              value={lesseeInfo?.mbrDetailAddr || ""}
               onChange={(e) =>
-                setLesseeInfo({ ...lesseeInfo, mbrBasicAddr: e.target.value })
+                setLesseeInfo({ ...lesseeInfo, mbrDetailAddr: e.target.value })
               }
             />
             <button
@@ -272,7 +274,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
             <Input
               className="flex-1"
               type="text"
-              name=""
+              name="lesseeMemo"
               placeholder="계약 관련 메모"
               value={lesseeInfo?.lesseeNote || ""}
               onChange={(e) =>
@@ -292,8 +294,9 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
         </div>
 
         <div className="flex justify-end pt-6">
+          <span onClick={testDummyData}>asdf</span>
           <Button
-            onClick={handleSubmit}
+            onClick={() => onSave(lesseeInfo)}
           >
             다음 →
           </Button>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import Input from "../../form/input/InputField";
 import PhoneInput from "../../form/group-input/PhoneInput";
@@ -6,27 +6,32 @@ import SelectControlled from "../../form/SelectControlled";
 import Button from "../../ui/button/Button";
 import { useSecureAxios } from "../../../hooks/useSecureAxios";
 import Label from "../../form/Label";
+import { useContractInfo } from "../../../context/ContractInfoContext";
 
-function AddNonUserTenancy({
-  tenancy,
+function AddTenancy({
+  lessor,
   onSave,
   onBack,
-  contractInfo,
   tenancyNo,
-  setTenancyNo,
+  setTenancyNo
 }) {
-  console.log("데이터 추가 확인-->", contractInfo);
+  const axios = useSecureAxios();
+  const { contractInfo, _setContractInfo } = useContractInfo();
   const [lesserTypeList, setLesserTypeList] = useState();
   const [bankList, setBankList] = useState();
-  const [tenancyList, setTenancyList] = useState(tenancy);
+  const [tenancyList, setTenancyList] = useState({ "0": {} });
+  useEffect(() => {
+    if (lessor && Object.keys(lessor).length > 0 && Object.keys(lessor).length > 0) {
+      setTenancyList(lessor);
+    }
+  }, [lessor]);
   const addButtonRef = useRef(null);
   const [rentalPtyIdInput, setRentalPtyIdInput] = useState(
-    tenancyList["0"]?.rentalPtyId
+    tenancyList["0"]?.rentalPtyId || null
   );
   const [lsrYnTypeCdInput, setLsrYnTypeCdInput] = useState(
-    tenancyList["0"]?.lsrYnTypeCd
+    tenancyList["0"]?.lsrYnTypeCd || null
   );
-  const axios = useSecureAxios();
   const countries = [
     { code: "KR", label: "+82" },
     { code: "US", label: "+1" },
@@ -61,33 +66,42 @@ function AddNonUserTenancy({
       .catch((err) => {
         console.error("공통코드 오류남(AddNonUserTenancy)", err);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleAddTenancy = () => {
-    const newEntry = {
-      rentalPtyId: "",
-      lsrYnTypeCd: "",
-      mbrNm: "",
-      lessorBankNm: "",
-      lessorBankAcc: "",
-      mbrTelNo: "",
-      mbrBasicAddr: "",
-      mbrDetailAddr: "",
-      mbrEmlAddr: "",
-    };
 
+  const handleAddTenancy = () => {
     setTenancyList((prev) => ({
       ...prev,
-      [tenancyNo.toString()]: newEntry,
+      [tenancyNo.toString()]: {
+        mbrCd: "",
+        mbrId: "",
+        mbrNm: "",
+        mbrTelno: "",
+        mbrEmlAddr: "",
+        mbrBasicAddr: "",
+        mbrDetailAddr: "",
+        mbrRegNo1: "",
+        mbrRegNo2: "",
+        rentalPtyId: tenancyList["0"]?.rentalPtyId || "",
+        lsrYnTypeCd: "",
+        lessorBankNm: "",
+        lessorBankAcc: "",
+      }
     }));
 
     setTenancyNo(tenancyNo + 1);
+    console.log(`%c[AddTenancy]`, "color:yellow; font-weight:bold;", tenancyList);
+
   };
-  const updateTenancy = (key, updatedData) => {
+
+  const updateLessor = (key, updatedFields) => {
+    console.log("updateLessor", key, updatedFields);
     setTenancyList((prev) => ({
       ...prev,
       [key]: {
-        ...updatedData,
+        ...prev[key],
+        ...updatedFields,
         rentalPtyId: rentalPtyIdInput,
         lsrYnTypeCd: lsrYnTypeCdInput,
       },
@@ -97,7 +111,42 @@ function AddNonUserTenancy({
   const handleSubmit = () => {
     console.log("tenancyList", tenancyList);
     console.log("[onSave] 데이터 추가 확인-->", contractInfo);
+    console.log("[onSave] tenancyList", tenancyList); // AddTenancy에서 찍기
+
     onSave(tenancyList);
+    console.log(contractInfo); // 다음 페이지 또는 onSave 이후 바로
+
+  };
+
+  const testDummyData = () => {
+    setTenancyList({
+      "0": {
+        rentalPtyId: "123-45-67890",
+        lsrYnTypeCd: "002", // 예: 개인사업자
+        mbrNm: "홍길동",
+        lessorBankNm: "004", // 예: 국민은행 (실제 codeValue에 맞게 입력)
+        lessorBankAcc: "110-1234-5678",
+        mbrTelNo: "+821012345678",
+        mbrBasicAddr: "서울특별시 강남구 테헤란로",
+        mbrDetailAddr: "101동 202호",
+        mbrEmlAddr: "gildong@example.com",
+      },
+      "1": {
+        rentalPtyId: "987-65-43210",
+        lsrYnTypeCd: "002", // 예: 공동사업자
+        mbrNm: "김철수",
+        lessorBankNm: "088", // 예: 신한은행
+        lessorBankAcc: "140-9876-5432",
+        mbrTelNo: "+821055566677",
+        mbrBasicAddr: "부산광역시 해운대구 해운대로",
+        mbrDetailAddr: "301동 404호",
+        mbrEmlAddr: "chulsoo@example.com",
+      },
+    });
+
+    // 선택 항목도 맞게 설정
+    setRentalPtyIdInput("123-45-67890");
+    setLsrYnTypeCdInput("001");
   };
 
   return (
@@ -122,14 +171,14 @@ function AddNonUserTenancy({
               id="rentalPtyId"
               name="rentalPtyId"
               placeholder="임대사업자등록번호"
-              value={tenancyList["0"]?.rentalPtyId}
+              value={tenancyList["0"]?.rentalPtyId || ""}
               onChange={(e) => {
-                setRentalPtyIdInput(e.target.value);
+                // setRentalPtyIdInput(e.target.value);
+                updateLessor("0", { rentalPtyId: e.target.value })
               }}
             />
             <button
               className="w-[100px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-
             >검증</button>
           </div>
           <div className="flex flex-row items-center gap-3 w-full">
@@ -141,13 +190,13 @@ function AddNonUserTenancy({
             </Label>
             <SelectControlled
               id={"lsrYnTypeCd"}
-              name={"lsrTypeCd"}
+              name={"lsrYnTypeCd"}
               options={lesserTypeList}
               placeholder={"--임대유형 선택--"}
-              value={lsrYnTypeCdInput}
+              value={tenancyList["0"]?.lsrYnTypeCd || ""}
               onChange={(value) => {
-                console.log("임대유형 코드 변경: ", value);
-                setLsrYnTypeCdInput(value);
+                // setLsrYnTypeCdInput(value);
+                updateLessor("0", { lsrYnTypeCd: value })
               }}
             />
           </div>
@@ -161,9 +210,9 @@ function AddNonUserTenancy({
             <button
               className="text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
               ref={addButtonRef}
-              onClick={(e) => handleAddTenancy()}
+              onClick={(e) => handleAddTenancy(e)}
               disabled={
-                !(lsrYnTypeCdInput === "002" || lsrYnTypeCdInput === "003")
+                !["002", "003"].includes(tenancyList["0"]?.lsrYnTypeCd)
               }
             >
               +
@@ -176,17 +225,17 @@ function AddNonUserTenancy({
           </div>
         </div>
         {Object.entries(tenancyList).map(([idx, oneTenancy]) => (
-          <>
-            <div
-              class="oneTenancy"
+          <React.Fragment key={idx}>
+            < div
+              oneTenancy
               key={parseInt(idx) + 1}
               className="grid grid-cols-4 gap-4"
             >
               {idx === "0" ? (
                 <h2 className="col-span-4">임대사업자 대표</h2>
-              ) : (
+              ) : (<>
                 <h2 className="col-span-4">공동사업자 {idx}</h2>
-              )}
+              </>)}
               <div className="flex items-center gap-3">
                 <Label
                   htmlFor={"lsrYnTypeCd001"}
@@ -206,7 +255,7 @@ function AddNonUserTenancy({
                       mbrNm: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
               </div>
@@ -223,7 +272,7 @@ function AddNonUserTenancy({
                       lessorBankNm: value,
                     };
 
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
                 <Input
@@ -236,7 +285,7 @@ function AddNonUserTenancy({
                       lessorBankAcc: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
               </div>
@@ -253,7 +302,7 @@ function AddNonUserTenancy({
                       mbrTelNo: val,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
               </div>
@@ -271,7 +320,7 @@ function AddNonUserTenancy({
                       mbrBasicAddr: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
                 <Input
@@ -285,7 +334,7 @@ function AddNonUserTenancy({
                       mbrDetailAddr: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
               </div>
@@ -303,7 +352,7 @@ function AddNonUserTenancy({
                       mbrEmlAddr: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateTenancy(idx, updated);
+                    updateLessor(idx, updated);
                   }}
                 />
               </div>
@@ -311,20 +360,22 @@ function AddNonUserTenancy({
             <div className="col-span-4">
               <hr />
             </div>
-          </>
-        ))}
+          </React.Fragment>
+        ))
+        }
 
         {/* 저장 버튼 */}
         <div className="flex justify-end pt-6">
+          <span onClick={testDummyData} className="text-gray-300">테스트^0^</span>
           <Button
             onClick={handleSubmit}
           >
             다음 →
           </Button>
         </div>
-      </ComponentCard>
+      </ComponentCard >
     </>
   );
 }
 
-export default AddNonUserTenancy;
+export default AddTenancy;

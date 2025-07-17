@@ -6,19 +6,9 @@ import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 
 export default function HousingContractForm({
-  formData,
-  onChange,
-  handleChangeLessorField,
+  contractInfo,
+  handleChange,
 }) {
-  const onChangeA = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  console.log("formData확인:", formData);
   return (
     <ComponentCard
       title="주택임대차표준계약서"
@@ -34,20 +24,18 @@ export default function HousingContractForm({
             <div className="col-span-1">
               <label className="font-semibold">중개인 대표(ㅇ):</label>
               <Input
-                name="broker"
-                value={formData.agentName}
-                onChange={onChange}
+                name="agentName"
+                value={contractInfo?.agentName || ""}
+                onChange={handleChange}
                 placeholder="중개인 성명"
               />
             </div>
             <div className="col-span-1">
               <label className="font-semibold">임대인 대표(ㅇ):</label>
               <Input
-                name="mbrNm"
-                value={formData.lessor["0"]?.mbrNm || ""}
-                onChange={(e) =>
-                  handleChangeLessorField("0", "mbrNm", e.target.value)
-                }
+                name="lessorName"
+                value={contractInfo?.lessorName || ""}
+                onChange={handleChange}
                 placeholder="임대인 성명"
               />
             </div>
@@ -55,8 +43,8 @@ export default function HousingContractForm({
               <label className="font-semibold">임차인 대표(ㅇ):</label>
               <Input
                 name="lesseeName"
-                value={formData.lesseeName}
-                onChange={onChange}
+                value={contractInfo?.lesseeName || ""}
+                onChange={handleChange}
                 placeholder="임차인 성명"
               />
             </div>
@@ -64,14 +52,14 @@ export default function HousingContractForm({
               <label className="font-semibold">계약형태:</label>
               <br />
               <SelectBasicStyle
-                name="contractType"
-                value={formData.contractType}
-                onChange={onChange}
+                name="listingTypeSale"
+                value={contractInfo?.listingTypeSale || ""}
+                onChange={handleChange}
                 placeholder="--임대 유형--"
                 options={[
-                  { value: "전세", label: "전세" },
-                  { value: "월세", label: "월세" },
-                  { value: "매매", label: "매매" },
+                  { value: "001", label: "전세" },
+                  { value: "002", label: "월세" },
+                  { value: "003", label: "매매" },
                 ]}
               />
             </div>
@@ -86,10 +74,10 @@ export default function HousingContractForm({
               </label>
               <div className="flex flex-row gap-3 col-span-4">
                 <Input
-                  name="locationBasic"
+                  name="listingAdd"
                   className="flex-1"
-                  value={formData.locationBasic}
-                  onChange={onChange}
+                  value={contractInfo?.listingAdd || ""}
+                  onChange={handleChange}
                   placeholder="임차주택 기본주소"
                 />
                 <Button className="invisible" disabled:true></Button>
@@ -101,62 +89,63 @@ export default function HousingContractForm({
               </label>
               <div className="flex flex-row gap-3 col-span-4">
                 <Input
-                  name="location"
+                  name="listingAdd"
                   className="flex-1"
-                  // value={formData.locationDetail} KakaoMapGeocoder
-                  onChange={onChange}
+                  value={contractInfo?.listingAdd || ""}
+                  onChange={handleChange}
                   placeholder="임차주택 도로명주소"
                 />
                 <Button className="invisible" disabled:true></Button>
               </div>
             </div>
           </div>
+
           <div className="pt-5">
             <p className="font-semibold">[토지 / 건물]</p>
             <div className="grid grid-cols-4 gap-4 mb-2">
               <div className="col-span-4">
                 <label className="text-sm font-bold mb-2">임차부분</label>
                 <Input
-                  name="rentedArea"
+                  name="listingAdd2"
                   className="col-span-3"
-                  value={formData.locationDetail}
-                  onChange={onChange}
+                  value={contractInfo.listingAdd2 || ""}
+                  onChange={handleChange}
                   placeholder="층수, 호수 등 상세"
                 />
               </div>
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">지목</label>
                 <Input
-                  name="land"
-                  value={formData.land}
-                  onChange={onChange}
+                  name="listingLand"
+                  value={contractInfo.listingLand || ""}
+                  onChange={handleChange}
                   placeholder="지목"
                 />
               </div>
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">구조·용도</label>
                 <Input
-                  name="structure"
-                  value={formData.structure}
-                  onChange={onChange}
+                  name="listingTypeCode1"
+                  value={contractInfo.listingTypeCode1 || ""}
+                  onChange={handleChange}
                   placeholder="구조·용도"
                 />
               </div>
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">전용면적(m²)</label>
                 <Input
-                  name="lstgExArea"
-                  value={formData.lstgExArea}
-                  onChange={onChange}
+                  name="listingExArea"
+                  value={contractInfo.listingExArea || ""}
+                  onChange={handleChange}
                   placeholder="전용면적(m²)"
                 />
               </div>
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">공급면적(m²)</label>
                 <Input
-                  name="lstgGrArea"
-                  value={formData.lstgGrArea}
-                  onChange={onChange}
+                  name="listingGrArea"
+                  value={contractInfo.listingGrArea || ""}
+                  onChange={handleChange}
                   placeholder="공급면적(m²)"
                 />
               </div>

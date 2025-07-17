@@ -5,6 +5,8 @@ import ContractPDFLoader from "./ContractPDFLoader";
 import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 import { useAxios } from "../../../hooks/useAxios";
+import Swal from "sweetalert2";
+
 /*
   사용자가 모든 계약데이터를 입력한 뒤, 마지막 확인 및 파일 첨부를 하는 단계
   폼 제출 버튼이 존재하고 contractInfo 상태를 최종적으로 서버에 전송하는 위치
@@ -15,13 +17,28 @@ function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attached
   const { listing, tenancy, lessee, broker, files } = contractInfo;
 
   const handleSubmitProceedingContract = async () => {
-    const base64Files = await Promise.all(contractInfo.files.map(async (file) => {
-      const base64 = await fileToBase64(file);
-      return {
-        name: file.name,
-        content: base64,
-      };
-    }));
+    const hasStandardPdf = uploadedFiles.some(
+      (file) => file.name === "표준임대차계약서.pdf"
+    );
+
+    if (!hasStandardPdf) {
+      Swal.fire({
+        icon: "warning",
+        title: "필수 서류 누락",
+        text: "'표준임대차계약서.pdf' 파일이 첨부되지 않았습니다.",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+
+    const base64Files =
+      await Promise.all(contractInfo.files.map(async (file) => {
+        const base64 = await fileToBase64(file);
+        return {
+          name: file.name,
+          content: base64,
+        };
+      }));
 
     const payload = {
       contract: contractInfo,
@@ -35,9 +52,14 @@ function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attached
     };
     await console.log("전송합니다 --->> ", payload);
     await axios.post("/cont/new/submit", payload)
-      .then(data => console.log("🎉 제출 완료", data));
-
-
+      .then(data => {
+        console.log("🎉 제출 완료", data);
+        Swal.fire({
+          icon: "success",
+          title: "제출 완료!",
+          text: "신규 계약이 성공적으로 등록되었습니다.",
+        })
+      });
   }
 
 
@@ -50,7 +72,6 @@ function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attached
     });
   }
 
-  // 파일 변경 시 부모에게도 알려줌
   useEffect(() => {
     onFilesUploaded(uploadedFiles);
     contractInfo.files = uploadedFiles;
@@ -61,7 +82,10 @@ function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attached
     console.log(attachedFile);
     if (attachedFile) {
       setUploadedFiles((prev) => {
-        const alreadyIncluded = prev.find(f => f.name === attachedFile.name && f.size === attachedFile.size);
+        const alreadyIncluded = prev.find(f =>
+          f.name === attachedFile.name &&
+          f.size === attachedFile.size &&
+          f.name === "표준임대차계약서.pdf");
         return alreadyIncluded ? prev : [attachedFile, ...prev];
       });
     }
