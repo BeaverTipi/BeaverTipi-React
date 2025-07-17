@@ -33,10 +33,9 @@ const navItems = [
   },
   {
     icon: <PageIcon />,
-    name: "상품 관리",
-    subItems: [
-      { name: "신규 매물 등록", path: "/broker/myoffice/lstg/new", pro: false }
-      , { name: "등록 매물", path: "/broker/myoffice/lstg/mng", pro: false }],
+    name: " 매물 관리",
+      path: "/broker/myoffice/lstg/mng",
+  pro: false
   },
   {
     icon: <ListIcon />,
