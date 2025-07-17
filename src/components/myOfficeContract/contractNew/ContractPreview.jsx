@@ -7,7 +7,7 @@ import { fillPdfStandardLeaseFormWithFormData } from "../../ContractSample/Stand
 import { useContractInfo } from "../../../context/ContractInfoContext";
 
 
-export default function ContractPreview({ onConfirm, onBack, onExtract }) {
+export default function ContractPreview({ onConfirm, onBack }) {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const { contractInfo } = useContractInfo();

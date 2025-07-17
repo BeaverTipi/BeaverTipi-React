@@ -11,9 +11,11 @@ export const ContractInfoProvider = ({ children }) => {
   const updateListingInfo = listing => {
     setContractInfo(prev => ({
       ...prev
+      , check: "V"
       , lessorInfo: { "0": { ...listing.tenancyInfo } }
       , listingInfo: listing
       , listingId: listing.lstgId || ""
+      , listingName: listing.lstgNm || ""
       , listingTypeSale: listing.lstgTypeSale || ""          //계약유형
       , listingTypeSaleKorean: ""
       , listingLocation: listing.lstgAdd
