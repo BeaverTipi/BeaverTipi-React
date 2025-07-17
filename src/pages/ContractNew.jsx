@@ -34,7 +34,6 @@ ContractNew.jsx (최상위)
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSecureAxios } from "../hooks/useSecureAxios.js";
 import ContractListingSelect from "../components/myOfficeContract/contractNew/ContractListingSelect";
 import AddTenancy from "../components/myOfficeContract/contractNew/AddTenancy.jsx";
 import AddLessee from "../components/myOfficeContract/contractNew/AddLessee";
@@ -43,8 +42,6 @@ import ContractWriterForm from "../components/myOfficeContract/contractNew/Contr
 import ContractPreview from "../components/myOfficeContract/contractNew/ContractPreview.jsx";
 import NewContractInfoLayout from "../components/myOfficeContract/contractNew/NewContractInfoLayout.jsx";
 import ContractNewStepNavigation from "../components/myOfficeContract/contractNew/ContractNewStepNavigation.jsx";
-import { fillPdfStandardLeaseFormWithFormData } from "../components/ContractSample/StandardLeaseForm/fillPdfStandardLeaseForm";
-import pdfTemplate from "../components/ContractSample/표준임대차계약서.pdf"; // Vite/Webpack 설정에 따라 import 방식 다를 수 있음
 import { useContractInfo } from "../context/ContractInfoContext";
 
 const STEP = {
@@ -189,9 +186,33 @@ function ContractNew() {
       transition: { duration: 0.4, ease: "easeInOut" },
     }),
   };
+  const fadeVariants = {
+    initial: {
+      opacity: 0,
+      scale: 0.98,
+    },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.3, ease: "easeOut" },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.98,
+      transition: { duration: 0.2, ease: "easeOut" },
+    },
+  };
   return (
     <>
-      <ContractNewStepNavigation step={step} STEP={STEP} />
+      <motion.div
+        key={`nav-${step}`}
+        initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
+        animate={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
+        exit={{ clipPath: "inset(0 100% 0 0)" }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
+      >
+        <ContractNewStepNavigation step={step} STEP={STEP} />
+      </motion.div >
       <div className="relative w-full min-h-screen">
         {/* 브라우저 높이 기준으로 스크롤 */}
         <AnimatePresence custom={direction} mode="wait">
@@ -313,7 +334,7 @@ function ContractNew() {
             <motion.div
               key="contract"
               custom={direction}
-              variants={variants}
+              variants={fadeVariants}
               initial="initial"
               animate="animate"
               exit="exit"
