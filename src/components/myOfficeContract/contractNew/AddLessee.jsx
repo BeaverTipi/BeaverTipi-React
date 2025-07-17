@@ -6,10 +6,14 @@ import { useAxios } from "../../../hooks/useAxios";
 import Label from "../../form/Label";
 import { Modal } from "../../ui/modal";
 
-function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
+function AddLessee({ lessee, lstgId, onSave, onBack }) {
   const axios = useAxios();
   const [lesseeInfo, setLesseeInfo] = useState(/*lessee || */null);
-  // useEffect(() => { if (lessee) setLesseeInfo(lessee); }, [lessee]);
+  useEffect(() => {
+    if (lessee && !lesseeInfo) {
+      setLesseeInfo(lessee);
+    }
+  }, [lessee]);
   const [wishlist, setWishlist] = useState([]);
   const [contextMenu, setContextMenu] = useState(null); // { x, y, item }
   const [modalData, setModalData] = useState(null);
@@ -58,21 +62,21 @@ function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
       mbrBasicAddr: modalData.mbrBasicAddr || "",
       mbrDetailAddr: modalData.mbrDetailAddr || "",
       mbrProfilImage: modalData.mbrProfilImage || "",
-      lesseeNote: lesseeInfo?.lesseeNote || "", // 기존 메모는 유지
+      lesseeNote: lesseeInfo?.lesseeNote || "",
     });
-    setModalData(null); // 모달 닫기
+    setModalData(null);
   };
-
 
   const testDummyData = () => {
     setLesseeInfo({
-      mbrCd: "M2507000110"
-      , mbrNm: "꺽따귀"
-      , mbrTelno: "010-2195-9621"
-      , mbrEmlAddr: "2davijean@gmail.com"
-      , mbrBasicAddr: "대전시 유성구 문화원로46번길 26"
-      , mbrDetailAddr: "모던하우스 203호"
-      , mbrZip: 34167
+      mbrCd: "M2507000112"
+      , mbrNm: "배비"
+      , mbrTelno: "010-3333-4444"
+      , mbrEmlAddr: "sajaboys3@ddit.or.kr"
+      , mbrBasicAddr: "대전광역시 중구 계룡로 846"
+      , mbrDetailAddr: "3층 304호"
+      , mbrProfilImage: ""
+      , lesseeNote: "오늘 저녁은 마라탕^0^"
     });
   }
   return (
@@ -270,7 +274,7 @@ function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
             <Input
               className="flex-1"
               type="text"
-              name=""
+              name="lesseeMemo"
               placeholder="계약 관련 메모"
               value={lesseeInfo?.lesseeNote || ""}
               onChange={(e) =>
@@ -290,8 +294,9 @@ function AddLessee({ /*lessee, */lstgId, onSave, onBack }) {
         </div>
 
         <div className="flex justify-end pt-6">
+          <span onClick={testDummyData}>asdf</span>
           <Button
-            onClick={onSave}
+            onClick={() => onSave(lesseeInfo)}
           >
             다음 →
           </Button>

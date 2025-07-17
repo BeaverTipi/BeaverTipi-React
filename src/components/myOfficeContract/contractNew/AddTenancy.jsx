@@ -9,6 +9,7 @@ import Label from "../../form/Label";
 import { useContractInfo } from "../../../context/ContractInfoContext";
 
 function AddTenancy({
+  lessor,
   onSave,
   onBack,
   tenancyNo,
@@ -19,6 +20,11 @@ function AddTenancy({
   const [lesserTypeList, setLesserTypeList] = useState();
   const [bankList, setBankList] = useState();
   const [tenancyList, setTenancyList] = useState({ "0": {} });
+  useEffect(() => {
+    if (lessor && Object.keys(lessor).length > 0 && Object.keys(lessor).length > 0) {
+      setTenancyList(lessor);
+    }
+  }, [lessor]);
   const addButtonRef = useRef(null);
   const [rentalPtyIdInput, setRentalPtyIdInput] = useState(
     tenancyList["0"]?.rentalPtyId || null

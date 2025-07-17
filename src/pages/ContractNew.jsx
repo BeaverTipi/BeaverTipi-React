@@ -101,8 +101,9 @@ function ContractNew() {
     //최초 단계를 재수행할 시, 기록된 정보 모두 초기화
     setContractInfo(contractInfoReset);
     updateListingInfo(selectedListing);
-    if (!selectedListing.tenancyInfo) goToStep(STEP.ADD_TENANCY);
-    else goToStep(STEP.ADD_LESSEE);
+    // if (!selectedListing.tenancyInfo) goToStep(STEP.ADD_TENANCY);
+    // else goToStep(STEP.ADD_LESSEE);
+    goToStep(STEP.ADD_TENANCY);
     console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
   };
 
@@ -111,17 +112,33 @@ function ContractNew() {
     updateLessorInfo(tenancyInfo)
     console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
   };
+  useEffect(() => {
+    if (contractInfo?.lessorInfo) {
+      console.log(
+        `%c[전환 후 상태확인]`, "color:yellow; font-weight:bold;",
+        contractInfo.lessorInfo);
+    }
+  }, [contractInfo.lessorInfo]);
 
   const handleLesseeSaved = (lesseeInfo) => {
-    updateLesseeInfo(lesseeInfo);
+    updateLesseeInfo(lesseeInfo)
     goToStep(STEP.SAMPLE_SELECT);
-    console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
   };
+  useEffect(() => {
+    if (contractInfo?.lesseeInfo) {
+      console.log(
+        `%c[전환 후 상태확인]`, "color:yellow; font-weight:bold;",
+        contractInfo.lesseeInfo);
+    }
+  }, [contractInfo.lesseeInfo]);
 
   const handleSampleIdSaved = (sampleId) => {
     updateSampleId(sampleId);
-    goToStep(STEP.SAMPLE_WRITE);
-    console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
+    setTimeout(() => {
+      goToStep(STEP.SAMPLE_WRITE);
+      console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
+    }, 0);
+
   };
 
   const handleWrittenSaved = contract => {
@@ -212,6 +229,7 @@ function ContractNew() {
               className="w-full"
             >
               <AddTenancy
+                lessor={contractInfo.lessorInfo || {}}
                 onSave={handleTenancySaved}
                 onBack={handleBack}
                 tenancyNo={tenancyNo}
@@ -231,7 +249,7 @@ function ContractNew() {
               className="w-full"
             >
               <AddLessee
-                // lessee={contractInfo.lesseeInfo || {}}
+                lessee={contractInfo.lesseeInfo || {}}
                 lstgId={contractInfo.listingInfo?.lstgId || ""}
                 onSave={handleLesseeSaved}
                 onBack={handleBack}
@@ -256,7 +274,7 @@ function ContractNew() {
             </motion.div>
           )}
 
-          {step === STEP.SAMPLE_WRITE && contractInfo.sampleId && (
+          {step === STEP.SAMPLE_WRITE /*&& contractInfo.sampleId*/ && (
             <motion.div
               key="sample-write"
               custom={direction}
@@ -267,7 +285,6 @@ function ContractNew() {
               className="w-full"
             >
               <ContractWriterForm
-                sampleId={contractInfo.sampleId}
                 onSave={handleWrittenSaved}
                 onBack={handleBack}
               />

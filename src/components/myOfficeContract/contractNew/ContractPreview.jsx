@@ -4,11 +4,13 @@ import ContractPDFRenderer from "../../ContractPDFRenderer";
 import Button from "../../ui/button/Button";
 import pdfTemplate from "../../ContractSample/표준임대차계약서.pdf";
 import { fillPdfStandardLeaseFormWithFormData } from "../../ContractSample/StandardLeaseForm/fillPdfStandardLeaseForm";
+import { useContractInfo } from "../../../context/ContractInfoContext";
 
 
-export default function ContractPreview({ contractInfo, onConfirm, onBack, onExtract }) {
+export default function ContractPreview({ onConfirm, onBack, onExtract }) {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
+  const { contractInfo } = useContractInfo();
   useEffect(() => {
     const generatePdf = async () => {
       try {

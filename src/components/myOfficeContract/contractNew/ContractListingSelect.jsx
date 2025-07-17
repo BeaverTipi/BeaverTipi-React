@@ -201,7 +201,7 @@ function ContractListingSelect({ onSave, }) {
               <div className="flex flex-col-reverse justify-start mb-3">
                 <button
                   onClick={handleResetFilters}
-                  className="w-[60px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                  className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
                 >
                   초기화
                 </button>

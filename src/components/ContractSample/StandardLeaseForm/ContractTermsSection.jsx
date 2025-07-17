@@ -5,7 +5,6 @@ import ComponentCard from "../../common/ComponentCard";
 
 export default function ContractTermsSection({
   contractInfo,
-  setContractInfo,
   handleChange,
 }) {
   return (
@@ -21,8 +20,8 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">보증금</label>
           <Input
-            name="lstgLeaseAmt"
-            value={contractInfo?.lstgLeaseAmt || ""}
+            name="listingLeaseAmt"
+            value={contractInfo?.listingLeaseAmt || ""}
             onChange={handleChange}
             placeholder="원정(W)"
             className="col-span-3"
@@ -31,8 +30,8 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">계약금</label>
           <Input
-            name="contDeposit"
-            value={contractInfo?.contDeposit || ""}
+            name="listingDeposit"
+            value={contractInfo?.listingDeposit || ""}
             onChange={handleChange}
             className="col-span-3"
             placeholder="원정(W)"
@@ -61,8 +60,8 @@ export default function ContractTermsSection({
         <div className="grid grid-cols-4 gap-4">
           <label className="col-span-1 font-semibold">차임 (월세)</label>
           <Input
-            name="lstgLeaseM"
-            value={contractInfo?.lstgLeaseM}
+            name="listingLeaseM"
+            value={contractInfo?.listingLeaseM}
             onChange={handleChange}
             className="col-span-3"
             placeholder="원정(W) 매월 ○일 지급, 계좌 포함"

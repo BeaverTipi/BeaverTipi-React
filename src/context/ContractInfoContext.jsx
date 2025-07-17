@@ -11,6 +11,7 @@ export const ContractInfoProvider = ({ children }) => {
   const updateListingInfo = listing => {
     setContractInfo(prev => ({
       ...prev
+      , lessorInfo: { "0": { ...listing.tenancyInfo } }
       , listingInfo: listing
       , listingId: listing.lstgId || ""
       , listingTypeSale: listing.lstgTypeSale || ""          //계약유형
@@ -106,6 +107,8 @@ export const ContractInfoProvider = ({ children }) => {
       , lessorTaxYN: contract.lessorTaxYN
       , listingDeposit: contract.listingDeposit //계약금
       , listingDepositDay: contract.listingDepositDay //계약금 지불일
+      , middlePayment: contract.middlePayment //중도금
+      , balancePayment: contract.balancePayment //잔금
       , managementTotal: contract.managementTotal
       , management1: contract.management1
       , management2: contract.management2
@@ -120,6 +123,7 @@ export const ContractInfoProvider = ({ children }) => {
       , twoWeeksLaterDateYear: contract.twoWeekslaterDateYear
       , twoWeeksLaterDateMonth: contract.twoWeekslaterDateMonth
       , twoWeeksLaterDateDay: contract.twoWeekslaterDateDay
+      , repairNeed: contract.repairNeed
       , repairNeedYN: contract.repairNeedYN
       , repairDeadlineDate: contract.repairDeadlineDate
       , repairDeadlineDateYear: contract.repairDeadlineDateYear

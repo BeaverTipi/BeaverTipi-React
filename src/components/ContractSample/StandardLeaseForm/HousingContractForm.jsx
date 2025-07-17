@@ -7,7 +7,6 @@ import Button from "../../ui/button/Button";
 
 export default function HousingContractForm({
   contractInfo,
-  setContractInfo,
   handleChange,
 }) {
   return (
@@ -53,14 +52,14 @@ export default function HousingContractForm({
               <label className="font-semibold">계약형태:</label>
               <br />
               <SelectBasicStyle
-                name="contractType"
-                value={contractInfo?.contractType || ""}
+                name="listingTypeSale"
+                value={contractInfo?.listingTypeSale || ""}
                 onChange={handleChange}
                 placeholder="--임대 유형--"
                 options={[
-                  { value: "전세", label: "전세" },
-                  { value: "월세", label: "월세" },
-                  { value: "매매", label: "매매" },
+                  { value: "001", label: "전세" },
+                  { value: "002", label: "월세" },
+                  { value: "003", label: "매매" },
                 ]}
               />
             </div>
@@ -75,9 +74,9 @@ export default function HousingContractForm({
               </label>
               <div className="flex flex-row gap-3 col-span-4">
                 <Input
-                  name="locationBasic"
+                  name="listingAdd"
                   className="flex-1"
-                  value={contractInfo?.locationBasic || ""}
+                  value={contractInfo?.listingAdd || ""}
                   onChange={handleChange}
                   placeholder="임차주택 기본주소"
                 />
@@ -90,9 +89,9 @@ export default function HousingContractForm({
               </label>
               <div className="flex flex-row gap-3 col-span-4">
                 <Input
-                  name="location"
+                  name="listingAdd"
                   className="flex-1"
-                  value={contractInfo?.location || ""}
+                  value={contractInfo?.listingAdd || ""}
                   onChange={handleChange}
                   placeholder="임차주택 도로명주소"
                 />
@@ -107,9 +106,9 @@ export default function HousingContractForm({
               <div className="col-span-4">
                 <label className="text-sm font-bold mb-2">임차부분</label>
                 <Input
-                  name="rentedArea"
+                  name="listingAdd2"
                   className="col-span-3"
-                  value={contractInfo.rentedArea || ""}
+                  value={contractInfo.listingAdd2 || ""}
                   onChange={handleChange}
                   placeholder="층수, 호수 등 상세"
                 />
@@ -117,8 +116,8 @@ export default function HousingContractForm({
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">지목</label>
                 <Input
-                  name="land"
-                  value={contractInfo.land || ""}
+                  name="listingLand"
+                  value={contractInfo.listingLand || ""}
                   onChange={handleChange}
                   placeholder="지목"
                 />
@@ -126,8 +125,8 @@ export default function HousingContractForm({
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">구조·용도</label>
                 <Input
-                  name="structure"
-                  value={contractInfo.structure || ""}
+                  name="listingTypeCode1"
+                  value={contractInfo.listingTypeCode1 || ""}
                   onChange={handleChange}
                   placeholder="구조·용도"
                 />
@@ -135,8 +134,8 @@ export default function HousingContractForm({
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">전용면적(m²)</label>
                 <Input
-                  name="lstgExArea"
-                  value={contractInfo.lstgExArea || ""}
+                  name="listingExArea"
+                  value={contractInfo.listingExArea || ""}
                   onChange={handleChange}
                   placeholder="전용면적(m²)"
                 />
@@ -144,8 +143,8 @@ export default function HousingContractForm({
               <div className="col-span-1">
                 <label className="text-sm font-bold mb-2">공급면적(m²)</label>
                 <Input
-                  name="lstgGrArea"
-                  value={contractInfo.lstgGrArea || ""}
+                  name="listingGrArea"
+                  value={contractInfo.listingGrArea || ""}
                   onChange={handleChange}
                   placeholder="공급면적(m²)"
                 />

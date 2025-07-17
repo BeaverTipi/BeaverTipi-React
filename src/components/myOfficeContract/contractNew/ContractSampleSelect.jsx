@@ -20,8 +20,7 @@ const contractSamples = [
   },
 ];
 
-export default function ContractSampleSelect({ onNext, onBack, contractInfo }) {
-  console.log("데이터 추가 확인-->", contractInfo);
+export default function ContractSampleSelect({ onNext, onBack }) {
 
   const [selectedSample, setSelectedSample] = useState(null);
   const [previewSample, setPreviewSample] = useState(null); // 모달용
