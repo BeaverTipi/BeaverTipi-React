@@ -16,7 +16,7 @@ export default function PdfCoordinatePicker({ pdfFile }) {
 
       const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
       const page = await pdf.getPage(1); // 첫 페이지만 대상
-      const viewport = page.getViewport({ scale: 1.5 });
+      const viewport = page.getViewport({ scale: 1.0 });
 
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");

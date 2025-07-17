@@ -6,16 +6,20 @@ import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 import { useAxios } from "../../../hooks/useAxios";
 import Swal from "sweetalert2";
+import { useContractInfo } from "../../../context/ContractInfoContext";
+import { useSecureAxios } from "../../../hooks/useSecureAxios";
+import { useAES256 } from "../../../hooks/useAES256";
 
 /*
   사용자가 모든 계약데이터를 입력한 뒤, 마지막 확인 및 파일 첨부를 하는 단계
   폼 제출 버튼이 존재하고 contractInfo 상태를 최종적으로 서버에 전송하는 위치
  */
-function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attachedFile }) {
-  const axios = useAxios();
-  const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
+function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
+  const axios = useSecureAxios();
+  const { contractInfo } = useContractInfo();
   const { listing, tenancy, lessee, broker, files } = contractInfo;
-
+  const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
+  const { encryptWithRandomIV } = useAES256();
   const handleSubmitProceedingContract = async () => {
     const hasStandardPdf = uploadedFiles.some(
       (file) => file.name === "표준임대차계약서.pdf"
@@ -41,25 +45,49 @@ function NewContractInfoLayout({ contractInfo, onBack, onFilesUploaded, attached
       }));
 
     const payload = {
-      contract: contractInfo,
-      files: uploadedFiles.map(file => ({
+      contractInfo: contractInfo,
+      files: uploadedFiles.map((file) => ({
+        fileId: null,
+        fileAttachSeq: null,
+        fileSourceRef: null,
+        fileSourceId: null,
         fileOriginalname: file.name,
-        fileSize: file.size,
+        fileSavedname: null,
         fileMime: file.type,
+        fileDir: null,
+        fileSize: file.size,
+        docTypeCd: null,
         filePathUrl: file.path || null,
+        regDtm: null
       })),
       base64Files: base64Files,
     };
-    await console.log("전송합니다 --->> ", payload);
-    await axios.post("/cont/new/submit", payload)
+    console.log("전송합니다 --->> ", payload);
+    await axios.post("cont/new/submit", payload)
       .then(data => {
-        console.log("🎉 제출 완료", data);
+        const contId = data?.contId;
+        if (contId) {
+          const localStorageKey = encryptWithRandomIV("NEXT_PROCEEDING-CONTRACT");
+          const localStorageValue = encryptWithRandomIV(contId);
+          localStorage.setItem(localStorageKey, localStorageValue);
+          Swal.fire({
+            icon: "success",
+            title: "제출 완료!",
+            text: "신규 계약이 성공적으로 등록되었습니다.",
+          }).then(() => {
+            window.location.href = "/broker/myoffice/cont/proceeding";
+          });
+        } else {
+          throw new Error("계약 ID 누락");
+        }
+      }).catch(error => {
+        console.error("❌ 계약 제출 실패", error);
         Swal.fire({
-          icon: "success",
-          title: "제출 완료!",
-          text: "신규 계약이 성공적으로 등록되었습니다.",
-        })
-      });
+          icon: "error",
+          title: "전송 실패",
+          text: error?.response?.data?.message || "서버와 통신하지 못했습니다.",
+        });
+      })
   }
 
 
