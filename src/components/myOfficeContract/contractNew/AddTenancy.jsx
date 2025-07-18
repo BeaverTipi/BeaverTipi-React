@@ -66,9 +66,27 @@ function AddTenancy({
       .catch((err) => {
         console.error("공통코드 오류남(AddNonUserTenancy)", err);
       });
+
+    axios.post("/cont/new/lessor", {
+      rentalPtyId: contractInfo?.listingInfo.rentalPtyId
+    }).then(data => {
+
+      setTenancyList(prev => ({
+        ...prev,
+        ["0"]: {
+          ...prev["0"],
+          rentalPtyId: contractInfo?.listingInfo.rentalPtyId,
+          lsrYnTypeCd: data[0]?.lsrYnTypeCd,
+        }
+      }));
+      console.log("방금 추가한 임대인 리스트 -------_> ", tenancyList);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+
+  });
 
   const handleAddTenancy = () => {
     setTenancyList((prev) => ({
