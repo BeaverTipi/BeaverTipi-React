@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router"; // ✅ 추가
+import { useNavigate, useParams } from "react-router";
 import ListingInfoSection from "../components/myOfficeListing/newList/ListingInfoSection";
 import ListingTradeSection from "../components/myOfficeListing/newList/ListingTradeSection";
 import ListingExtraInfoSection from "../components/myOfficeListing/newList/ListingExtraInfoSection";
@@ -13,64 +13,138 @@ import ComponentCard from "../components/common/ComponentCard";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
 
 const ListingNew = () => {
-  const navigate = useNavigate(); // ✅ 여기!
+  const navigate = useNavigate();
   const axios = useSecureAxios();
-const [commonCodes, setCommonCodes] = useState({
-  typeSale: [],
-  heating: [],
-  cooling: [],
-  roomType: [],
-  roomFeature: []
-});
-const [formData, setFormData] = useState({
-  lstgNm: "", // 매물명
-  lstgTypeCode1: "", // 매물 유형
-  lstgTypeSale: "", // 거래 유형
-  lstgPrice: "",
-  lstgAreaSupply: "",
-  lstgRoomCnt: 0,
-  lstgBathCnt: 0,
-  lstgFloor: 0,
-  parkingYn: false,
-  roomType: "", // 오픈형/분리형
-  roomFeature: [], // checkbox
-  heating: "",
-  cooling: [], // checkbox
-  lstgDesc: "",
-  imageUpload: []
-});
+  const { lstgId } = useParams();
+  const isEditMode = !!lstgId;
 
-useEffect(() => {
-  axios.post("/form", {
-    codeGroup: {
-      typeSale: "TRDST",
-      heating: "HEAT",
-      cooling: "COOL",
-      roomType: "ROOMT",
-      roomFeature: "FEATURE"
-    }
-  })
-  .then((res) => {
-    setCommonCodes({
-      typeSale: res.typeSale || [],
-      heating: res.heating || [],
-      cooling: res.cooling || [],
-      roomType: res.roomType || [],
-      roomFeature: res.roomFeature || []
-    });
-  })
-  .catch((err) => {
-    console.error("공통코드 불러오기 실패", err);
+  const [commonCodes, setCommonCodes] = useState({
+    typeSale: [],
+    lstgType1: [],
+    lstgType2: [],
+    facType: []
   });
-}, []);
+
+  const [facilityAppliances, setFacilityAppliances] = useState([]);
+  const [facilityFurnitures, setFacilityFurnitures] = useState([]);
+  const [facilityBuildings, setFacilityBuildings] = useState([]);
+
+  const [existingImages, setExistingImages] = useState([]);
+
+  const [formData, setFormData] = useState({
+    lstgNm: "",
+    lstgTypeCode1: "",
+    lstgTypeSale: "",
+    lstgPrice: "",
+    lstgAreaSupply: "",
+    lstgRoomCnt: 0,
+    lstgBathCnt: 0,
+    lstgFloor: 0,
+    parkingYn: false,
+    roomType: "",
+    roomFeature: [],
+    heating: "",
+    cooling: [],
+    lstgDesc: "",
+    imageUpload: [],
+    appliance: [],
+    furniture: [],
+    building: []
+  });
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const formRes = await axios.post("/form", {
+          codeGroup: {
+            typeSale: "TRDST",
+            lstgType1: "LSTG1",
+            lstgType2: "LSTG2",
+            facType: "FAC"
+          }
+        });
+
+        const formData = formRes.data;
+        setCommonCodes({
+          typeSale: formData.typeSale || [],
+          lstgType1: formData.lstgType1 || [],
+          lstgType2: formData.lstgType2 || [],
+          facType: formData.facType || []
+        });
+      } catch (err) {
+        console.error("공통코드 불러오기 실패", err);
+      }
+
+      try {
+  const optionRes = await axios.post("/lstg/facilityOption", {});
+  const options = optionRes.data;
+
+  if (!Array.isArray(options)) {
+    console.error("시설 옵션 응답이 배열이 아닙니다:", options);
+    return;
+  }
+
+      setFacilityAppliances(options.filter(opt => opt.facTypeCcCd === "001"));
+      setFacilityFurnitures(options.filter(opt => opt.facTypeCcCd === "002"));
+      setFacilityBuildings(options.filter(opt => opt.facTypeCcCd === "003"));
+    } catch (err) {
+      console.error("시설 옵션 불러오기 실패", err);
+    }
+
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    const fetchListingDetails = async () => {
+      try {
+        if (isEditMode) {
+          const res = await axios.post("/lstg/listing-details", { lstgId });
+
+          setFormData(prev => ({
+            ...prev,
+            lstgNm: res.lstgNm,
+            lstgTypeCode1: res.lstgTypeCode1,
+            lstgTypeSale: res.lstgTypeSale,
+            lstgPrice: res.lstgPrice,
+            lstgAreaSupply: res.lstgAreaSupply,
+            lstgRoomCnt: res.lstgRoomCnt,
+            lstgBathCnt: res.lstgBathCnt,
+            lstgFloor: res.lstgFloor,
+            parkingYn: res.lstgParkYn === "Y",
+            roomType: res.roomType,
+            roomFeature: res.roomFeature || [],
+            heating: res.heating,
+            cooling: res.cooling || [],
+            lstgDesc: res.lstgDesc,
+            imageUpload: [],
+            appliance: res.appliance || [],
+            furniture: res.furniture || [],
+            building: res.building || []
+          }));
+
+          if (Array.isArray(res.lstgImageUrls)) {
+            setExistingImages(res.lstgImageUrls);
+          } else if (res.lstgThumbnailUrl) {
+            setExistingImages([res.lstgThumbnailUrl]);
+          }
+        }
+      } catch (err) {
+        console.error("매물 정보 조회 실패", err);
+      }
+    };
+
+    fetchListingDetails();
+  }, [isEditMode, lstgId]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
-      if (name === "roomFeature" || name === "cooling") {
+      if (["roomFeature", "cooling", "appliance", "furniture", "building"].includes(name)) {
         setFormData((prev) => {
           const current = new Set(prev[name]);
-          if (checked) current.add(value);
-          else current.delete(value);
+          checked ? current.add(value) : current.delete(value);
           return { ...prev, [name]: [...current] };
         });
       } else {
@@ -93,50 +167,49 @@ useEffect(() => {
     });
 
     try {
-      await axios.post("/building/product/add", data);
-      alert("등록 성공");
+      if (isEditMode) {
+        data.append("lstgId", lstgId);
+        await axios.post("/building/product/update", data);
+        alert("수정 성공");
+      } else {
+        await axios.post("/building/product/add", data);
+        alert("등록 성공");
+      }
+      navigate("/broker/myoffice/lstg/mng");
     } catch (error) {
       console.error(error);
-      alert("등록 실패");
+      alert(isEditMode ? "수정 실패" : "등록 실패");
     }
   };
 
   return (
     <>
-      <PageBreadcrumb pageTitle="매물 등록" />
-      <div className="container mx-auto p-6">
-        <ComponentCard
-          title={
-            <button
-              className="text-[#BC6B2C] hover:text-[#A25720] font-semibold"
-              onClick={() => navigate(-1)}
-            >
-              ← 뒤로가기
-            </button>
-          }
-        >
-          <form
-            onSubmit={handleSubmit}
-            encType="multipart/form-data"
-            className="space-y-8"
-          >
-            <ListingInfoSection formData={formData} onChange={handleChange} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ListingTradeSection formData={formData} onChange={handleChange} />
-              <ListingFacilitySection formData={formData} onChange={handleChange} />
-            </div>
-
-            <ListingExtraInfoSection formData={formData} onChange={handleChange} />
-            <ListingDescriptionSection formData={formData} onChange={handleChange} />
-            <ListingPhotoUploadSection
-              onChange={(files) =>
-                setFormData((prev) => ({ ...prev, imageUpload: files }))
-              }
+      <PageBreadcrumb pageTitle={isEditMode ? "매물 수정" : "매물 등록"} />
+      <ComponentCard title="매물 등록" onBack={() => navigate(-1)}>
+        <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-8">
+          <ListingInfoSection formData={formData} onChange={handleChange} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ListingTradeSection formData={formData} onChange={handleChange} />
+            <ListingFacilitySection
+              formData={formData}
+              onChange={handleChange}
+              applianceOptions={facilityAppliances}
+              furnitureOptions={facilityFurnitures}
+              buildingOptions={facilityBuildings}
             />
-            <SubmitSection />
-          </form>
-        </ComponentCard>
-      </div>
+          </div>
+          <ListingExtraInfoSection formData={formData} onChange={handleChange} />
+          <ListingDescriptionSection formData={formData} onChange={handleChange} />
+          <ListingPhotoUploadSection
+            onChange={(files) =>
+              setFormData((prev) => ({ ...prev, imageUpload: files }))
+            }
+            isEditMode={isEditMode}
+            existingImages={existingImages}
+          />
+          <SubmitSection />
+        </form>
+      </ComponentCard>
     </>
   );
 };

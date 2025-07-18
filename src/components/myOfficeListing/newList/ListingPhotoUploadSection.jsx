@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import ComponentCard from "../../common/ComponentCard";
 import { useDropzone } from "react-dropzone";
 
-export default function ListingPhotoUploadSection({ onChange }) {
+export default function ListingPhotoUploadSection({
+  onChange,
+  isEditMode = false,
+  existingImages = [],
+}) {
   const [previewFiles, setPreviewFiles] = useState([]);
 
   const onDrop = (acceptedFiles) => {
@@ -42,6 +46,24 @@ export default function ListingPhotoUploadSection({ onChange }) {
   return (
     <ComponentCard title="사진 등록">
       <div className="transition border border-gray-300 border-dashed rounded-xl p-6 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+        {/* ✅ 기존 이미지 미리보기 */}
+        {isEditMode && existingImages.length > 0 && (
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold text-gray-800 mb-2">기존 이미지</h4>
+            <div className="flex gap-4 flex-wrap">
+              {existingImages.map((url, idx) => (
+                <div key={idx} className="w-32 h-32 rounded overflow-hidden border shadow">
+                  <img
+                    src={url}
+                    alt={`기존 이미지 ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <form
           {...getRootProps()}
           className={`cursor-pointer ${
@@ -63,7 +85,9 @@ export default function ListingPhotoUploadSection({ onChange }) {
                       key={idx}
                       className="flex justify-between items-center border p-2 rounded bg-white dark:bg-gray-800 shadow-sm truncate"
                     >
-                      <span className="truncate">{fileObj.file.name} ({(fileObj.file.size / 1024).toFixed(1)} KB)</span>
+                      <span className="truncate">
+                        {fileObj.file.name} ({(fileObj.file.size / 1024).toFixed(1)} KB)
+                      </span>
                       <button
                         type="button"
                         className="text-red-500 text-xs ml-2"
@@ -84,7 +108,7 @@ export default function ListingPhotoUploadSection({ onChange }) {
               )}
             </div>
 
-            {/* 오른쪽: 미리보기 */}
+            {/* 오른쪽: 이미지 미리보기 */}
             <div className="w-full md:w-1/2 grid grid-cols-2 gap-4">
               {previewFiles.length > 0 ? (
                 previewFiles.map((fileObj, idx) => (

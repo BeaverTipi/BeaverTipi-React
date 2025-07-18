@@ -95,7 +95,8 @@ export default function App() {
                 </Route>
 
                 <Route path="lstg" element={<Listing />}>
-                  <Route path="new" element={<ListingNew />} />
+                  <Route path="mng/new" element={<ListingNew />} />
+                  <Route path="mng/edit/:lstgId" element={<ListingNew />} />
                   <Route path="mng" element={<ListingMng />} />
                 </Route>
 
