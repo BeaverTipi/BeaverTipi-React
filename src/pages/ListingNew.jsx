@@ -15,54 +15,54 @@ import PageBreadcrumb from "../components/common/PageBreadCrumb";
 const ListingNew = () => {
   const navigate = useNavigate(); // ✅ 여기!
   const axios = useSecureAxios();
-const [commonCodes, setCommonCodes] = useState({
-  typeSale: [],
-  heating: [],
-  cooling: [],
-  roomType: [],
-  roomFeature: []
-});
-const [formData, setFormData] = useState({
-  lstgNm: "", // 매물명
-  lstgTypeCode1: "", // 매물 유형
-  lstgTypeSale: "", // 거래 유형
-  lstgPrice: "",
-  lstgAreaSupply: "",
-  lstgRoomCnt: 0,
-  lstgBathCnt: 0,
-  lstgFloor: 0,
-  parkingYn: false,
-  roomType: "", // 오픈형/분리형
-  roomFeature: [], // checkbox
-  heating: "",
-  cooling: [], // checkbox
-  lstgDesc: "",
-  imageUpload: []
-});
-
-useEffect(() => {
-  axios.post("/form", {
-    codeGroup: {
-      typeSale: "TRDST",
-      heating: "HEAT",
-      cooling: "COOL",
-      roomType: "ROOMT",
-      roomFeature: "FEATURE"
-    }
-  })
-  .then((res) => {
-    setCommonCodes({
-      typeSale: res.typeSale || [],
-      heating: res.heating || [],
-      cooling: res.cooling || [],
-      roomType: res.roomType || [],
-      roomFeature: res.roomFeature || []
-    });
-  })
-  .catch((err) => {
-    console.error("공통코드 불러오기 실패", err);
+  const [commonCodes, setCommonCodes] = useState({
+    typeSale: [],
+    heating: [],
+    cooling: [],
+    roomType: [],
+    roomFeature: []
   });
-}, []);
+  const [formData, setFormData] = useState({
+    lstgNm: "", // 매물명
+    lstgTypeCode1: "", // 매물 유형
+    lstgTypeSale: "", // 거래 유형
+    lstgPrice: "",
+    lstgAreaSupply: "",
+    lstgRoomCnt: 0,
+    lstgBathCnt: 0,
+    lstgFloor: 0,
+    parkingYn: false,
+    roomType: "", // 오픈형/분리형
+    roomFeature: [], // checkbox
+    heating: "",
+    cooling: [], // checkbox
+    lstgDesc: "",
+    imageUpload: []
+  });
+
+  useEffect(() => {
+    axios.post("/form", {
+      codeGroup: {
+        typeSale: "TRDST",
+        heating: "HEAT",
+        cooling: "COOL",
+        roomType: "ROOMT",
+        roomFeature: "FEATURE"
+      }
+    })
+      .then((res) => {
+        setCommonCodes({
+          typeSale: res.typeSale || [],
+          heating: res.heating || [],
+          cooling: res.cooling || [],
+          roomType: res.roomType || [],
+          roomFeature: res.roomFeature || []
+        });
+      })
+      .catch((err) => {
+        console.error("공통코드 불러오기 실패", err);
+      });
+  }, []);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -109,7 +109,7 @@ useEffect(() => {
           title={
             <button
               className="text-[#BC6B2C] hover:text-[#A25720] font-semibold"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/broker/myoffice/lstg/mng")}
             >
               ← 뒤로가기
             </button>
