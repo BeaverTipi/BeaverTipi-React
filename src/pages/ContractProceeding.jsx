@@ -5,7 +5,7 @@ function ContractProceeding() {
 
   return (
     <>
-      {/* <ProceedingContracts /> */}
+      <ProceedingContracts />
     </>
   )
 }
