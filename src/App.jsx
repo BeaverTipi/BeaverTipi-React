@@ -36,6 +36,7 @@ import PdfCoordinatePicker from "./components/PdfCoordinatePicker";
 import { ContextMenuProvider } from "./context/ContextMenuContext";
 import { useContextMenu } from "./context/ContextMenuContext";
 import { useEffect } from "react";
+import ContractSignature from "./pages/ContractSignature";
 
 const GlobalContextMenu = () => {
   const { contextMenu, setContextMenu } = useContextMenu();
@@ -58,10 +59,10 @@ export default function App() {
   useEffect(() => {
     const blockDefaultContext = (e) => e.preventDefault();
     document.addEventListener("contextmenu", blockDefaultContext);
-    return () => document.removeEventListener("contextmenu", blockDefaultContext);
+    return () =>
+      document.removeEventListener("contextmenu", blockDefaultContext);
   }, []);
   return (
-
     <ContextMenuProvider>
       <AxiosProvider>
         <AESProvider>
@@ -69,16 +70,22 @@ export default function App() {
             <ScrollToTop />
             <GlobalContextMenu />
             <Routes>
-
               {/* 첫 진입 시 자동 리디렉션 */}
-              <Route path="/" element={<Navigate to="/broker/myoffice" replace />} />
-              <Route path="/broker" element={<Navigate to="/broker/myoffice" replace />} />
+              <Route
+                path="/"
+                element={<Navigate to="/broker/myoffice" replace />}
+              />
+              <Route
+                path="/broker"
+                element={<Navigate to="/broker/myoffice" replace />}
+              />
               {
                 //<Route path="/broker/myoffice/listing-details" element={<ListingDetails />} />
               }
+              <Route path="/contract" element={<ContractSignature />} />
 
               {/* 인증이 필요한 대시보드 라우트 */}
-              < Route
+              <Route
                 path="/broker/myoffice"
                 element={
                   <ProtectedRoute>
@@ -95,7 +102,8 @@ export default function App() {
                 </Route>
 
                 <Route path="lstg" element={<Listing />}>
-                  <Route path="new" element={<ListingNew />} />
+                  <Route path="mng/new" element={<ListingNew />} />
+                  <Route path="mng/edit/:lstgId" element={<ListingNew />} />
                   <Route path="mng" element={<ListingMng />} />
                 </Route>
 
@@ -112,7 +120,12 @@ export default function App() {
 
                 {/* Forms */}
                 <Route path="form-elements" element={<FormElements />} />
-                <Route path="pdf-coor" element={<PdfCoordinatePicker pdfFile="/표준임대차계약서.pdf" />} />
+                <Route
+                  path="pdf-coor"
+                  element={
+                    <PdfCoordinatePicker pdfFile="/표준임대차계약서.pdf" />
+                  }
+                />
                 {/* Tables */}
                 <Route path="basic-tables" element={<BasicTables />} />
 
@@ -137,9 +150,8 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
-
         </AESProvider>
-      </AxiosProvider >
+      </AxiosProvider>
     </ContextMenuProvider>
   );
 }

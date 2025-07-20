@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import "../worker/pdfjsWorkerWrapper"; // workerSrc 설정됨
 
-
-
-export default function ContractPDFRenderer({ file }) {
+export default function ContractPDFRenderer({ file, signatureImage }) {
   const containerRef = useRef(null);
   const [numPages, setNumPages] = useState(0);
 

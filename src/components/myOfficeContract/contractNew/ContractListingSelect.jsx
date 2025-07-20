@@ -18,7 +18,7 @@ import {
 import Label from "../../form/Label";
 import { useContractInfo } from "../../../context/ContractInfoContext";
 
-function ContractListingSelect({ onSave, }) {
+function ContractListingSelect({ onSave }) {
   const axios = useSecureAxios();
   const [lstgList, setLstgList] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -32,8 +32,10 @@ function ContractListingSelect({ onSave, }) {
   const [filterListingTypeValue, setFilterListingTypeValue] = useState("000");
   const [filterTypeSaleValue, setFilterTypeSaleValue] = useState("000");
   const [filterProdStatValue, setFilterProdStatValue] = useState("000");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
   const [searchCategory, setSearchCategory] = useState("전체");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -47,32 +49,34 @@ function ContractListingSelect({ onSave, }) {
   }, []);
 
   useEffect(() => {
-    axios.post("form", {
-      codeGroup: {
-        typeSale: "TRDST"
-        , prodStat: "PRDST"
-        , listingType: "LSTG1"
-      },
-    }).then((data) => {
-      const trdstOpt = data.typeSale.map((trdst) => ({
-        ...trdst,
-        value: trdst.codeValue,
-        label: trdst.codeName,
-      }));
-      const prdstOpt = data.prodStat.map((prdst) => ({
-        ...prdst,
-        value: prdst.codeValue,
-        label: prdst.codeName,
-      }));
-      const lstg1Opt = data.listingType.map(lstg1 => ({
-        ...lstg1,
-        value: lstg1.codeValue,
-        label: lstg1.codeName
-      }));
-      setTypeSaleOptions(trdstOpt);
-      setProdStatOptions(prdstOpt);
-      setListingTypeOptions(lstg1Opt);
-    })
+    axios
+      .post("form", {
+        codeGroup: {
+          typeSale: "TRDST",
+          prodStat: "PRDST",
+          listingType: "LSTG1",
+        },
+      })
+      .then((data) => {
+        const trdstOpt = data.typeSale.map((trdst) => ({
+          ...trdst,
+          value: trdst.codeValue,
+          label: trdst.codeName,
+        }));
+        const prdstOpt = data.prodStat.map((prdst) => ({
+          ...prdst,
+          value: prdst.codeValue,
+          label: prdst.codeName,
+        }));
+        const lstg1Opt = data.listingType.map((lstg1) => ({
+          ...lstg1,
+          value: lstg1.codeValue,
+          label: lstg1.codeName,
+        }));
+        setTypeSaleOptions(trdstOpt);
+        setProdStatOptions(prdstOpt);
+        setListingTypeOptions(lstg1Opt);
+      })
       .catch((err) => {
         console.error("공통코드 오류남(ContractListingSelect)", err);
       });
@@ -92,18 +96,29 @@ function ContractListingSelect({ onSave, }) {
   };
 
   const getListingTypeCode1Name = (lstgTypeCode1) => {
-    const matched = listingTypeOptions.find(opt => opt.value === lstgTypeCode1);
+    const matched = listingTypeOptions.find(
+      (opt) => opt.value === lstgTypeCode1
+    );
+    return matched ? matched.label : "기타";
+  };
+
+  const getListingTypeSaleName = (lstgTypeSale) => {
+    const matched = typeSaleOptions.find((opt) => opt.value === lstgTypeSale);
     return matched ? matched.label : "기타";
   };
 
   const getListingProdStatName = (lstgProdStat) => {
-    const matched = prodStatOptions.find(opt => opt.value === lstgProdStat);
+    const matched = prodStatOptions.find((opt) => opt.value === lstgProdStat);
     const getColor = (code) => {
       switch (code) {
-        case "001": return "success";
-        case "002": return "warning";
-        case "003": return "error";
-        default: return "gray";
+        case "001":
+          return "success";
+        case "002":
+          return "warning";
+        case "003":
+          return "error";
+        default:
+          return "gray";
       }
     };
     return (
@@ -115,31 +130,61 @@ function ContractListingSelect({ onSave, }) {
 
   const filteredList = useMemo(() => {
     const trimmedSearch = searchText.trim().toLowerCase();
-    return lstgList.filter(lstg => {
-      if (filterListingTypeValue !== "000" && lstg.lstgTypeCode1 !== filterListingTypeValue) return false;
-      if (filterTypeSaleValue !== "000" && lstg.lstgTypeDeal !== filterTypeSaleValue) return false;
-      if (filterProdStatValue !== "000" && lstg.lstgProdStat !== filterProdStatValue) return false;
+    return lstgList.filter((lstg) => {
+      const regDate = lstg.lstgRegDate?.split("T")[0]; // "2025-07-20"
+      // 🔹 날짜 범위 조건
+      if (filterStartDate && regDate < filterStartDate) return false;
+      if (filterEndDate && regDate > filterEndDate) return false;
+
+      if (
+        filterListingTypeValue !== "000" &&
+        lstg.lstgTypeCode1 !== filterListingTypeValue
+      )
+        return false;
+      if (
+        filterTypeSaleValue !== "000" &&
+        lstg.lstgTypeSale !== filterTypeSaleValue
+      )
+        return false;
+      if (
+        filterProdStatValue !== "000" &&
+        lstg.lstgProdStat !== filterProdStatValue
+      )
+        return false;
       if (!trimmedSearch || (backspaceUsed && !trimmedSearch)) return true;
-      if (searchCategory === '전체') {
+      if (searchCategory === "전체") {
         return (
           (lstg.lstgNm || "").toLowerCase().includes(trimmedSearch) ||
-          (lstg.tenancyInfo?.mbrNm || "").toLowerCase().includes(trimmedSearch) ||
+          (lstg.tenancyInfo?.mbrNm || "")
+            .toLowerCase()
+            .includes(trimmedSearch) ||
           (lstg.lstgAdd || "").toLowerCase().includes(trimmedSearch)
         );
       }
       const value = (() => {
         switch (searchCategory) {
-          case '매물명': return lstg.lstgNm || '';
-          case '임대인': return lstg.tenancyInfo?.mbrNm || '';
-          case '주소': return lstg.lstgAdd || '';
-          default: return '';
+          case "매물명":
+            return lstg.lstgNm || "";
+          case "임대인":
+            return lstg.tenancyInfo?.mbrNm || "";
+          case "주소":
+            return lstg.lstgAdd || "";
+          default:
+            return "";
         }
       })();
       return value.toLowerCase().includes(trimmedSearch);
     });
   }, [
-    lstgList, searchCategory, searchText, backspaceUsed,
-    filterListingTypeValue, filterTypeSaleValue, filterProdStatValue
+    lstgList,
+    searchCategory,
+    searchText,
+    backspaceUsed,
+    filterListingTypeValue,
+    filterTypeSaleValue,
+    filterProdStatValue,
+    filterStartDate,
+    filterEndDate,
   ]);
 
   const handleResetFilters = () => {
@@ -150,6 +195,8 @@ function ContractListingSelect({ onSave, }) {
     setSearchText("");
     setBackspaceUsed(false);
     setCurrentPage(1);
+    setFilterStartDate("");
+    setFilterEndDate("");
   };
 
   const paginatedList = useMemo(() => {
@@ -160,15 +207,18 @@ function ContractListingSelect({ onSave, }) {
 
   return (
     <>
-      <ComponentCard
-        title="📝 계약할 매물 선택"
-      >
+      <ComponentCard title="📝 계약할 매물 선택">
         {/* 검색요소 */}
         <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50">
-          <div data-name={"SearchBox^0^"} className="flex flex-row justify-between">
+          <div
+            data-name={"SearchBox^0^"}
+            className="flex flex-row justify-between"
+          >
             <div className="flex flex-row gap-3">
               <div className="flex flex-col justify-start">
-                <Label className="h-fit text-xs font-semibold">＊ 매물 유형</Label>
+                <Label className="h-fit text-xs font-semibold">
+                  ＊ 매물 유형
+                </Label>
                 <SelectControlled
                   value={filterListingTypeValue}
                   onChange={(val) => setFilterListingTypeValue(val)}
@@ -178,7 +228,9 @@ function ContractListingSelect({ onSave, }) {
                 />
               </div>
               <div className="flex flex-col justify-start">
-                <Label className="h-fit text-xs font-semibold">＊ 거래 유형</Label>
+                <Label className="h-fit text-xs font-semibold">
+                  ＊ 거래 유형
+                </Label>
                 <SelectControlled
                   value={filterTypeSaleValue}
                   onChange={(val) => setFilterTypeSaleValue(val)}
@@ -189,7 +241,9 @@ function ContractListingSelect({ onSave, }) {
               </div>
 
               <div className="flex flex-col justify-start">
-                <Label className="h-fit text-xs font-semibold">＊ 거래 상태</Label>
+                <Label className="h-fit text-xs font-semibold">
+                  ＊ 거래 상태
+                </Label>
                 <SelectControlled
                   value={filterProdStatValue}
                   onChange={(val) => setFilterProdStatValue(val)}
@@ -198,6 +252,37 @@ function ContractListingSelect({ onSave, }) {
                   className="max-h-9 text-xs w-[90px]"
                 />
               </div>
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold">＊ 시작일</Label>
+                <Input
+                  type="date"
+                  value={filterStartDate}
+                  onChange={(e) => {
+                    setFilterStartDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                />
+              </div>
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold invisible">
+                  ~
+                </Label>
+                <span className="pt-2">~</span>
+              </div>
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold">＊ 종료일</Label>
+                <Input
+                  type="date"
+                  value={filterEndDate}
+                  onChange={(e) => {
+                    setFilterEndDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                />
+              </div>
+
               <div className="flex flex-col-reverse justify-start mb-3">
                 <button
                   onClick={handleResetFilters}
@@ -209,7 +294,9 @@ function ContractListingSelect({ onSave, }) {
             </div>
             <div className="flex flex-row gap-0 items-center mb-2">
               <div className="flex flex-col justify-start h-fit">
-                <Label className="h-fit text-xs font-semibold">＊ 검색 조건</Label>
+                <Label className="h-fit text-xs font-semibold">
+                  ＊ 검색 조건
+                </Label>
                 <SelectControlled
                   value={searchCategory}
                   onChange={(val) => setSearchCategory(val)}
@@ -223,8 +310,10 @@ function ContractListingSelect({ onSave, }) {
                   className="mr-2 max-h-9 text-xs w-[90px]"
                 />
               </div>
-              <div className="flex flex-col justify-start h-fit">
-                <Label className="h-fit text-xs font-semibold invisible">.</Label>
+              <div className="relative flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold invisible">
+                  .
+                </Label>
                 <Input
                   type="text"
                   placeholder="검색어 입력"
@@ -241,8 +330,11 @@ function ContractListingSelect({ onSave, }) {
                   onKeyDown={(e) => {
                     if (e.key === "Backspace") setBackspaceUsed(true);
                   }}
-                  className="ml-0 w-[200px] max-h-9 text-xs"
+                  className="ml-0 w-[200px] max-h-9 text-xs pr-10"
                 />
+                <span className="material-icons absolute right-1.5 top-[23px] text-gray-400 text-sm cursor-pointer hover:text-amber-300">
+                  search
+                </span>
               </div>
             </div>
           </div>
@@ -267,31 +359,37 @@ function ContractListingSelect({ onSave, }) {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[80px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[150px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     임대인
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     거래유형
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                  >
+                    매물 등록일자
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     거래상태
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[200px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     비고
                   </TableCell>
@@ -338,7 +436,12 @@ function ContractListingSelect({ onSave, }) {
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-theme-sm text-center dark:text-gray-400">
                       <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        ^0^
+                        {getListingTypeSaleName(lstg.lstgTypeSale)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
+                        {lstg.lstgRegDate?.split("T")[0]}
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
@@ -353,7 +456,6 @@ function ContractListingSelect({ onSave, }) {
                 ))}
               </TableBody>
             </Table>
-
           </div>
         </div>
         <div>
@@ -361,7 +463,11 @@ function ContractListingSelect({ onSave, }) {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage ? 'bg-amber-600 border border-amber-400 text-white' : 'bg-gray-100 border border-gray-300 text-gray-400'}`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
@@ -378,8 +484,9 @@ function ContractListingSelect({ onSave, }) {
       >
         <ComponentCard
           title={selectedListing?.lstgNm || "선택된 매물"}
-          desc={`${selectedListing?.lstgAdd || ""} ${selectedListing?.lstgAdd2 || ""
-            }`}
+          desc={`${selectedListing?.lstgAdd || ""} ${
+            selectedListing?.lstgAdd2 || ""
+          }`}
         >
           <div className="p-6 space-y-6">
             <div className="flex items-start justify-between">
@@ -469,10 +576,11 @@ function ContractListingSelect({ onSave, }) {
                 onClick={handleGoToContract}
                 disabled={!selectedListing?.tenancyInfo}
                 className={`px-6 text-white 
-                ${selectedListing?.tenancyInfo
+                ${
+                  selectedListing?.tenancyInfo
                     ? "bg-amber-600 hover:bg-amber-800"
                     : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                }`}
               >
                 계약으로 이동
               </Button>

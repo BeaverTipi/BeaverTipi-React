@@ -4,24 +4,40 @@ const Table = ({ children, className }) => {
 };
 
 // TableHeader Component
-const TableHeader = ({ children, className }) => {
-  return <thead className={className}>{children}</thead>;
+const TableHeader = ({ children, className, ...props }) => {
+  return (
+    <thead className={className} {...props}>
+      {children}
+    </thead>
+  );
 };
 
 // TableBody Component
-const TableBody = ({ children, className }) => {
-  return <tbody className={className}>{children}</tbody>;
+const TableBody = ({ children, className, ...props }) => {
+  return (
+    <tbody className={className} {...props}>
+      {children}
+    </tbody>
+  );
 };
 
 // TableRow Component
-const TableRow = ({ children, className }) => {
-  return <tr className={className}>{children}</tr>;
+const TableRow = ({ children, className, ...props }) => {
+  return (
+    <tr className={className} {...props}>
+      {children}
+    </tr>
+  );
 };
 
 // TableCell Component
-const TableCell = ({ children, isHeader = false, className }) => {
+const TableCell = ({ children, isHeader = false, className, ...props }) => {
   const CellTag = isHeader ? "th" : "td";
-  return <CellTag className={` ${className}`}>{children}</CellTag>;
+  return (
+    <CellTag className={` ${className}`} {...props}>
+      {children}
+    </CellTag>
+  );
 };
 
 export { Table, TableHeader, TableBody, TableRow, TableCell };

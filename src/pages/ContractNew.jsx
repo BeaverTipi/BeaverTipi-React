@@ -62,14 +62,14 @@ function ContractNew() {
   const [direction, setDirection] = useState("forward");
   const [tenancyNo, setTenancyNo] = useState(1);
   const {
-    contractInfo
-    , setContractInfo
-    , updateListingInfo
-    , updateLessorInfo
-    , updateLesseeInfo
-    , updateSampleId
-    , updateWrittenInfo
-    , updateAttachedFiles
+    contractInfo,
+    setContractInfo,
+    updateListingInfo,
+    updateLessorInfo,
+    updateLesseeInfo,
+    updateSampleId,
+    updateWrittenInfo,
+    updateAttachedFiles,
   } = useContractInfo();
   const contractInfoReset = {
     files: null,
@@ -105,26 +105,30 @@ function ContractNew() {
 
   const handleTenancySaved = (tenancyInfo) => {
     goToStep(STEP.ADD_LESSEE);
-    updateLessorInfo(tenancyInfo)
+    updateLessorInfo(tenancyInfo);
     console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
   };
   useEffect(() => {
     if (contractInfo?.lessorInfo) {
       console.log(
-        `%c[전환 후 상태확인]`, "color:yellow; font-weight:bold;",
-        contractInfo.lessorInfo);
+        `%c[전환 후 상태확인]`,
+        "color:yellow; font-weight:bold;",
+        contractInfo.lessorInfo
+      );
     }
   }, [contractInfo.lessorInfo]);
 
   const handleLesseeSaved = (lesseeInfo) => {
-    updateLesseeInfo(lesseeInfo)
+    updateLesseeInfo(lesseeInfo);
     goToStep(STEP.SAMPLE_SELECT);
   };
   useEffect(() => {
     if (contractInfo?.lesseeInfo) {
       console.log(
-        `%c[전환 후 상태확인]`, "color:yellow; font-weight:bold;",
-        contractInfo.lesseeInfo);
+        `%c[전환 후 상태확인]`,
+        "color:yellow; font-weight:bold;",
+        contractInfo.lesseeInfo
+      );
     }
   }, [contractInfo.lesseeInfo]);
 
@@ -134,10 +138,9 @@ function ContractNew() {
       goToStep(STEP.SAMPLE_WRITE);
       console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
     }, 0);
-
   };
 
-  const handleWrittenSaved = contract => {
+  const handleWrittenSaved = (contract) => {
     updateWrittenInfo(contract);
     goToStep(STEP.PDF_PREVIEW);
     console.log(`%c[전환]`, "color:yellow; font-weight:bold;", contractInfo);
@@ -211,32 +214,24 @@ function ContractNew() {
         transition={{ duration: 0.6, ease: "easeInOut" }}
       >
         <ContractNewStepNavigation step={step} STEP={STEP} />
-      </motion.div >
+      </motion.div>
       <div className="relative w-full min-h-screen">
         {/* 브라우저 높이 기준으로 스크롤 */}
         <AnimatePresence custom={direction} mode="wait">
-          {step === STEP.SELECT &&
-            (isFirstRender ? (
-              <div key="select" className="w-full">
-                <ContractListingSelect
-                  onSave={handleListingSaved}
-                />
-              </div>
-            ) : (
-              <motion.div
-                key="select"
-                custom={direction}
-                variants={variants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="w-full"
-              >
-                <ContractListingSelect
-                  onSave={handleListingSaved}
-                />
-              </motion.div>
-            ))}
+          {step === STEP.SELECT && (
+            <motion.div
+              key="select"
+              initial={isFirstRender ? { opacity: 0, y: 20 } : undefined}
+              animate={isFirstRender ? { opacity: 1, y: 0 } : "animate"}
+              exit={isFirstRender ? { opacity: 0, y: 20 } : "exit"}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
+              custom={isFirstRender ? undefined : direction}
+              variants={isFirstRender ? undefined : variants}
+              className="w-full"
+            >
+              <ContractListingSelect onSave={handleListingSaved} />
+            </motion.div>
+          )}
 
           {step === STEP.ADD_TENANCY && (
             <motion.div
