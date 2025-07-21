@@ -16,24 +16,19 @@ const Input = ({
   hint,
   //커스텀 영역
   onKeyDown,
+  onBlur,
+  ...props
 }) => {
-  // let inputClasses = ` h-11 rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${className} w-full`;
+  const isDateInput = type === "date";
 
-  // if (disabled) {
-  //   inputClasses += ` text-gray-500 border-gray-300 opacity-40 bg-gray-100 cursor-not-allowed dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700 opacity-40`;
-  // } else if (error) {
-  //   inputClasses += `  border-error-500 focus:border-error-300 focus:ring-error-500/20 dark:text-error-400 dark:border-error-500 dark:focus:border-error-800`;
-  // } else if (success) {
-  //   inputClasses += `  border-success-500 focus:border-success-300 focus:ring-success-500/20 dark:text-success-400 dark:border-success-500 dark:focus:border-success-800`;
-  // } else {
-  //   inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-amber-300 focus:ring-amber-500/20 dark:border-gray-700 dark:text-white/90  dark:focus:border-amber-800`;
-  // }
   const baseClass = `
-    h-11 rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs 
-    placeholder:text-gray-400 focus:outline-hidden focus:ring-3 
-    dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30
-    w-full
-  `;
+  ${isDateInput ? "appearance-auto bg-white text-black" : "bg-transparent"}
+  h-11 rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs 
+  placeholder:text-gray-400 focus:outline-hidden focus:ring-3
+  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30
+  w-full
+`;
+
 
   const stateClass = disabled
     ? `text-gray-500 border-gray-300 opacity-40 bg-gray-100 cursor-not-allowed 
@@ -47,7 +42,12 @@ const Input = ({
         : `bg-transparent text-gray-800 border-gray-300 focus:border-amber-300 focus:ring-amber-500/20 
        dark:border-gray-700 dark:text-white/90 dark:focus:border-amber-800`;
 
-  const inputClasses = twMerge(`${baseClass} ${stateClass} ${className}`);
+  const inputClasses = twMerge(`
+    ${baseClass}
+    ${type === "date" ? "appearance-auto bg-white text-black dark:bg-gray-900 dark:text-white" : "appearance-none bg-transparent text-gray-800 dark:text-white/90"}
+    ${stateClass}
+    ${className}
+  `);
   return (
     <>
       <input
@@ -63,6 +63,8 @@ const Input = ({
         disabled={disabled}
         className={inputClasses}
         onKeyDown={onKeyDown}
+        onBlur={onBlur}
+        {...props}
       />
 
       {hint && (

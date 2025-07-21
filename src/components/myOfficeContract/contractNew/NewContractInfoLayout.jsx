@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { useContractInfo } from "../../../context/ContractInfoContext";
 import { useSecureAxios } from "../../../hooks/useSecureAxios";
 import { useAES256 } from "../../../hooks/useAES256";
+import { Navigate, useNavigate } from "react-router";
 
 /*
   사용자가 모든 계약데이터를 입력한 뒤, 마지막 확인 및 파일 첨부를 하는 단계
@@ -16,10 +17,11 @@ import { useAES256 } from "../../../hooks/useAES256";
  */
 function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
   const axios = useSecureAxios();
+  const navigate = useNavigate();
   const { contractInfo } = useContractInfo();
   const { listing, tenancy, lessee, broker, files } = contractInfo;
   const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
-  const { encryptWithRandomIV } = useAES256();
+  const { encryptWithRandomIV, encrypt } = useAES256();
   const handleSubmitProceedingContract = async () => {
     const hasStandardPdf = uploadedFiles.some(
       (file) => file.name === "표준임대차계약서.pdf"
@@ -66,16 +68,17 @@ function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
     await axios.post("cont/new/submit", payload)
       .then(data => {
         const contId = data?.contId;
+        console.log("1298u24398q23re98eqr2q99", contId);
         if (contId) {
-          const localStorageKey = encryptWithRandomIV("NEXT_PROCEEDING-CONTRACT");
-          const localStorageValue = encryptWithRandomIV(contId);
+          const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
+          const localStorageValue = encrypt(contId);
           localStorage.setItem(localStorageKey, localStorageValue);
           Swal.fire({
             icon: "success",
             title: "제출 완료!",
             text: "신규 계약이 성공적으로 등록되었습니다.",
           }).then(() => {
-            window.location.href = "/broker/myoffice/cont/proceeding";
+            window.location.href = "/broker/myoffice/cont/proceeding"
           });
         } else {
           throw new Error("계약 ID 누락");

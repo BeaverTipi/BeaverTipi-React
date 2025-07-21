@@ -8,14 +8,14 @@ const Checkbox = ({
 }) => {
   return (
     <label
-      className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
+      className={`flex items-center group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
         }`}
     >
-      <div className="relative w-5 h-5">
+      <div className="relative w-4 h-4">
         <input
           id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-amber-400 disabled:opacity-60 
+          className={`w-4 h-4 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-amber-400 disabled:opacity-60 
           ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
@@ -25,8 +25,8 @@ const Checkbox = ({
           <svg
             className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2"
             xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
+            width="12"
+            height="12"
             viewBox="0 0 14 14"
             fill="none"
           >
@@ -43,8 +43,8 @@ const Checkbox = ({
           <svg
             className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2"
             xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
+            width="12"
+            height="12"
             viewBox="0 0 14 14"
             fill="none"
           >

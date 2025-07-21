@@ -22,7 +22,9 @@ function AddTenancy({
   const [tenancyList, setTenancyList] = useState({ "0": {} });
   useEffect(() => {
     if (lessor && Object.keys(lessor).length > 0 && Object.keys(lessor).length > 0) {
-      setTenancyList(lessor);
+      setTenancyList({
+        "0": { ...lessor["0"], lessorMbrCd: lessor["0"].mbrCd, lessorMbrId: lessor["0"].mbrId }
+      });
     }
   }, [lessor]);
   const addButtonRef = useRef(null);
@@ -102,7 +104,7 @@ function AddTenancy({
         mbrRegNo1: "",
         mbrRegNo2: "",
         rentalPtyId: tenancyList["0"]?.rentalPtyId || "",
-        lsrYnTypeCd: "",
+        lsrYnTypeCd: tenancyList["0"]?.lsrYnTypeCd || "",
         lessorBankNm: "",
         lessorBankAcc: "",
       }
@@ -139,7 +141,7 @@ function AddTenancy({
   const testDummyData = () => {
     setTenancyList({
       "0": {
-        rentalPtyId: "123-45-67890",
+        rentalPtyId: "987-65-43210",
         lsrYnTypeCd: "002", // 예: 개인사업자
         mbrNm: "홍길동",
         lessorBankNm: "004", // 예: 국민은행 (실제 codeValue에 맞게 입력)
@@ -148,6 +150,7 @@ function AddTenancy({
         mbrBasicAddr: "서울특별시 강남구 테헤란로",
         mbrDetailAddr: "101동 202호",
         mbrEmlAddr: "gildong@example.com",
+        lessorMbrCd: "M2507000110"
       },
       "1": {
         rentalPtyId: "987-65-43210",
@@ -159,6 +162,7 @@ function AddTenancy({
         mbrBasicAddr: "부산광역시 해운대구 해운대로",
         mbrDetailAddr: "301동 404호",
         mbrEmlAddr: "chulsoo@example.com",
+        lessorMbrCd: "M2507000110"
       },
     });
 
@@ -374,6 +378,22 @@ function AddTenancy({
                   }}
                 />
               </div>
+              <Input
+                className="flex-1 invisible"
+                readOnly
+                type="text"
+                name="lessorMbrCd"
+                id="lessorMbrCd"
+                placeholder="회원코드"
+                value={tenancyList[idx]?.lessorMbrCd || ""}
+                onChange={(e) => {
+                  const updated = {
+                    ...oneTenancy,
+                    mbrCd: e.target.value
+                  };
+                  updateLessor(idx, updated);
+                }}
+              />
             </div>
             <div className="col-span-4">
               <hr />

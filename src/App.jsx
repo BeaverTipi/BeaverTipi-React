@@ -57,7 +57,11 @@ const GlobalContextMenu = () => {
 
 export default function App() {
   useEffect(() => {
-    const blockDefaultContext = (e) => e.preventDefault();
+    const blockDefaultContext = (e) => {
+      // 달력 등 기본 UI 방해하지 않도록 input/date는 예외 처리
+      if (e.target.tagName === "INPUT" && e.target.type === "date") return;
+      e.preventDefault();
+    };
     document.addEventListener("contextmenu", blockDefaultContext);
     return () =>
       document.removeEventListener("contextmenu", blockDefaultContext);

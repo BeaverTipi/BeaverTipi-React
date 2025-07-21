@@ -282,14 +282,16 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
               }
             />
           </div>
-          <input
-            className="invisible"
-            type="text"
-            value={lesseeInfo?.mbrCd || ""}
-            name="mbrCd"
-            placeholder="회원코드"
+          <Input
+            className="flex-1 invisible"
             readOnly
-            disabled
+            type="text"
+            name="lesseembrCd"
+            placeholder="회원코드"
+            value={lesseeInfo?.lesseeMbrCd || ""}
+            onChange={(e) =>
+              setLesseeInfo({ ...lesseeInfo, lesseeMbrCd: e.target.value })
+            }
           />
         </div>
 

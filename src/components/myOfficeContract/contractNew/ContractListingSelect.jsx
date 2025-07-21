@@ -33,12 +33,24 @@ function ContractListingSelect({ onSave }) {
   const [filterTypeSaleValue, setFilterTypeSaleValue] = useState("000");
   const [filterProdStatValue, setFilterProdStatValue] = useState("000");
   const [filterStartDate, setFilterStartDate] = useState("");
-  const [filterEndDate, setFilterEndDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState(() => {
+    const now = new Date();
+    return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+  });
   const [searchCategory, setSearchCategory] = useState("전체");
   const [searchText, setSearchText] = useState("");
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const isValidDate = (dateStr) => {
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    return (
+      date instanceof Date &&
+      !isNaN(date) &&
+      dateStr === date.toISOString().slice(0, 10)
+    );
+  };
 
   useEffect(() => {
     axios
@@ -256,12 +268,16 @@ function ContractListingSelect({ onSave }) {
                 <Label className="h-fit text-xs font-semibold">＊ 시작일</Label>
                 <Input
                   type="date"
-                  value={filterStartDate}
-                  onChange={(e) => {
-                    setFilterStartDate(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  value={isValidDate(filterStartDate) ? filterStartDate : ""}
+                  onChange={(e) => setFilterStartDate(e.target.value)}
+                  onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                  onKeyDown={(e) => {
+                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    if (!allowed.includes(e.key)) {
+                      e.preventDefault(); // 숫자와 하이픈 외 입력 차단
+                    }
+                  }}
                 />
               </div>
               <div className="flex flex-col justify-start h-fit">
@@ -274,12 +290,16 @@ function ContractListingSelect({ onSave }) {
                 <Label className="h-fit text-xs font-semibold">＊ 종료일</Label>
                 <Input
                   type="date"
-                  value={filterEndDate}
-                  onChange={(e) => {
-                    setFilterEndDate(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  value={isValidDate(filterEndDate) ? filterEndDate : ""}
+                  onChange={(e) => setFilterEndDate(e.target.value)}
+                  onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                  onKeyDown={(e) => {
+                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    if (!allowed.includes(e.key)) {
+                      e.preventDefault(); // 숫자와 하이픈 외 입력 차단
+                    }
+                  }}
                 />
               </div>
 
@@ -398,62 +418,72 @@ function ContractListingSelect({ onSave }) {
 
               {/* Table Body */}
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {paginatedList.map((lstg, idx) => (
-                  <TableRow
-                    key={lstg.lstgId}
-                    className={"hover:bg-gray-100 dark:hover:bg-white/5"}
-                  >
-                    <TableCell className="px-5 py-4 sm:px-6 text-center">
-                      <div className="pointer-events-none flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
-                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                          {idx + 1}
-                        </span>
+                {paginatedList.length > 0 ? (
+                  paginatedList.map((lstg, idx) => (
+                    <TableRow
+                      key={lstg.lstgId}
+                      className={"hover:bg-gray-100 dark:hover:bg-white/5"}
+                    >
+                      <TableCell className="px-5 py-4 sm:px-6 text-center">
+                        <div className="pointer-events-none flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
+                          <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                            {idx + 1}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                        <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
+                          {getListingTypeCode1Name(lstg.lstgTypeCode1)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <div
+                          title={lstg.lstgNm}
+                          className="cursor-pointer text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
+                          onClick={() => {
+                            console.log("📣 Row clicked!", lstg.lstgId);
+                            handleSelectListing(lstg.lstgId);
+                          }}
+                        >
+                          {lstg.lstgNm}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <div className="pointer-events-none flex justify-center -space-x-2 text-center overflow-hidden text-ellipsis whitespace-nowrap">
+                          {lstg.tenancyInfo !== null
+                            ? lstg.tenancyInfo.mbrNm
+                            : "-"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-theme-sm text-center dark:text-gray-400">
+                        <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
+                          {getListingTypeSaleName(lstg.lstgTypeSale)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                        <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
+                          {lstg.lstgRegDate?.split("T")[0]}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                        <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
+                          {getListingProdStatName(lstg.lstgProdStat)}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                        <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap"></div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow className={"hover:bg-gray-100 dark:hover:bg-white/5"} >
+                    <TableCell className="text-gray-500 text-theme-xs dark:text-gray-400" colSpan={8}>
+                      <div className="py-4 pointer-events-none overflow-hidden text-center text-lg whitespace-nowrap">
+                        없어요
                       </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        {getListingTypeCode1Name(lstg.lstgTypeCode1)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                      <div
-                        title={lstg.lstgNm}
-                        className="cursor-pointer text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
-                        onClick={() => {
-                          console.log("📣 Row clicked!", lstg.lstgId);
-                          handleSelectListing(lstg.lstgId);
-                        }}
-                      >
-                        {lstg.lstgNm}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none flex justify-center -space-x-2 text-center overflow-hidden text-ellipsis whitespace-nowrap">
-                        {lstg.tenancyInfo !== null
-                          ? lstg.tenancyInfo.mbrNm
-                          : "-"}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm text-center dark:text-gray-400">
-                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        {getListingTypeSaleName(lstg.lstgTypeSale)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        {lstg.lstgRegDate?.split("T")[0]}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        {getListingProdStatName(lstg.lstgProdStat)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                      <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap"></div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
@@ -463,11 +493,10 @@ function ContractListingSelect({ onSave }) {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${
-                  i + 1 === currentPage
-                    ? "bg-amber-600 border border-amber-400 text-white"
-                    : "bg-gray-100 border border-gray-300 text-gray-400"
-                }`}
+                className={`px-3 py-1 rounded ${i + 1 === currentPage
+                  ? "bg-amber-600 border border-amber-400 text-white"
+                  : "bg-gray-100 border border-gray-300 text-gray-400"
+                  }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
@@ -484,9 +513,8 @@ function ContractListingSelect({ onSave }) {
       >
         <ComponentCard
           title={selectedListing?.lstgNm || "선택된 매물"}
-          desc={`${selectedListing?.lstgAdd || ""} ${
-            selectedListing?.lstgAdd2 || ""
-          }`}
+          desc={`${selectedListing?.lstgAdd || ""} ${selectedListing?.lstgAdd2 || ""
+            }`}
         >
           <div className="p-6 space-y-6">
             <div className="flex items-start justify-between">
@@ -576,11 +604,10 @@ function ContractListingSelect({ onSave }) {
                 onClick={handleGoToContract}
                 disabled={!selectedListing?.tenancyInfo}
                 className={`px-6 text-white 
-                ${
-                  selectedListing?.tenancyInfo
+                ${selectedListing?.tenancyInfo
                     ? "bg-amber-600 hover:bg-amber-800"
                     : "bg-gray-300 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 계약으로 이동
               </Button>
