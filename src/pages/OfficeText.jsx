@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
+import OfficeInfoMain from '../components/myOfficeInfo/OfficeInfoMain.jsx';
+
 
 function OfficeText() {
   return (
-    <div>OfficeText</div>
-  )
+    <OfficeInfoMain />
+  );
 }
 
-export default OfficeText
+export default OfficeText;
