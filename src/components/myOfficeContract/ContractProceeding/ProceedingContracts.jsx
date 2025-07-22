@@ -312,22 +312,18 @@ function ProceedingContracts() {
   const handleContractSignaturePageNavigate = async contId => {
     try {
       // 1. 서버에 contSignYn 조회 요청
-      const data = await axios.post(`cont/proc/sign-status`, {
+      const { success, signYn, _message } = await axios.post(`cont/proc/sign-status`, {
         contId: contId
         , _method: "GET"
       });
 
-      const contSignYn = data;
-
-      if (contSignYn === "N") {
-        // 2. 닫힌 계약이면 알림
+      if (!success || signYn === "N") {
         Swal.fire({
           icon: "info",
           title: "서명페이지가 만료되었습니다",
           text: "해당 계약의 서명 가능 기간이 종료되었습니다.",
         });
       } else {
-        // 3. 정상일 경우만 이동
         navigate("/contract", { state: { contId } });
       }
     } catch (err) {
@@ -372,7 +368,7 @@ function ProceedingContracts() {
     if (!result.isConfirmed) return;
 
     try {
-      const response = await axios.post("cont/proc/open-signpage", {
+      const data = await axios.post("cont/proc/open-signpage", {
         contId,
         _method: "UPDATE",
       });
@@ -395,7 +391,6 @@ function ProceedingContracts() {
         );
       // // (3) 서명 페이지로 이동
       // navigate("/contract", { state: { contId } });
-
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({
