@@ -28,7 +28,7 @@ export default function ListingTradeSection({ formData, onChange }) {
           name="lstgTypeSale"
           options={tradeOptions}
           placeholder="선택"
-          value={tradeType}
+          value={formData.lstgTypeSale}
           onChange={handleTradeTypeChange}
           className="w-48"
         />
@@ -48,21 +48,21 @@ export default function ListingTradeSection({ formData, onChange }) {
           onChange={onChange}
         />
       </div>
-      <div className="flex flex-col">
-        <Label className="mb-1">보증금</Label>
-        <Input
-          type="number"
-          name="lstgFee"
-          placeholder="보증금"
-          value={formData.lstgFee}
-          onChange={onChange}
-        />
-      </div>
     </div>
   )}
 
   {tradeType === "2" && (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="flex flex-col">
+        <Label className="mb-1">보증금</Label>
+        <Input
+          type="number"
+          name="lstgLeaseAmt"
+          placeholder="보증금"
+          value={formData.lstgFee}
+          onChange={onChange}
+        />
+      </div>
       <div className="flex flex-col">
         <Label className="mb-1">월세</Label>
         <Input
@@ -70,16 +70,6 @@ export default function ListingTradeSection({ formData, onChange }) {
           name="lstgLeaseM"
           placeholder="월세"
           value={formData.lstgLeaseM}
-          onChange={onChange}
-        />
-      </div>
-      <div className="flex flex-col">
-        <Label className="mb-1">보증금</Label>
-        <Input
-          type="number"
-          name="lstgFee"
-          placeholder="보증금"
-          value={formData.lstgFee}
           onChange={onChange}
         />
       </div>
