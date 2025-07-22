@@ -3,28 +3,64 @@ import React from "react";
 const NameCardPreview = React.forwardRef(({
   width = 360,
   height = 200,
-  bigTitle,
-  smallTitle,
-  content1,
-  content2,
-  content3,
-  color = "#3a5dfb",
   bgImage,
+  color = "#3a5dfb",
   textColor = "#222",
   profiles = [],
   onProfileDelete,
   onProfileUpdate,
-  onSelect
+  texts = [],
+  onTextFontSize,
+  onTextPos,
+  onRemoveText
 }, ref) => {
+  // 텍스트 이동
+  const handleTextMoveMouseDown = (idx, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const { x, y } = texts[idx].pos;
+    const onMouseMove = moveEvt => {
+      const diffX = moveEvt.clientX - startX;
+      const diffY = moveEvt.clientY - startY;
+      onTextPos(idx, { x: x + diffX, y: y + diffY });
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
 
-  // 이동/크기조절
-  const handleMoveMouseDown = (idx, e) => {
+  // 텍스트 크기조절
+  const handleTextResizeMouseDown = (idx, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startFontSize = texts[idx].fontSize;
+    const onMouseMove = moveEvt => {
+      const diff = moveEvt.clientX - startX;
+      const newFontSize = Math.max(10, startFontSize + diff * 0.5); // 0.5배율로 부드럽게
+      onTextFontSize(idx, newFontSize);
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
+
+  // 프로필 이미지 이동/크기조절 동일(생략, 기존코드 유지)
+  const handleProfileMoveMouseDown = (idx, e) => {
     e.preventDefault();
     e.stopPropagation();
     const startX = e.clientX;
     const startY = e.clientY;
     const { x, y } = profiles[idx].pos;
-    const onMouseMove = (moveEvt) => {
+    const onMouseMove = moveEvt => {
       const diffX = moveEvt.clientX - startX;
       const diffY = moveEvt.clientY - startY;
       onProfileUpdate(idx, { pos: { x: x + diffX, y: y + diffY } });
@@ -37,12 +73,12 @@ const NameCardPreview = React.forwardRef(({
     window.addEventListener("mouseup", onMouseUp);
   };
 
-  const handleResizeMouseDown = (idx, e) => {
+  const handleProfileResizeMouseDown = (idx, e) => {
     e.preventDefault();
     e.stopPropagation();
     const startX = e.clientX;
     const startSize = profiles[idx].size;
-    const onMouseMove = (moveEvt) => {
+    const onMouseMove = moveEvt => {
       const diff = moveEvt.clientX - startX;
       const newSize = Math.max(32, startSize + diff);
       onProfileUpdate(idx, { size: newSize });
@@ -66,21 +102,76 @@ const NameCardPreview = React.forwardRef(({
         borderRadius: 12,
         boxShadow: "0 4px 24px rgba(0,0,0,0.1)",
         overflow: "hidden",
-        userSelect: "none",
-        zIndex: 1,
-        pointerEvents: "auto"
+        userSelect: "none"
       }}
     >
-      {/* 텍스트 영역 */}
-      <div style={{ padding: 16, color: textColor }}>
-        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, letterSpacing: ".5px" }}>{bigTitle || "홍길동"}</h2>
-        <h4 style={{ margin: "4px 0", fontSize: 16, fontWeight: 500 }}>{smallTitle || "회사명/직책"}</h4>
-        <p style={{ margin: "8px 0 0", fontSize: 14 }}>{content1 || "010-1234-5678"}</p>
-        <p style={{ margin: "4px 0 0", fontSize: 14 }}>{content2 || "email@example.com"}</p>
-        <p style={{ margin: "4px 0 0", fontSize: 14 }}>{content3 || "주소/기타 정보"}</p>
-      </div>
+      {/* 모든 텍스트 렌더 */}
+      {texts.map((t, idx) => (
+        <div
+          key={t.key}
+          style={{
+            position: "absolute",
+            left: t.pos.x,
+            top: t.pos.y,
+            color: textColor,
+            fontSize: t.fontSize,
+            fontWeight: idx === 0 ? 700 : 500, // 첫줄(이름)은 두껍게
+            letterSpacing: ".5px",
+            cursor: "move",
+            zIndex: 20 + idx,
+            display: "flex",
+            alignItems: "center"
+          }}
+          onMouseDown={e => handleTextMoveMouseDown(idx, e)}
+        >
+          <span
+            style={{
+              background: "rgba(255,255,255,0.02)",
+              padding: "2px 3px 2px 2px",
+              borderRadius: 4
+            }}
+          >
+            {t.value || (idx === 0
+              ? "홍길동"
+              : idx === 1
+                ? "회사명/직책"
+                : idx === 2
+                  ? "010-1234-5678"
+                  : idx === 3
+                    ? "email@example.com"
+                    : idx === 4
+                      ? "주소/기타 정보"
+                      : `Text${idx + 1}`)}
+          </span>
+          {/* 크기조절 핸들 */}
+          <div
+            onMouseDown={e => handleTextResizeMouseDown(idx, e)}
+            style={{
+              position: "absolute",
+              right: -19,
+              bottom: -16,
+              width: 23,
+              height: 23,
+              background: "#fff",
+              border: "2px solid #3a5dfb",
+              borderRadius: 8,
+              cursor: "nwse-resize",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 15,
+              color: "#3a5dfb",
+              boxShadow: "0 2px 8px #3a5dfb11",
+              userSelect: "none",
+              zIndex: 1
+            }}
+            tabIndex={-1}
+          >↔</div>
+          
+        </div>
+      ))}
 
-      {/* 프로필 여러장 + X버튼만 */}
+      {/* 프로필 여러장 + X버튼 */}
       {profiles.map((profile, idx) => (
         <div
           key={idx}
@@ -88,14 +179,13 @@ const NameCardPreview = React.forwardRef(({
             position: "absolute",
             left: profile.pos.x,
             top: profile.pos.y,
-            zIndex: 10 + idx,
-            pointerEvents: "auto", // ← 이거!
+            zIndex: 50 + idx,
+            pointerEvents: "auto",
             width: profile.size,
             height: profile.size,
             cursor: "move"
           }}
-          onMouseDown={e => handleMoveMouseDown(idx, e)}
-          onClick={e => { e.stopPropagation(); onSelect?.(idx); }}
+          onMouseDown={e => handleProfileMoveMouseDown(idx, e)}
         >
           <div
             style={{
@@ -122,7 +212,6 @@ const NameCardPreview = React.forwardRef(({
                 background: "#fff"
               }}
             />
-            {/* X버튼 */}
             <button
               style={{
                 position: "absolute", 
@@ -151,7 +240,7 @@ const NameCardPreview = React.forwardRef(({
           </div>
           {/* 크기조절 핸들 */}
           <div
-            onMouseDown={e => handleResizeMouseDown(idx, e)}
+            onMouseDown={e => handleProfileResizeMouseDown(idx, e)}
             style={{
               position: "absolute",
               right: -16,
