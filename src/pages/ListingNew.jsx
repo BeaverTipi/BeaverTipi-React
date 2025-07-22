@@ -7,7 +7,6 @@ import ListingFacilitySection from "../components/myOfficeListing/newList/Listin
 import ListingDescriptionSection from "../components/myOfficeListing/newList/ListingDescriptionSection";
 import SubmitSection from "../components/myOfficeListing/newList/SubmitSection";
 import ListingPhotoUploadSection from "../components/myOfficeListing/newList/ListingPhotoUploadSection";
-
 import { useSecureAxios } from "../hooks/useSecureAxios";
 import ComponentCard from "../components/common/ComponentCard";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
@@ -22,13 +21,12 @@ const ListingNew = () => {
     typeSale: [],
     lstgType1: [],
     lstgType2: [],
-    facType: []
+    facType: [],
   });
-
+  
   const [facilityAppliances, setFacilityAppliances] = useState([]);
   const [facilityFurnitures, setFacilityFurnitures] = useState([]);
   const [facilityBuildings, setFacilityBuildings] = useState([]);
-
   const [existingImages, setExistingImages] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -43,60 +41,45 @@ const ListingNew = () => {
     imageUpload: [],
     appliance: [],
     furniture: [],
-    building: []
+    building: [],
+    lstgFloor: "",
+    lstgBath: "",
+    lstgRoomCnt: "",
+    lstgAdd: "",
+    lstgAdd2: "",
+    lstgPostal: "",
   });
-
+    // 📍 filtered 소분류 코드 만들기
+  const filteredLstgType2 = commonCodes.lstgType2.filter(
+    (item) => item.parentCodeValue === formData.lstgTypeCode1
+  );
+  
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchAll = async () => {
       try {
-        const formRes = await axios.post("/form", {
+        // 공통 코드 불러오기
+        const { typeSale, lstgType1, lstgType2, facType } = await axios.post("/form", {
           codeGroup: {
             typeSale: "TRDST",
             lstgType1: "LSTG1",
             lstgType2: "LSTG2",
-            facType: "FAC"
-          }
+            facType: "FAC",
+          },
         });
+        setCommonCodes({ typeSale, lstgType1, lstgType2, facType });
+        
+        // 시설 옵션 불러오기
+        const options = await axios.post("/lstg/facilityOption");
+        if (!Array.isArray(options)) throw new Error("옵션 결과가 배열이 아님");
 
-        const formData = formRes.data;
-        setCommonCodes({
-          typeSale: formData.typeSale || [],
-          lstgType1: formData.lstgType1 || [],
-          lstgType2: formData.lstgType2 || [],
-          facType: formData.facType || []
-        });
-      } catch (err) {
-        console.error("공통코드 불러오기 실패", err);
-      }
+        setFacilityAppliances(options.filter((opt) => opt.facTypeCcCd === "001"));
+        setFacilityFurnitures(options.filter((opt) => opt.facTypeCcCd === "002"));
+        setFacilityBuildings(options.filter((opt) => opt.facTypeCcCd === "003"));
 
-      try {
-  const optionRes = await axios.post("/lstg/facilityOption", {});
-  const options = optionRes.data;
-
-  if (!Array.isArray(options)) {
-    console.error("시설 옵션 응답이 배열이 아닙니다:", options);
-    return;
-  }
-
-      setFacilityAppliances(options.filter(opt => opt.facTypeCcCd === "001"));
-      setFacilityFurnitures(options.filter(opt => opt.facTypeCcCd === "002"));
-      setFacilityBuildings(options.filter(opt => opt.facTypeCcCd === "003"));
-    } catch (err) {
-      console.error("시설 옵션 불러오기 실패", err);
-    }
-
-    };
-
-    fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    const fetchListingDetails = async () => {
-      try {
+        // 수정 모드일 경우 상세 정보 조회
         if (isEditMode) {
           const res = await axios.post("/lstg/listing-details", { lstgId });
-
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             lstgNm: res.lstgNm,
             lstgTypeCode1: res.lstgTypeCode1,
@@ -112,41 +95,58 @@ const ListingNew = () => {
             heating: res.heating,
             cooling: res.cooling || [],
             lstgDesc: res.lstgDesc,
-            imageUpload: [],
             appliance: res.appliance || [],
             furniture: res.furniture || [],
-            building: res.building || []
+            building: res.building || [],
           }));
 
-          if (Array.isArray(res.lstgImageUrls)) {
-            setExistingImages(res.lstgImageUrls);
-          } else if (res.lstgThumbnailUrl) {
-            setExistingImages([res.lstgThumbnailUrl]);
-          }
+          const images = res.lstgImageUrls ?? (res.lstgThumbnailUrl ? [res.lstgThumbnailUrl] : []);
+          setExistingImages(images);
         }
       } catch (err) {
-        console.error("매물 정보 조회 실패", err);
+        console.error("초기 데이터 불러오기 실패", err);
       }
+
+      // 카카오 주소 검색 스크립트 삽입
+      const script = document.createElement("script");
+      script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.async = true;
+      document.body.appendChild(script);
+      return () => document.body.removeChild(script);
     };
 
-    fetchListingDetails();
-  }, [isEditMode, lstgId]);
+    fetchAll();
+  }, [axios, isEditMode, lstgId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     if (type === "checkbox") {
-      if (["roomFeature", "cooling", "appliance", "furniture", "building"].includes(name)) {
-        setFormData((prev) => {
+      const isMulti = ["roomFeature", "cooling", "appliance", "furniture", "building"].includes(name);
+      setFormData((prev) => {
+        if (isMulti) {
           const current = new Set(prev[name]);
           checked ? current.add(value) : current.delete(value);
           return { ...prev, [name]: [...current] };
-        });
-      } else {
-        setFormData((prev) => ({ ...prev, [name]: checked }));
-      }
+        } else {
+          return { ...prev, [name]: checked };
+        }
+      });
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleRadioChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (name, value, isChecked) => {
+    setFormData((prev) => {
+      const current = new Set(prev[name] || []);
+      isChecked ? current.add(value) : current.delete(value);
+      return { ...prev, [name]: [...current] };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -170,34 +170,59 @@ const ListingNew = () => {
         alert("등록 성공");
       }
       navigate("/broker/myoffice/lstg/mng");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert(isEditMode ? "수정 실패" : "등록 실패");
     }
   };
+// ✅ 주소검색 함수
+const handleAddressSearch = () => {
+  new window.daum.Postcode({
+    oncomplete: function (data) {
+      const fullAddress = data.address; // 도로명 주소 또는 지번 주소
+      const postalCode = data.zonecode; // 우편번호
+
+      setFormData((prev) => ({
+        ...prev,
+        lstgAdd: fullAddress,
+        lstgPostal: postalCode,
+        // lstgAdd2는 사용자가 직접 입력하게 두는 것이 일반적
+      }));
+    },
+  }).open();
+};
 
   return (
     <>
       <PageBreadcrumb pageTitle={isEditMode ? "매물 수정" : "매물 등록"} />
-      <ComponentCard title="매물 등록" onBack={() => navigate(-1)}>
+      <ComponentCard title={isEditMode ? "수정" : "신규 등록"} onBack={() => navigate(-1)}>
         <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-8">
-          <ListingInfoSection formData={formData} onChange={handleChange} />
+          <ListingInfoSection
+            formData={formData}
+            onRadioChange={handleRadioChange}
+            onAddressSearch={handleAddressSearch}
+            commonCodes={commonCodes}
+            filteredLstgType2={filteredLstgType2}
+          />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ListingTradeSection formData={formData} onChange={handleChange} />
-            <ListingFacilitySection
+            <ListingExtraInfoSection
               formData={formData}
               onChange={handleChange}
-              applianceOptions={facilityAppliances}
-              furnitureOptions={facilityFurnitures}
-              buildingOptions={facilityBuildings}
+              onCheckboxChange={handleCheckboxChange}
+              onRadioChange={handleRadioChange}
             />
           </div>
-          <ListingExtraInfoSection formData={formData} onChange={handleChange} />
+          <ListingFacilitySection
+            formData={formData}
+            applianceOptions={facilityAppliances}
+            furnitureOptions={facilityFurnitures}
+            buildingOptions={facilityBuildings}
+            onCheckboxChange={handleCheckboxChange}
+          />
           <ListingDescriptionSection formData={formData} onChange={handleChange} />
           <ListingPhotoUploadSection
-            onChange={(files) =>
-              setFormData((prev) => ({ ...prev, imageUpload: files }))
-            }
+            onChange={(files) => setFormData((prev) => ({ ...prev, imageUpload: files }))}
             isEditMode={isEditMode}
             existingImages={existingImages}
           />
