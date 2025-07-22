@@ -76,11 +76,10 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
+        <span className="block mr-1 font-medium text-theme-sm">{BROKER_INFO.mbrNnm}&nbsp;</span>
+        <span className="mr-3 overflow-hidden rounded-full h-9 w-9">
           <img src={BROKER_INFO?.memberFile?.filePathUrl || "/images/재윤비버.png"} alt="User" />
         </span>
-
-        <span className="block mr-1 font-medium text-theme-sm">{BROKER_INFO.mbrNnm}</span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
             }`}

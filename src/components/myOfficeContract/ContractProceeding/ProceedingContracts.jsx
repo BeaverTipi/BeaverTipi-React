@@ -16,7 +16,6 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-
 function ProceedingContracts() {
   const navigate = useNavigate();
   const axios = useSecureAxios();
@@ -310,7 +309,36 @@ function ProceedingContracts() {
     }
   }, []);
 
-  const handleContractSignaturePageNavigate = contId => navigate("/contract", { state: { contId } });
+  const handleContractSignaturePageNavigate = async contId => {
+    try {
+      // 1. 서버에 contSignYn 조회 요청
+      const data = await axios.post(`cont/proc/sign-status`, {
+        contId: contId
+        , _method: "GET"
+      });
+
+      const contSignYn = data;
+
+      if (contSignYn === "N") {
+        // 2. 닫힌 계약이면 알림
+        Swal.fire({
+          icon: "info",
+          title: "서명페이지가 만료되었습니다",
+          text: "해당 계약의 서명 가능 기간이 종료되었습니다.",
+        });
+      } else {
+        // 3. 정상일 경우만 이동
+        navigate("/contract", { state: { contId } });
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "요청 실패",
+        text: "계약 상태를 확인하는 데 실패했습니다.",
+      });
+    }
+  };
 
   const handleContractSignaturePageOpen = async (contId) => {
     const contract = procContracts.find((c) => c.contId === contId);
@@ -377,6 +405,47 @@ function ProceedingContracts() {
       });
     }
   };
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:80/ws/contractExpire");
+
+    socket.onopen = () => {
+      console.log("✅ WebSocket 연결 성공");
+    };
+
+    socket.onmessage = (event) => {
+      const msg = event.data;
+      if (msg.startsWith("EXPIRED:")) {
+        const expiredContId = msg.split(":")[1];
+        console.log("📢 계약 만료 감지됨!", expiredContId);
+
+        // 📌 필요한 경우 상태값 갱신
+        setProcContracts(prev =>
+          prev.map(c => c.contId === expiredContId ? { ...c, contSignYn: "N" } : c)
+        );
+
+        Swal.fire({
+          icon: "info",
+          title: "서명 페이지 만료됨",
+          text: `계약 [${expiredContId}]의 서명 페이지가 만료되었습니다.`,
+        });
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("❌ WebSocket 에러", err);
+    };
+
+    socket.onclose = () => {
+      console.log("🔌 WebSocket 연결 종료됨");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+
 
   return (
     <>
