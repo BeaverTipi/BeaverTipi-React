@@ -66,6 +66,7 @@ function ProceedingContracts() {
         icon: 'info',
         timer: 1500,
         showConfirmButton: false,
+        scrollbarPadding: false
       });
     }
     const confirmed = await Swal.fire({
@@ -77,12 +78,24 @@ function ProceedingContracts() {
       cancelButtonColor: '#aaa',
       confirmButtonText: '삭제하기',
       cancelButtonText: '취소',
+      scrollbarPadding: false
     });
     if (!confirmed.isConfirmed) return;
 
     try {
-      await axios.post("cont/delete/bulk", selectedIds); // ✅ 경로 점검
-      setProcContracts(prev => prev.filter(c => !selectedIds.includes(c.contId)));
+      await axios.post("cont/proc/delete", {
+        selectedContracts: selectedIds,
+        _method: "DELETE"
+      })
+        .then(data => console.log(data));
+      setProcContracts(prev => {
+        const updated = prev.filter(c => !selectedIds.includes(c.contId));
+        const newTotalPages = Math.ceil(updated.length / itemsPerPage);
+        // 현재 페이지가 사라졌다면 이전 페이지로 이동
+        if (currentPage > newTotalPages)
+          setCurrentPage(Math.max(1, newTotalPages));
+        return updated;
+      });
       setSelectedIds([]);
       setIsBulkMode(false); // ✅ 성공시에만 종료
 
@@ -92,6 +105,7 @@ function ProceedingContracts() {
         icon: 'success',
         timer: 1500,
         showConfirmButton: false,
+        scrollbarPadding: false
       });
     } catch (err) {
       console.error("삭제 오류:", err);
@@ -101,6 +115,7 @@ function ProceedingContracts() {
         icon: 'error', // ✅ 수정됨
         timer: 1500,
         showConfirmButton: false,
+        scrollbarPadding: false
       });
     }
   };
@@ -185,7 +200,10 @@ function ProceedingContracts() {
     setCurrentPage(1);
     setIsBulkMode(false);
     setFilterStartDate("");
-    setFilterEndDate("");
+    setFilterEndDate(() => {
+      const now = new Date();
+      return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+    });
     setSelectedIds([]); // 모드 변경 시 선택 초기화
   };
   /*(1/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
@@ -292,10 +310,74 @@ function ProceedingContracts() {
     }
   }, []);
 
+  const handleContractSignaturePageNavigate = contId => navigate("/contract", { state: { contId } });
 
-  const handleContractSignaturePage = (contId) => {
-    navigate("/contract", { state: { contId } });
+  const handleContractSignaturePageOpen = async (contId) => {
+    const contract = procContracts.find((c) => c.contId === contId);
+    if (!contract) return;
+
+    const { listingInfo, tenancyInfo, lesseeInfo, contDtm, contTypeCode } = contract;
+    const result = await Swal.fire({
+      title: "계약 개설 확인",
+      html: `
+        <p style="font-weight: 500; font-size: 14px; margin-bottom: 10px;">
+          ⚠️ 전자서명 페이지는 개설 시점부터 <b>10분간 유효</b>하며 ⚠️<br/>
+          유효 시간이 지나면 자동으로 만료됩니다.<br/>
+          계약자에게 링크를 공유하기 전에 유효 시간을 꼭 확인해 주세요.
+        </p>
+        <div style="text-align: left; font-size: 13px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 10px;">
+          <b>매물명:</b> ${listingInfo?.lstgNm || "-"}<br/>
+          <b>주소:</b> ${listingInfo?.lstgAdd || "-"}<br/>
+          <b>임대인:</b> ${tenancyInfo?.mbrNm || "-"}<br/>
+          <b>임차인:</b> ${lesseeInfo?.mbrNm || "-"}<br/>
+          <b>계약일시:</b> ${contDtm || "-"}<br/>
+          <b>계약유형:</b> ${getContractTypeName(contTypeCode)}
+        </div>
+`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "서명 페이지 열기",
+      cancelButtonText: "취소",
+      scrollbarPadding: false,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const response = await axios.post("cont/proc/open-signpage", {
+        contId,
+        _method: "UPDATE",
+      });
+
+      axios
+        .post("cont/proc/list")
+        .then((data) => {
+          // console.log("proceeding-contracts:: ", data);
+          if (!isEqual(data, procContracts)) {
+            setProcContracts(data);
+          }
+          return data;
+        })
+        .then((data) =>
+          console.log(
+            `%c[RE_STATE] procContracts`,
+            "color:yellow; font-weight:bold",
+            procContracts
+          )
+        );
+      // // (3) 서명 페이지로 이동
+      // navigate("/contract", { state: { contId } });
+
+    } catch (err) {
+      console.error("서명 페이지 개설 실패", err);
+      Swal.fire({
+        icon: "error",
+        title: "오류 발생",
+        text: "서명 페이지 개설에 실패했습니다. 다시 시도해주세요.",
+      });
+    }
   };
+
   return (
     <>
       <ComponentCard title="📝 진행중인 계약">
@@ -626,18 +708,30 @@ function ProceedingContracts() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                          {" "}
-                          <button
-                            className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 "
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleContractSignaturePage(proc.contId);
-                            }}
-                          >
-                            개설
-                          </button>
+                          {proc.contSignYn === 'N' ? (
+                            <button
+                              className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleContractSignaturePageOpen(proc.contId);
+                              }}
+                            >
+                              개설
+                            </button>
+                          ) : (
+                            <button
+                              className="w-[50px] text-xs text-blue-700 border border-blue-700 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleContractSignaturePageNavigate(proc.contId); // 동일한 함수 재사용
+                              }}
+                            >
+                              이동
+                            </button>
+                          )}
                         </div>
                       </TableCell>
+
                     </TableRow>
                   ))
                 ) : (

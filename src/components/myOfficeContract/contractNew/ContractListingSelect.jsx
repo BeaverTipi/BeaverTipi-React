@@ -208,7 +208,10 @@ function ContractListingSelect({ onSave }) {
     setBackspaceUsed(false);
     setCurrentPage(1);
     setFilterStartDate("");
-    setFilterEndDate("");
+    setFilterEndDate(() => {
+      const now = new Date();
+      return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+    });
   };
 
   const paginatedList = useMemo(() => {
