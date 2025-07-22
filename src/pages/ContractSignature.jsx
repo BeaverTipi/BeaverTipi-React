@@ -9,6 +9,8 @@ export default function ContractSignature() {
   const location = useLocation();
   const contId = location.state?.contId;
   const [loading, setLoading] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 3000); // 3초 후 로딩 false
