@@ -80,11 +80,15 @@ export default function App() {
                 path="/broker"
                 element={<Navigate to="/broker/myoffice" replace />}
               />
-              {
-                //<Route path="/broker/myoffice/listing-details" element={<ListingDetails />} />
-              }
-              <Route path="/contract" element={<ContractSignature />} />
-              <Route path="/signin" element={<SignIn />} />
+              <Route path="/contract" element={
+                <ProtectedRoute>
+                  <ContractSignature />
+                </ProtectedRoute>
+              } />
+              <Route path="/signin" element={
+                <ProtectedRoute>
+                  <SignIn />
+                </ProtectedRoute>} />
               {/* 인증이 필요한 대시보드 라우트 */}
               <Route
                 path="/broker/myoffice"
@@ -99,7 +103,7 @@ export default function App() {
                 {/* 실제 기능 라우트 */}
                 <Route path="info" element={<OfficeInfo />}>
                   <Route path="text" element={<OfficeText />} />
-                  
+
                 </Route>
 
                 <Route path="lstg" element={<Listing />}>

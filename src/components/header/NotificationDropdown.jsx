@@ -25,6 +25,21 @@ export default function NotificationDropdown() {
   const groupStart = currentGroup * pagesPerGroup + 1;
   const groupEnd = Math.min(groupStart + pagesPerGroup - 1, totalPages);
 
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+  if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+  if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+
   const axios = useSecureAxios();
   useEffect(() => {
     reloadNotifications();
@@ -57,24 +72,23 @@ export default function NotificationDropdown() {
     try {
       const data = await axios.post(`notifications/read/${notifId}`);
       const targetUrl = data.notifRefUrl || "/";
+      if (!targetUrl.startsWith("/broker") &&
+        !targetUrl.startsWith("/contract") &&
+        !targetUrl.startsWith("/sign")
+      ) window.location.href = SPRING_URL_ORIGIN + targetUrl;
+      else window.location.href = targetUrl;
+      //^0^끝
       setNotifList(prev => {
         prev.map(notif => notif.notifId === notifId ? { ...notif, notifReadYn: true } : notif);
       });
-
-      // setTimeout(() => {
-      // }, 200);
-      // window.location.href = targetUrl;
     }
     catch (err) { console.err("알림 클릭 벗 targetUrl 이동 실패", err); }
   };
 
   const deleteNotification = async (notifId) => {
     await axios.delete(`/api/notifications/${notifId}`);
-    reloadNotifications(); // refresh
+    reloadNotifications();
   };
-
-
-
 
   function toggleDropdown() {
     setIsOpen(!isOpen);

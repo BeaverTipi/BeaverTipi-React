@@ -34,6 +34,7 @@ function ProceedingContracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [clickedRowId, setClickedRowId] = useState(null);
+
   useEffect(() => {
     if (clickedRowId !== null) {
       const timer = setTimeout(() => {
@@ -343,7 +344,10 @@ function ProceedingContracts() {
           scrollbarPadding: false,
         });
       } else {
-        navigate(`/contract/${contId}`, { state: { contId } });
+        // navigate(`/contract/${contId}`, { state: { contId } });
+        axios.post(`contract/${contId}`, {
+          contId: contId
+        });
       }
     } catch (err) {
       console.error(err);

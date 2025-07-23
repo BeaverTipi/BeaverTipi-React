@@ -5,7 +5,22 @@ import { useSecureAxios } from "../hooks/useSecureAxios";
 import { useAxios } from "../hooks/useAxios";
 
 export default function ContractSignature() {
-  const brokerAxios = useAxios();
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+  if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+  if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+
+  const axios = useSecureAxios();
   const navigate = useNavigate();
   const location = useLocation();
   const contId = location.state?.contId;
@@ -16,8 +31,8 @@ export default function ContractSignature() {
 
   useEffect(() => {
     // JWT 인증 여부 확인
-    brokerAxios
-      .get("http://localhost:80/rest/auth", { withCredentials: true })
+    axios
+      .get(`${SPRING_URL_ORIGIN}/rest/auth`, { withCredentials: true })
       .then(() => console.log("✅ 인증됨"))
       .catch(() => navigate("/signin", { replace: true }));
 

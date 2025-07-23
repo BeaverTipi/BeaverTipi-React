@@ -8,6 +8,7 @@ import axios from "axios";
 // 마이페이지 이동 내려오는거 
 
 import { PageIcon, DocsIcon, AlertHexaIcon, CalenderIcon } from "../../icons";
+import { useSecureAxios } from "../../hooks/useSecureAxios";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,9 +29,9 @@ export default function UserDropdown() {
 
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
-  const brokerAxios = useAxios();
+  const axios = useSecureAxios();
   useEffect(() => {
-    brokerAxios.get("/member/read")
+    axios.get("/member/read")
       .then(data => {
         console.log("하하 ㅈ대로 되라", data);
         setBROKER_INFO(data);

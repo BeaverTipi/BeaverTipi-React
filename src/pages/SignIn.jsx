@@ -11,8 +11,8 @@ export default function SignIn() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        "/login",
+      const res = await axios.get(
+        "/account/login",
         { mbrId, mbrPw },
         { withCredentials: true }
       );
