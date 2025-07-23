@@ -13,19 +13,19 @@ export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
   let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
-  
+
   // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
   if (HOSTNAME === "react.beavertipi.com") {
     HOSTNAME = "beavertipi.com";
   }
-      if (HOSTNAME === "hbdev.beavertipi.com") {
+  if (HOSTNAME === "hbdev.beavertipi.com") {
     HOSTNAME = "hbdev1.beavertipi.com";
   }
-      if (HOSTNAME === "dev.beavertipi.com") {
+  if (HOSTNAME === "dev.beavertipi.com") {
     HOSTNAME = "dev1.beavertipi.com";
   }
   const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
-  
+
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
   const brokerAxios = useAxios();
@@ -123,17 +123,25 @@ export default function UserDropdown() {
         <DropdownItem
           onItemClick={closeDropdown}
           tag="a"
-          to={`${baseURL}/account/read`}
+          to={`${SPRING_URL_ORIGIN}/account/read`}
           className="flex items-center pl-2 gap-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
-          <a href={`${baseURL}/account/read`}>
-            <span className="block font-medium text-lg text-gray-700 dark:text-gray-400">
-              {BROKER_INFO.mbrNnm}
-            </span>
+          {/* <a href={`${SPRING_URL_ORIGIN}/account/read`}> */}
+          <div className="pl-0.5">
+            <div className="flex flex-row gap-2">
+              <span className="block font-medium text-lg text-gray-700 dark:text-gray-400">
+                {BROKER_INFO.mbrNnm}
+              </span>
+              {/* 별로 안 예쁘고 휑해서 함 집어넣어 봄 */}
+              <span className="block font-extralight text-lg text-gray-700 dark:text-gray-400">
+                {BROKER_INFO.mbrBasicAddr?.slice(0, 2) ?? ""}
+              </span>
+            </div>
             <span className="mt-0.5 block text-theme-sm text-gray-500 dark:text-gray-400">
               {BROKER_INFO.mbrEmlAddr !== null ? BROKER_INFO.mbrEmlAddr : "register your NEW EMAIL"}
             </span>
-          </a>
+          </div>
+          {/* </a> */}
         </DropdownItem>
 
         <ul className="flex flex-col gap-1 pt-2 pb-3 border-b border-gray-200 dark:border-gray-800">

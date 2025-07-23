@@ -80,7 +80,7 @@ export function useSecureAxios() {
     );
 
     return instance;
-  }, [baseURL, encryptWithRandomIV, decryptWithIV]);
+  }, [encryptWithRandomIV, decryptWithIV]);
 
   return secureAxios;
 }

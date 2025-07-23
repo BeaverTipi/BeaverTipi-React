@@ -8,20 +8,20 @@ import { useSidebar } from "../context/SidebarContext";
 
 const AppHeader = () => {
   const BACKEND_PORT = 80;
-   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
   let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
-  
+
   // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
   if (HOSTNAME === "react.beavertipi.com") {
     HOSTNAME = "beavertipi.com";
   }
-    if (HOSTNAME === "dev.beavertipi.com") {
+  if (HOSTNAME === "dev.beavertipi.com") {
     HOSTNAME = "dev1.beavertipi.com";
-  }    if (HOSTNAME === "hbdev.beavertipi.com") {
+  } if (HOSTNAME === "hbdev.beavertipi.com") {
     HOSTNAME = "hbdev1.beavertipi.com";
   }
   const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
-  
+
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
@@ -98,7 +98,7 @@ const AppHeader = () => {
             {/* Cross Icon */}
           </button>
 
-          <Link to={`${baseURL}`} className="lg:hidden">
+          <Link to={SPRING_URL_ORIGIN} className="lg:hidden">
             <img
               className="dark:hidden max-w-15 p-0"
               src="/images/logo/logo-icon.png"
