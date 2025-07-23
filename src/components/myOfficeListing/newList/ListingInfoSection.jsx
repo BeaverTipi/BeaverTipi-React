@@ -12,6 +12,7 @@ export default function ListingInfoSection({
   commonCodes,
   onAddressSearch,
   filteredLstgType2,
+  onChange
 }) {
   console.log("공통코드", commonCodes.lstgType1, commonCodes.lstgType2);
 
@@ -93,6 +94,7 @@ export default function ListingInfoSection({
           name="lstgAdd2"
           placeholder="상세 주소 입력"
           defaultValue={formData.lstgAdd2 || ""}
+           onChange={onChange}
         />
         <Input
           type="text"
@@ -100,6 +102,7 @@ export default function ListingInfoSection({
           name="lstgRoomNum"
           placeholder="층, 호 , 실 *"
           defaultValue={formData.lstgRoomNum || ""}
+           onChange={onChange}
         />
       </div>
     </ComponentCard>

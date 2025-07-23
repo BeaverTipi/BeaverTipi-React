@@ -14,6 +14,7 @@ export default function ListingTable({
   getListingTypeName,
   getProdStatCodesName,
   getTypeSaleCodeName,
+  getListingDetailTypeName,
 }) {
   return (
     <>
@@ -22,19 +23,69 @@ export default function ListingTable({
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-gray-700">
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">번호</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">매물유형</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">매물명</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">임대인</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">거래유형</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">거래상태</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300">비고</TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  번호
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  매물유형
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  매물 상세 유형
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  매물명
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  임대인
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  거래유형
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  거래상태
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  등록 일자
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
+                >
+                  비고
+                </TableCell>
               </TableRow>
             </TableHeader>
 
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-700">
               {lstgList.map((lstg, i) => (
-                <TableRow key={lstg.lstgId} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                <TableRow
+                  key={lstg.lstgId}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-xs text-gray-500 dark:text-gray-300">
                     {i + 1}
                   </TableCell>
@@ -42,6 +93,11 @@ export default function ListingTable({
                   <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
                     <Badge size="sm" color="info">
                       {getListingTypeName(lstg.lstgTypeCode1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                    <Badge size="sm" color="info">
+                      {getListingDetailTypeName(lstg.lstgTypeCode2)}
                     </Badge>
                   </TableCell>
 
@@ -65,8 +121,13 @@ export default function ListingTable({
                   <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
                     {getProdStatCodesName(lstg.lstgProdStat)}
                   </TableCell>
+                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                    {lstg.lstgRegDate ? lstg.lstgRegDate.split("T")[0] : "-"}
+                  </TableCell>
 
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">-</TableCell>
+                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                    -
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

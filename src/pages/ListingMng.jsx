@@ -15,65 +15,154 @@ export default function ListingMng() {
   const [typeSaleCodes, setTypeSaleCodes] = useState([]);
   const [prodStatCodes, setProdStatCodes] = useState([]);
   const [lstgList, setLstgList] = useState([]);
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
 
+  const [filteredListingDetailTypeCodes, setFilteredListingDetailTypeCodes] =
+    useState([]);
   const [filterListingTypeValue, setFilterListingTypeValue] = useState("000");
   const [filterTypeSaleValue, setFilterTypeSaleValue] = useState("000");
   const [filterProdStatValue, setFilterProdStatValue] = useState("000");
   const [searchCategory, setSearchCategory] = useState("전체");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterListingDetailTypeValue, setFilterListingDetailTypeValue] =
+    useState("000");
+
   const itemsPerPage = 10;
+  const handleListingTypeChange = (value) => {
+    setFilterListingTypeValue(value);
+
+    const filtered = listingDetailTypeCodes
+      .filter((detail) => detail.parentCode === value)
+      .map((item) => ({
+        value: item.value, // ✅ 주의: 이미 value, label로 되어 있어야 함
+        label: item.label,
+      }));
+
+    const uniqueFiltered = filtered.filter((item) => item.value !== "000");
+    setFilteredListingDetailTypeCodes([
+      { value: "000", label: "전체" },
+      ...uniqueFiltered,
+    ]);
+
+    setFilterListingDetailTypeValue("000");
+  };
 
   const axios = useSecureAxios();
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.post("/form", {
-      codeGroup: {
-        listingType: "LSTG1",
-        typeSale: "TRDST",
-        listingDetailType: "LSTG2",
-        prodStat: "PRDST"
-      },
-    }).then(data => {
-      setListingTypeCodes(data.listingType.map(item => ({ value: item.codeValue, label: item.codeName })));
-      setTypeSaleCodes(data.typeSale.map(item => ({ value: item.codeValue, label: item.codeName })));
-      setListingDetailTypeCodes(data.listingDetailType.map(item => ({ value: item.codeValue, label: item.codeName })));
-      setProdStatCodes(data.prodStat.map(item => ({ value: item.codeValue, label: item.codeName })));
-    }).catch(err => console.error("공통코드 로딩 실패", err));
+    axios
+      .post("/form", {
+        codeGroup: {
+          listingType: "LSTG1",
+          typeSale: "TRDST",
+          listingDetailType: "LSTG2",
+          prodStat: "PRDST",
+        },
+      })
+      .then((data) => {
+        const listingTypeOptions = data.listingType.map((item) => ({
+          value: item.codeValue,
+          label: item.codeName,
+        }));
 
-    axios.get("/lstg/list").then(data => {
-      data.forEach((lstg, idx) => lstg["indexNo"] = idx + 1);
-      setLstgList(data);
-    }).catch(error => console.error("'lstgList' loading failed", error));
+        const typeSaleOptions = data.typeSale.map((item) => ({
+          value: item.codeValue,
+          label: item.codeName,
+        }));
+
+        const prodStatOptions = data.prodStat.map((item) => ({
+          value: item.codeValue,
+          label: item.codeName,
+        }));
+
+        const listingDetailOptions = data.listingDetailType.map((item) => ({
+          value: item.codeValue,
+          label: item.codeName,
+          parentCode: item.parentCodeValue, // LSTG1의 codeValue와 매칭됨
+        }));
+
+        setListingTypeCodes(listingTypeOptions);
+        setTypeSaleCodes(typeSaleOptions);
+        setProdStatCodes(prodStatOptions);
+        setListingDetailTypeCodes(listingDetailOptions);
+        setFilteredListingDetailTypeCodes(listingDetailOptions); // 이걸 제대로 된 format으로
+      })
+      .catch((err) => console.error("공통코드 로딩 실패", err));
+
+    axios
+      .get("/lstg/list")
+      .then((data) => {
+        data.forEach((lstg, idx) => (lstg["indexNo"] = idx + 1));
+        setLstgList(data);
+      })
+      .catch((error) => console.error("'lstgList' loading failed", error));
   }, []);
 
   const filteredList = useMemo(() => {
     const trimmedSearch = searchText.trim().toLowerCase();
-    return lstgList.filter(lstg => {
-      if (filterListingTypeValue !== "000" && String(lstg.lstgTypeCode1).trim() !== filterListingTypeValue) return false;
-      if (filterTypeSaleValue !== "000" && String(lstg.lstgTypeSale).trim() !== filterTypeSaleValue) return false;
-      if (filterProdStatValue !== "000" && String(lstg.lstgProdStat).trim() !== filterProdStatValue) return false;
+    return lstgList.filter((lstg) => {
+      if (filterStartDate && lstg.lstgRegDate < filterStartDate) return false;
+      if (filterEndDate && lstg.lstgRegDate > filterEndDate) return false;
+      if (
+        filterListingTypeValue !== "000" &&
+        String(lstg.lstgTypeCode1).trim() !== filterListingTypeValue
+      )
+        return false;
+      if (
+        filterListingDetailTypeValue !== "000" &&
+        String(lstg.lstgTypeCode2).trim() !== filterListingDetailTypeValue
+      )
+        return false;
+      if (
+        filterTypeSaleValue !== "000" &&
+        String(lstg.lstgTypeSale).trim() !== filterTypeSaleValue
+      )
+        return false;
+      if (
+        filterProdStatValue !== "000" &&
+        String(lstg.lstgProdStat).trim() !== filterProdStatValue
+      )
+        return false;
       if (!trimmedSearch || (backspaceUsed && !trimmedSearch)) return true;
-      if (searchCategory === '전체') {
+      if (searchCategory === "전체") {
         return (
           (lstg.lstgNm || "").toLowerCase().includes(trimmedSearch) ||
-          (lstg.tenancyInfo?.mbrNm || "").toLowerCase().includes(trimmedSearch) ||
+          (lstg.tenancyInfo?.mbrNm || "")
+            .toLowerCase()
+            .includes(trimmedSearch) ||
           (lstg.lstgAdd || "").toLowerCase().includes(trimmedSearch)
         );
       }
       const value = (() => {
         switch (searchCategory) {
-          case '매물명': return lstg.lstgNm || '';
-          case '임대인': return lstg.tenancyInfo?.mbrNm || '';
-          case '주소': return lstg.lstgAdd || '';
-          default: return '';
+          case "매물명":
+            return lstg.lstgNm || "";
+          case "임대인":
+            return lstg.tenancyInfo?.mbrNm || "";
+          case "주소":
+            return lstg.lstgAdd || "";
+          default:
+            return "";
         }
       })();
       return value.toLowerCase().includes(trimmedSearch);
     });
-  }, [lstgList, searchCategory, searchText, backspaceUsed, filterListingTypeValue, filterTypeSaleValue, filterProdStatValue]);
+  }, [
+    lstgList,
+    searchCategory,
+    searchText,
+    backspaceUsed,
+    filterListingDetailTypeValue,
+    filterListingTypeValue,
+    filterTypeSaleValue,
+    filterProdStatValue,
+    filterStartDate,
+    filterEndDate
+  ]);
 
   const paginatedList = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -82,18 +171,22 @@ export default function ListingMng() {
 
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
 
-  const getListingTypeName = code => listingTypeCodes.find(c => c.value === code)?.label || "기타";
-  const getTypeSaleCodeName = code => typeSaleCodes.find(c => c.value === code)?.label || "기타";
-  const getListingDetailTypeName = code => listingDetailTypeCodes.find(c => c.value === code)?.label || "기타";
-  const getProdStatCodesName = code => prodStatCodes.find(c => c.value === code)?.label || "기타";
+  const getListingTypeName = (code) =>
+    listingTypeCodes.find((c) => c.value === code)?.label || "기타";
+  const getTypeSaleCodeName = (code) =>
+    typeSaleCodes.find((c) => c.value === code)?.label || "기타";
+  const getListingDetailTypeName = (code) =>
+    listingDetailTypeCodes.find((c) => c.value === code)?.label || "기타";
+  const getProdStatCodesName = (code) =>
+    prodStatCodes.find((c) => c.value === code)?.label || "기타";
 
   const handleNext = () => {
-    const idx = lstgList.findIndex(l => l.lstgId === selectedLstgId);
+    const idx = lstgList.findIndex((l) => l.lstgId === selectedLstgId);
     if (idx < lstgList.length - 1) setSelectedLstgId(lstgList[idx + 1].lstgId);
   };
 
   const handlePrev = () => {
-    const idx = lstgList.findIndex(l => l.lstgId === selectedLstgId);
+    const idx = lstgList.findIndex((l) => l.lstgId === selectedLstgId);
     if (idx > 0) setSelectedLstgId(lstgList[idx - 1].lstgId);
   };
 
@@ -108,6 +201,10 @@ export default function ListingMng() {
           searchCategory={searchCategory}
           searchText={searchText}
           listingTypeOptions={listingTypeCodes}
+          listingDetailTypeOptions={filteredListingDetailTypeCodes}
+          filterListingDetailTypeValue={filterListingDetailTypeValue}
+          onListingTypeChange={handleListingTypeChange}
+          setFilterListingDetailTypeValue={setFilterListingDetailTypeValue}
           typeSaleOptions={typeSaleCodes}
           prodStatOptions={prodStatCodes}
           setFilterListingTypeValue={setFilterListingTypeValue}
@@ -115,6 +212,10 @@ export default function ListingMng() {
           setFilterProdStatValue={setFilterProdStatValue}
           setSearchCategory={setSearchCategory}
           setSearchText={setSearchText}
+          filterStartDate={filterStartDate}
+          filterEndDate={filterEndDate}
+          setFilterStartDate={setFilterStartDate}
+          setFilterEndDate={setFilterEndDate}
           handleResetFilters={() => {
             setFilterListingTypeValue("000");
             setFilterTypeSaleValue("000");
@@ -123,6 +224,11 @@ export default function ListingMng() {
             setSearchText("");
             setBackspaceUsed(false);
             setCurrentPage(1);
+            setFilterEndDate("");
+            setFilterStartDate(() => {
+      const now = new Date();
+      return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+    });
           }}
         />
 
@@ -132,13 +238,18 @@ export default function ListingMng() {
           getListingTypeName={getListingTypeName}
           getTypeSaleCodeName={getTypeSaleCodeName}
           getProdStatCodesName={getProdStatCodesName}
+          getListingDetailTypeName={getListingDetailTypeName}
         />
 
         <div className="flex flex-row justify-center gap-2 pt-4">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i}
-              className={`px-3 py-1 rounded ${i + 1 === currentPage ? 'bg-amber-600 border border-amber-400 text-white' : 'bg-gray-100 border border-gray-300 text-gray-400'}`}
+              className={`px-3 py-1 rounded ${
+                i + 1 === currentPage
+                  ? "bg-amber-600 border border-amber-400 text-white"
+                  : "bg-gray-100 border border-gray-300 text-gray-400"
+              }`}
               onClick={() => setCurrentPage(i + 1)}
             >
               {i + 1}
@@ -166,7 +277,9 @@ export default function ListingMng() {
             getListingDetailTypeName={getListingDetailTypeName}
             onNext={handleNext}
             onPrev={handlePrev}
-            currentIndex={lstgList.findIndex(l => l.lstgId === selectedLstgId)}
+            currentIndex={lstgList.findIndex(
+              (l) => l.lstgId === selectedLstgId
+            )}
             totalCount={lstgList.length}
           />
         )}

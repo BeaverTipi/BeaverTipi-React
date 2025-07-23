@@ -9,29 +9,55 @@ export default function ListingFilterBar({
   searchCategory,
   searchText,
   listingTypeOptions,
+  listingDetailTypeOptions,
   typeSaleOptions,
   prodStatOptions,
-  setFilterListingTypeValue,
+  filterListingDetailTypeValue,
   setFilterTypeSaleValue,
   setFilterProdStatValue,
   setSearchCategory,
   setSearchText,
+  setFilterListingDetailTypeValue,
   handleResetFilters,
+  onListingTypeChange,
+  filterStartDate,
+  filterEndDate,
+  setFilterStartDate,
+  setFilterEndDate,
 }) {
   return (
     <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50">
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-3">
+          {/* 매물 유형 */}
           <div className="flex flex-col justify-start">
             <Label className="h-fit text-xs font-semibold">＊ 매물 유형</Label>
             <SelectControlled
               value={filterListingTypeValue}
-              onChange={setFilterListingTypeValue}
+              onChange={(value) => {
+                onListingTypeChange?.(value); // ✅ 연동처리
+              }}
               options={listingTypeOptions}
               placeholder="--매물유형 선택--"
               className="max-h-9 text-xs w-[90px]"
             />
           </div>
+
+          {/* 상세유형 */}
+          <div className="flex flex-col justify-start">
+            <Label className="h-fit text-xs font-semibold">
+              ＊ 매물 상세 유형
+            </Label>
+            <SelectControlled
+              value={filterListingDetailTypeValue}
+              onChange={setFilterListingDetailTypeValue}
+              options={listingDetailTypeOptions}
+              placeholder="--상세유형 선택--"
+              className="max-h-9 text-xs w-[90px]"
+            />
+          </div>
+
+          {/* 거래유형 */}
           <div className="flex flex-col justify-start">
             <Label className="h-fit text-xs font-semibold">＊ 거래 유형</Label>
             <SelectControlled
@@ -42,6 +68,8 @@ export default function ListingFilterBar({
               className="max-h-9 text-xs w-[90px]"
             />
           </div>
+
+          {/* 거래상태 */}
           <div className="flex flex-col justify-start">
             <Label className="h-fit text-xs font-semibold">＊ 거래 상태</Label>
             <SelectControlled
@@ -52,10 +80,28 @@ export default function ListingFilterBar({
               className="max-h-9 text-xs w-[90px]"
             />
           </div>
-          <div className="flex flex-col-reverse justify-start mb-3">
+        </div>
+        {/* 등록일 (시작 ~ 종료) */}
+        <div className="flex flex-col justify-start">
+          <Label className="h-fit text-xs font-semibold">＊ 등록일</Label>
+          <div className="flex flex-row gap-1 items-center">
+            <Input
+              type="date"
+              value={filterStartDate}
+              onChange={(e) => setFilterStartDate(e.target.value)}
+              className="max-h-9 text-xs w-[130px]"
+            />
+
+            <span className="text-xs text-gray-500">~</span>
+            <Input
+              type="date"
+              value={filterEndDate}
+              onChange={(e) => setFilterEndDate(e.target.value)}
+              className="max-h-9 text-xs w-[130px]"
+            />
           </div>
         </div>
-
+        {/* 검색 영역 */}
         <div className="flex flex-row gap-0 items-center mb-2">
           <div className="flex flex-col justify-start h-fit">
             <Label className="h-fit text-xs font-semibold">＊ 검색 조건</Label>
@@ -72,6 +118,7 @@ export default function ListingFilterBar({
               className="mr-2 max-h-9 text-xs w-[90px]"
             />
           </div>
+
           <div className="flex flex-col justify-start h-fit">
             <Label className="h-fit text-xs font-semibold invisible">.</Label>
             <Input
@@ -82,13 +129,14 @@ export default function ListingFilterBar({
               className="ml-0 w-[200px] max-h-9 text-xs"
             />
           </div>
-            <button
-  onClick={handleResetFilters}
-  className="h-9 w-[70px] mt-auto text-xs ml-2 text-amber-800 border border-amber-800 rounded px-3 py-1 
-             hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
->
-              초기화
-            </button>
+
+          <button
+            onClick={handleResetFilters}
+            className="h-9 w-[70px] mt-auto text-xs ml-2 text-amber-800 border border-amber-800 rounded px-3 py-1 
+              hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+          >
+            초기화
+          </button>
         </div>
       </div>
     </div>
