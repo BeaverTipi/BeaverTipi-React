@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick-theme.css";
 export default function ListingDetails({
   lstgId,
   getListingTypeName,
+  getListingDetailTypeName,
   getProdStatCodesName,
   getTypeSaleCodeName,
   onNext,
@@ -19,7 +20,13 @@ export default function ListingDetails({
   const navigate = useNavigate();
   const sliderRef = useRef();
   const [detail, setDetail] = useState(null);
+function formatMoney(amount) {
+  // 숫자가 아닌 경우에는 그냥 그대로 반환
+  if (isNaN(amount)) return amount;
 
+  // 숫자 형식으로 변환 후, 세 자리마다 쉼표를 넣은 문자열로 변환
+  return `₩${amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+}
   useEffect(() => {
     if (lstgId) {
       axios
@@ -27,6 +34,7 @@ export default function ListingDetails({
         .then((data) => {
           setDetail(data);
           console.log("✅ 조회된 매물 ID:", lstgId);
+          console.log(data);
         })
         .catch((err) => {
           console.error("❌ 상세 조회 실패:", err);
@@ -100,9 +108,9 @@ return (
       <div className="grid grid-cols-2 gap-y-2">
         <InfoItem label="공급면적" value={detail.lstgGArea != null ? `${detail.lstgGArea}㎡` : "정보 없음"} />
         <InfoItem label="전용면적" value={detail.lstgExArea != null ? `${detail.lstgExArea}㎡` : "정보 없음"} />
-        <InfoItem label="보증금" value={detail.lstgLeaseAmt != null ? `${detail.lstgLeaseAmt}만원` : "정보 없음"} />
-        <InfoItem label="월세" value={detail.lstgLeaseM != null ? `${detail.lstgLeaseM}만원` : "정보 없음"} />
-        <InfoItem label="관리비" value={detail.lstgFee != null ? `${detail.lstgFee}만원` : "없음"} />
+        <InfoItem label="보증금" value={detail.lstgLeaseAmt != null ? formatMoney(detail.lstgLeaseAmt): "정보 없음"} />
+        <InfoItem label="월세" value={detail.lstgLeaseM != null ? formatMoney(detail.lstgLeaseM) : "정보 없음"} />
+        <InfoItem label="관리비" value={detail.lstgFee != null ? formatMoney(detail.lstgFee) : "없음"} />
       </div>
     </div>
 
@@ -111,7 +119,7 @@ return (
       <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">유형 및 상태</h3>
       <div className="grid grid-cols-2 gap-y-2">
         <InfoItem label="매물유형" value={getListingTypeName(detail.lstgTypeCode1)} />
-        <InfoItem label="상세유형" value={getListingTypeName(detail.lstgTypeCode2)} />
+        <InfoItem label="상세유형" value={getListingDetailTypeName(detail.lstgTypeCode2)} />
         <InfoItem label="거래유형" value={getTypeSaleCodeName(detail.lstgTypeSale)} />
         <InfoItem label="등록상태" value={getProdStatCodesName(detail.lstgProdStat)} />
         <InfoItem label="등록일자" value={detail.lstgRegDate} />

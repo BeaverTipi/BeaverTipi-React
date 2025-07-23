@@ -17,7 +17,21 @@ import {
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
-
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
 const navItems = [
   {
     icon: <PieChartIcon />,
@@ -307,7 +321,7 @@ const AppSidebar = () => {
       <div
         className="py-8 flex justify-center"
       >
-        <a href="http://localhost/">
+        <a href={`${SPRING_URL_ORIGIN}`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img

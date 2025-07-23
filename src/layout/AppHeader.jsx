@@ -8,9 +8,20 @@ import { useSidebar } from "../context/SidebarContext";
 
 const AppHeader = () => {
   const BACKEND_PORT = 80;
-  const PROTOCOL = window.location.protocol; // 'http:'
-  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
-  const baseURL = `${PROTOCOL}//${HOSTNAME}:${BACKEND_PORT}`;
+   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }    if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
@@ -110,13 +121,13 @@ const AppHeader = () => {
         <div className="items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none">
           <div className="flex items-center gap-x-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
             <a href="#">공지사항</a>
-            <a href={`${baseURL}/main/map`}>지도</a>
+            <a href={`${SPRING_URL_ORIGIN}/main/map`}>지도</a>
             <Link to="/broker/myoffice/lstg/mng/new">매물등록</Link>
-            <a href={`${baseURL}/account/read`}>마이페이지</a>
+            <a href={`${SPRING_URL_ORIGIN}/account/read`}>마이페이지</a>
             <button
               onClick={() =>
                 window.open(
-                  `${baseURL}/resident/chat?popup=true`,
+                  `${SPRING_URL_ORIGIN}/resident/chat?popup=true`,
                   "chatPopup",
                   "height=600, width=400,scrollbars=yes,resizable=yes"
                 )

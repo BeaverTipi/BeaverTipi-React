@@ -12,11 +12,11 @@ export default function ListingTradeSection({ formData, onChange }) {
     setTradeType(value);
     onChange(e);
   };
-
+  console.formData
   const tradeOptions = [
-    { value: "1", label: "전세" },
-    { value: "2", label: "월세" },
-    { value: "3", label: "매매" },
+    { value: "001", label: "전세" },
+    { value: "002", label: "월세" },
+    { value: "003", label: "매매" },
   ];
 
   return (
@@ -36,7 +36,7 @@ export default function ListingTradeSection({ formData, onChange }) {
 
      {/* 조건별 입력 영역 */}
 <div className="mb-6 min-h-[90px]">
-  {tradeType === "1" && (
+  {tradeType === "001" && (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="flex flex-col">
         <Label className="mb-1">전세가</Label>
@@ -51,7 +51,7 @@ export default function ListingTradeSection({ formData, onChange }) {
     </div>
   )}
 
-  {tradeType === "2" && (
+  {tradeType === "002" && (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="flex flex-col">
         <Label className="mb-1">보증금</Label>
@@ -59,7 +59,7 @@ export default function ListingTradeSection({ formData, onChange }) {
           type="number"
           name="lstgLeaseAmt"
           placeholder="보증금"
-          value={formData.lstgFee}
+          value={formData.lstgLeaseAmt}
           onChange={onChange}
         />
       </div>
@@ -76,7 +76,7 @@ export default function ListingTradeSection({ formData, onChange }) {
     </div>
   )}
 
-  {tradeType === "3" && (
+  {tradeType === "003" && (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="flex flex-col">
         <Label className="mb-1">매매가</Label>
@@ -91,7 +91,7 @@ export default function ListingTradeSection({ formData, onChange }) {
     </div>
   )}
 
-  {!["1", "2", "3"].includes(tradeType) && (
+  {!["001", "002", "003"].includes(tradeType) && (
       <div className="flex items-center justify-center h-[90px] text-gray-400 border border-dashed rounded-md">
     거래 유형을 선택해주세요.
   </div>

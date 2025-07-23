@@ -6,9 +6,21 @@ import CryptoJS from "crypto-js";
 export function useSecureAxios() {
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
   const BACKEND_PORT = 80;
-  const PROTOCOL = window.location.protocol; // 'http:'
-  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
-  const SPRING_URL_ORIGIN = PROTOCOL + "//" + HOSTNAME + ":" + BACKEND_PORT;
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+    if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
   const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const secureAxios = useMemo(() => {
     const instance = axios.create({
