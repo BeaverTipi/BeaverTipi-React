@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSecureAxios } from "../../../hooks/useSecureAxios";
 import ComponentCard from "../../common/ComponentCard";
@@ -8,10 +8,13 @@ import Badge from "../../ui/badge/Badge";
 import Button from "../../ui/button/Button";
 import Label from "../../form/Label";
 import { TableBody, TableCell, TableHeader, TableRow } from "../../ui/table";
+import Checkbox from "../../form/input/Checkbox";
 import { Modal } from "../../ui/modal";
 import isEqual from "lodash.isequal";
 import { useAES256 } from "../../../hooks/useAES256";
-
+import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function ProceedingContracts() {
   const navigate = useNavigate();
@@ -31,9 +34,110 @@ function ProceedingContracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  /*(1/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState(() => {
+    const now = new Date();
+    return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+  });
+  const isValidDate = (dateStr) => {
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    return (
+      date instanceof Date &&
+      !isNaN(date) &&
+      dateStr === date.toISOString().slice(0, 10)
+    );
+  };
+
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]); // 체크된 contId 목록
+  const handleToggleBulkMode = () => {
+    setIsBulkMode(!isBulkMode);
+    setSelectedIds([]); // 모드 변경 시 선택 초기화
+  };
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      return Swal.fire({
+        title: "안내",
+        text: "선택된 계약이 없습니다.",
+        icon: "info",
+        timer: 1500,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+      });
+    }
+    const confirmed = await Swal.fire({
+      title: "삭제 확인",
+      text: `${selectedIds.length}건의 계약을 삭제하시겠습니까?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: "삭제하기",
+      cancelButtonText: "취소",
+      scrollbarPadding: false,
+    });
+    if (!confirmed.isConfirmed) return;
+
+    try {
+      await axios
+        .post("cont/proc/delete", {
+          selectedContracts: selectedIds,
+          _method: "DELETE",
+        })
+        .then((data) => console.log(data));
+      setProcContracts((prev) => {
+        const updated = prev.filter((c) => !selectedIds.includes(c.contId));
+        const newTotalPages = Math.ceil(updated.length / itemsPerPage);
+        // 현재 페이지가 사라졌다면 이전 페이지로 이동
+        if (currentPage > newTotalPages)
+          setCurrentPage(Math.max(1, newTotalPages));
+        return updated;
+      });
+      setSelectedIds([]);
+      setIsBulkMode(false); // ✅ 성공시에만 종료
+
+      Swal.fire({
+        title: "삭제 완료",
+        text: "선택한 계약이 삭제되었습니다.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+      });
+    } catch (err) {
+      console.error("삭제 오류:", err);
+      Swal.fire({
+        title: "삭제 실패",
+        text: "삭제 중 오류가 발생했습니다.",
+        icon: "error", // ✅ 수정됨
+        timer: 1500,
+        showConfirmButton: false,
+        scrollbarPadding: false,
+      });
+    }
+  };
+  const handleToggleAllCurrentPage = () => {
+    const currentIds = paginatedList.map((item) => item.contId);
+    const allSelected = currentIds.every((id) => selectedIds.includes(id));
+
+    if (allSelected) {
+      // 전체 해제
+      setSelectedIds((prev) => prev.filter((id) => !currentIds.includes(id)));
+    } else {
+      // 전체 선택
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...currentIds])));
+    }
+  };
+
   const filteredList = useMemo(() => {
     const trimmedSearch = searchText.trim().toLowerCase();
     return procContracts?.filter((proc) => {
+      const regDate = proc.contDtm?.split(" ")[0]; // "2025-07-20"
+      // 🔹 날짜 범위 조건
+      if (filterStartDate && regDate < filterStartDate) return false;
+      if (filterEndDate && regDate > filterEndDate) return false;
       if (
         filterContractStatValue !== "000" &&
         proc.contStatCd !== filterContractStatValue
@@ -82,6 +186,8 @@ function ProceedingContracts() {
     backspaceUsed,
     filterContractTypeValue,
     filterContractStatValue,
+    filterStartDate,
+    filterEndDate,
   ]);
 
   const handleResetFilters = () => {
@@ -91,7 +197,15 @@ function ProceedingContracts() {
     setSearchText("");
     setBackspaceUsed(false);
     setCurrentPage(1);
+    setIsBulkMode(false);
+    setFilterStartDate("");
+    setFilterEndDate(() => {
+      const now = new Date();
+      return now.toISOString().split("T")[0]; // 예: "2025-07-21"
+    });
+    setSelectedIds([]); // 모드 변경 시 선택 초기화
   };
+  /*(1/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
 
   const paginatedList = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -180,11 +294,14 @@ function ProceedingContracts() {
     if (hasShownModal || !procContracts) return;
     const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
     const localStorageValue = localStorage.getItem(localStorageKey);
-    const contractId = localStorageValue !== null ? decrypt(localStorageValue) : "";
+    const contractId =
+      localStorageValue !== null ? decrypt(localStorageValue) : "";
     console.log("12094urfc932u", contractId);
     if (!contractId || !procContracts) return;
     if (contractId && procContracts && procContracts.length > 0) {
-      const matchedContract = procContracts.find((c) => c.contId === contractId);
+      const matchedContract = procContracts.find(
+        (c) => c.contId === contractId
+      );
 
       if (matchedContract) {
         setSelectedContract(matchedContract);
@@ -194,11 +311,143 @@ function ProceedingContracts() {
     }
   }, []);
 
+  const handleContractSignaturePageNavigate = async (contId) => {
+    try {
+      // 1. 서버에 contSignYn 조회 요청
+      const { success, signYn, _message } = await axios.post(
+        `cont/proc/sign-status`,
+        {
+          contId: contId,
+          _method: "GET",
+        }
+      );
 
-  const handleContractSignaturePage = (contId) => {
-    navigate("/contract", { state: { contId } });
+      if (!success || signYn === "N") {
+        Swal.fire({
+          icon: "info",
+          title: "서명페이지가 만료되었습니다",
+          text: "해당 계약의 서명 가능 기간이 종료되었습니다.",
+        });
+      } else {
+        navigate("/contract", { state: { contId } });
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "요청 실패",
+        text: "계약 상태를 확인하는 데 실패했습니다.",
+      });
+    }
+  };
 
-  }
+  const handleContractSignaturePageOpen = async (contId) => {
+    const contract = procContracts.find((c) => c.contId === contId);
+    if (!contract) return;
+
+    const { listingInfo, tenancyInfo, lesseeInfo, contDtm, contTypeCode } =
+      contract;
+    const result = await Swal.fire({
+      title: "계약 개설 확인",
+      html: `
+        <p style="font-weight: 500; font-size: 14px; margin-bottom: 10px;">
+          ⚠️ 전자서명 페이지는 개설 시점부터 <b>10분간 유효</b>하며 ⚠️<br/>
+          유효 시간이 지나면 자동으로 만료됩니다.<br/>
+          계약자에게 링크를 공유하기 전에 유효 시간을 꼭 확인해 주세요.
+        </p>
+        <div style="text-align: left; font-size: 13px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 10px;">
+          <b>매물명:</b> ${listingInfo?.lstgNm || "-"}<br/>
+          <b>주소:</b> ${listingInfo?.lstgAdd || "-"}<br/>
+          <b>임대인:</b> ${tenancyInfo?.mbrNm || "-"}<br/>
+          <b>임차인:</b> ${lesseeInfo?.mbrNm || "-"}<br/>
+          <b>계약일시:</b> ${contDtm || "-"}<br/>
+          <b>계약유형:</b> ${getContractTypeName(contTypeCode)}
+        </div>
+`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "서명 페이지 열기",
+      cancelButtonText: "취소",
+      scrollbarPadding: false,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const data = await axios.post("cont/proc/open-signpage", {
+        contId,
+        _method: "UPDATE",
+      });
+
+      axios
+        .post("cont/proc/list")
+        .then((data) => {
+          // console.log("proceeding-contracts:: ", data);
+          if (!isEqual(data, procContracts)) {
+            setProcContracts(data);
+          }
+          return data;
+        })
+        .then((data) =>
+          console.log(
+            `%c[RE_STATE] procContracts`,
+            "color:yellow; font-weight:bold",
+            procContracts
+          )
+        );
+      // // (3) 서명 페이지로 이동
+      // navigate("/contract", { state: { contId } });
+    } catch (err) {
+      console.error("서명 페이지 개설 실패", err);
+      Swal.fire({
+        icon: "error",
+        title: "오류 발생",
+        text: "서명 페이지 개설에 실패했습니다. 다시 시도해주세요.",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:80/ws/contractExpire");
+
+    socket.onopen = () => {
+      console.log("✅ WebSocket 연결 성공");
+    };
+
+    socket.onmessage = (event) => {
+      const msg = event.data;
+      if (msg.startsWith("EXPIRED:")) {
+        const expiredContId = msg.split(":")[1];
+        console.log("📢 계약 만료 감지됨!", expiredContId);
+
+        // 📌 필요한 경우 상태값 갱신
+        setProcContracts((prev) =>
+          prev.map((c) =>
+            c.contId === expiredContId ? { ...c, contSignYn: "N" } : c
+          )
+        );
+
+        Swal.fire({
+          icon: "info",
+          title: "서명 페이지 만료됨",
+          text: `계약 [${expiredContId}]의 서명 페이지가 만료되었습니다.`,
+        });
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("❌ WebSocket 에러", err);
+    };
+
+    socket.onclose = () => {
+      console.log("🔌 WebSocket 연결 종료됨");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
     <>
       <ComponentCard title="📝 진행중인 계약">
@@ -211,7 +460,7 @@ function ProceedingContracts() {
             <div className="flex flex-row gap-3">
               <div className="flex flex-col justify-start">
                 <Label className="h-fit text-xs font-semibold">
-                  ＊ 계약 유형
+                  ＊ 거래 유형
                 </Label>
                 <SelectControlled
                   value={filterContractTypeValue}
@@ -233,20 +482,106 @@ function ProceedingContracts() {
                   className="max-h-9 text-xs w-[90px]"
                 />
               </div>
-              <div className="flex flex-col-reverse justify-start mb-3">
-                <button
-                  onClick={handleResetFilters}
-                  className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-                >
-                  초기화
-                </button>
-                <button
-                  onClick={handleCheckboxProcess}
-                  className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-                >
-                  일괄
-                </button>
+              {/*(2/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold">＊ 시작일</Label>
+                <Input
+                  type="date"
+                  value={isValidDate(filterStartDate) ? filterStartDate : ""}
+                  onChange={(e) => setFilterStartDate(e.target.value)}
+                  onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
+                  className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                  onKeyDown={(e) => {
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
+                    if (!allowed.includes(e.key)) {
+                      e.preventDefault(); // 숫자와 하이픈 외 입력 차단
+                    }
+                  }}
+                />
               </div>
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold invisible">
+                  ~
+                </Label>
+                <span className="pt-2">~</span>
+              </div>
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold">＊ 종료일</Label>
+                <Input
+                  type="date"
+                  value={isValidDate(filterEndDate) ? filterEndDate : ""}
+                  onChange={(e) => setFilterEndDate(e.target.value)}
+                  onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
+                  className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
+                  onKeyDown={(e) => {
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
+                    if (!allowed.includes(e.key)) {
+                      e.preventDefault(); // 숫자와 하이픈 외 입력 차단
+                    }
+                  }}
+                />
+              </div>
+              {/*(2/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/}
+              {/*(3/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
+              <div className="flex flex-row gap-2">
+                <div className="flex flex-col-reverse justify-start mb-3">
+                  <button
+                    onClick={handleResetFilters}
+                    className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                  >
+                    초기화
+                  </button>
+                </div>
+                <div className="flex flex-col-reverse justify-start mb-3">
+                  <button
+                    onClick={handleToggleBulkMode}
+                    className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                  >
+                    {isBulkMode ? "취소" : "일괄"}
+                  </button>
+                </div>
+                {isBulkMode && (
+                  <div className="flex flex-col-reverse justify-start mb-3">
+                    <button
+                      onClick={handleDeleteSelected}
+                      className="w-[70px] text-xs text-red-600 border border-red-600 rounded px-3 py-1 hover:text-red-400 hover:border-red-400 hover:bg-red-50 dark:hover:bg-gray-800"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/*(3/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/}
             </div>
             <div className="flex flex-row gap-0 items-center mb-2">
               <div className="flex flex-col justify-start h-fit">
@@ -300,12 +635,33 @@ function ProceedingContracts() {
             <table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                 <TableRow>
+                  {/*(4/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                   <TableCell
                     isHeader
-                    className="w-[70px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="relative  w-[80px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
-                    번호
+                    {isBulkMode ? (
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <Checkbox
+                          checked={
+                            paginatedList.length > 0 &&
+                            paginatedList.every((item) =>
+                              selectedIds.includes(item.contId)
+                            )
+                          }
+                          onChange={handleToggleAllCurrentPage}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+                    ) : (
+                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <span className="text-gray-500 text-theme-xs dark:text-gray-400">
+                          번호
+                        </span>
+                      </div>
+                    )}
                   </TableCell>
+                  {/*(4/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/}
                   <TableCell
                     isHeader
                     className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
@@ -362,7 +718,9 @@ function ProceedingContracts() {
                   paginatedList.map((proc, idx) => (
                     <TableRow
                       key={proc.contId}
-                      onClick={() => {
+                      onClick={(e) => {
+                        if (e.currentTarget !== e.target) return;
+
                         console.log("Row 클릭 핸들러");
                         setSelectedContract(proc);
                         setShowModal(true);
@@ -371,22 +729,41 @@ function ProceedingContracts() {
                         "cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5"
                       }
                     >
-                      <TableCell className="px-5 py-4 sm:px-6 text-center">
-                        <div className="flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
-                          <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                            {idx + 1}
-                          </span>
-                        </div>
+                      {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
+                      <TableCell className="relative px-5 py-4 sm:px-6 text-center">
+                        {isBulkMode ? (
+                          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <Checkbox
+                              checked={selectedIds.includes(proc.contId)}
+                              onChange={(checked) => {
+                                setSelectedIds((prev) =>
+                                  checked
+                                    ? [...prev, proc.contId]
+                                    : prev.filter((id) => id !== proc.contId)
+                                );
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        ) : (
+                          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <span className="text-gray-500 text-theme-xs dark:text-gray-400">
+                              {idx + 1}
+                            </span>
+                          </div>
+                        )}
                       </TableCell>
+                      {/*(5/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/}
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                           {getContractTypeName(proc.contTypeCode)}
                         </div>
                       </TableCell>
-                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
                         <div
                           title={proc.listingInfo?.lstgAdd}
-                          className=" text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
+                          // truncate = overflow-hidden + whitespace-nowrap + text-overflow: ellipsis
+                          className="text-gray-500 hover:underline truncate whitespace-nowrap overflow-hidden text-start"
                           onClick={() => {
                             console.log(
                               "📣 Row clicked!",
@@ -422,7 +799,7 @@ function ProceedingContracts() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                            " 원"
+                              " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -433,16 +810,29 @@ function ProceedingContracts() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                          {" "}
-                          <button
-                            className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800 "
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleContractSignaturePage(proc.contId);
-                            }}
-                          >
-                            개설
-                          </button>
+                          {proc.contSignYn === "N" ? (
+                            <button
+                              className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleContractSignaturePageOpen(proc.contId);
+                              }}
+                            >
+                              개설
+                            </button>
+                          ) : (
+                            <button
+                              className="w-[50px] text-xs text-blue-700 border border-blue-700 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleContractSignaturePageNavigate(
+                                  proc.contId
+                                ); // 동일한 함수 재사용
+                              }}
+                            >
+                              이동
+                            </button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -463,10 +853,11 @@ function ProceedingContracts() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}

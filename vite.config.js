@@ -35,7 +35,7 @@ function getBackendHost() {
 const localIP = getBackendHost();
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), svgr()],
+  plugins: [react(), tailwindcss(), svgr({ svgrOptions: { icon: true, } })],
   server: {
     host: true, // 👈 현재 PC IP로 바인딩
     port: 81,
