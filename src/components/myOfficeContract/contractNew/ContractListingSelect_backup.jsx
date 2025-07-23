@@ -248,10 +248,10 @@ function ContractListingSelect({ onSave }) {
     <>
       <ComponentCard title="📝 계약할 매물 선택">
         {/* 검색요소 */}
-        <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50">
+        <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50 space-y-2">
           <div
             data-name={"SearchBox^0^"}
-            className="flex flex-row justify-between"
+            className="flex flex-row justify-between gap-3"
           >
             <div className="flex flex-row gap-3">
               <div className="flex flex-col justify-start">
@@ -291,6 +291,57 @@ function ContractListingSelect({ onSave }) {
                   className="max-h-9 text-xs w-[90px]"
                 />
               </div>
+            </div>
+            <div className="flex flex-row gap-0 items-center mb-2">
+              <div className="flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold">
+                  ＊ 검색 조건
+                </Label>
+                <SelectControlled
+                  value={searchCategory}
+                  onChange={(val) => setSearchCategory(val)}
+                  placeholder="--선택--"
+                  options={[
+                    { label: "전체검색", value: "전체" },
+                    { label: "매물명", value: "매물명" },
+                    { label: "임대인", value: "임대인" },
+                    { label: "주소", value: "주소" },
+                  ]}
+                  className="mr-2 max-h-9 text-xs w-[90px]"
+                />
+              </div>
+              <div className="relative flex flex-col justify-start h-fit">
+                <Label className="h-fit text-xs font-semibold invisible">
+                  .
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="검색어 입력"
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setCurrentPage(1);
+                    if (e.target.value.trim() === "") {
+                      setBackspaceUsed(true);
+                    } else {
+                      setBackspaceUsed(false);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Backspace") setBackspaceUsed(true);
+                  }}
+                  className="ml-0 w-[200px] max-h-9 text-xs pr-10"
+                />
+                <span className="material-icons absolute right-1.5 top-[23px] text-gray-400 text-sm cursor-pointer hover:text-amber-300">
+                  search
+                </span>
+              </div>
+            </div>
+          </div>
+          {/* 2줄차: 날짜 + 버튼 */}
+          <div className="flex flex-row justify-between gap-3">
+            {/* 좌측: 시작일 ~ 종료일 */}
+            <div className="flex flex-row gap-2 mb-3">
               <div className="flex flex-col justify-start h-fit">
                 <Label className="h-fit text-xs font-semibold">＊ 시작일</Label>
                 <Input
@@ -359,63 +410,18 @@ function ContractListingSelect({ onSave }) {
                   }}
                 />
               </div>
-
-              <div className="flex flex-col-reverse justify-start mb-3">
-                <button
-                  onClick={handleResetFilters}
-                  className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-                >
-                  초기화
-                </button>
-              </div>
             </div>
-            <div className="flex flex-row gap-0 items-center mb-2">
-              <div className="flex flex-col justify-start h-fit">
-                <Label className="h-fit text-xs font-semibold">
-                  ＊ 검색 조건
-                </Label>
-                <SelectControlled
-                  value={searchCategory}
-                  onChange={(val) => setSearchCategory(val)}
-                  placeholder="--선택--"
-                  options={[
-                    { label: "전체검색", value: "전체" },
-                    { label: "매물명", value: "매물명" },
-                    { label: "임대인", value: "임대인" },
-                    { label: "주소", value: "주소" },
-                  ]}
-                  className="mr-2 max-h-9 text-xs w-[90px]"
-                />
-              </div>
-              <div className="relative flex flex-col justify-start h-fit">
-                <Label className="h-fit text-xs font-semibold invisible">
-                  .
-                </Label>
-                <Input
-                  type="text"
-                  placeholder="검색어 입력"
-                  value={searchText}
-                  onChange={(e) => {
-                    setSearchText(e.target.value);
-                    setCurrentPage(1);
-                    if (e.target.value.trim() === "") {
-                      setBackspaceUsed(true);
-                    } else {
-                      setBackspaceUsed(false);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Backspace") setBackspaceUsed(true);
-                  }}
-                  className="ml-0 w-[200px] max-h-9 text-xs pr-10"
-                />
-                <span className="material-icons absolute right-1.5 top-[23px] text-gray-400 text-sm cursor-pointer hover:text-amber-300">
-                  search
-                </span>
-              </div>
+            <div className="flex flex-col-reverse justify-start gap-2 mb-3">
+              <button
+                onClick={handleResetFilters}
+                className="w-[70px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+              >
+                초기화
+              </button>
             </div>
           </div>
         </div>
+
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
           <div className="max-w-full overflow-x-auto">
             <Table>

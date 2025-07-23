@@ -34,7 +34,6 @@ function ProceedingContracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-
   /*(1/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState(() => {
@@ -60,35 +59,36 @@ function ProceedingContracts() {
   const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) {
       return Swal.fire({
-        title: '안내',
-        text: '선택된 계약이 없습니다.',
-        icon: 'info',
+        title: "안내",
+        text: "선택된 계약이 없습니다.",
+        icon: "info",
         timer: 1500,
         showConfirmButton: false,
-        scrollbarPadding: false
+        scrollbarPadding: false,
       });
     }
     const confirmed = await Swal.fire({
-      title: '삭제 확인',
+      title: "삭제 확인",
       text: `${selectedIds.length}건의 계약을 삭제하시겠습니까?`,
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#aaa',
-      confirmButtonText: '삭제하기',
-      cancelButtonText: '취소',
-      scrollbarPadding: false
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: "삭제하기",
+      cancelButtonText: "취소",
+      scrollbarPadding: false,
     });
     if (!confirmed.isConfirmed) return;
 
     try {
-      await axios.post("cont/proc/delete", {
-        selectedContracts: selectedIds,
-        _method: "DELETE"
-      })
-        .then(data => console.log(data));
-      setProcContracts(prev => {
-        const updated = prev.filter(c => !selectedIds.includes(c.contId));
+      await axios
+        .post("cont/proc/delete", {
+          selectedContracts: selectedIds,
+          _method: "DELETE",
+        })
+        .then((data) => console.log(data));
+      setProcContracts((prev) => {
+        const updated = prev.filter((c) => !selectedIds.includes(c.contId));
         const newTotalPages = Math.ceil(updated.length / itemsPerPage);
         // 현재 페이지가 사라졌다면 이전 페이지로 이동
         if (currentPage > newTotalPages)
@@ -99,22 +99,22 @@ function ProceedingContracts() {
       setIsBulkMode(false); // ✅ 성공시에만 종료
 
       Swal.fire({
-        title: '삭제 완료',
-        text: '선택한 계약이 삭제되었습니다.',
-        icon: 'success',
+        title: "삭제 완료",
+        text: "선택한 계약이 삭제되었습니다.",
+        icon: "success",
         timer: 1500,
         showConfirmButton: false,
-        scrollbarPadding: false
+        scrollbarPadding: false,
       });
     } catch (err) {
       console.error("삭제 오류:", err);
       Swal.fire({
-        title: '삭제 실패',
-        text: '삭제 중 오류가 발생했습니다.',
-        icon: 'error', // ✅ 수정됨
+        title: "삭제 실패",
+        text: "삭제 중 오류가 발생했습니다.",
+        icon: "error", // ✅ 수정됨
         timer: 1500,
         showConfirmButton: false,
-        scrollbarPadding: false
+        scrollbarPadding: false,
       });
     }
   };
@@ -207,7 +207,6 @@ function ProceedingContracts() {
   };
   /*(1/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
 
-
   const paginatedList = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return (filteredList || []).slice(start, start + itemsPerPage);
@@ -295,11 +294,14 @@ function ProceedingContracts() {
     if (hasShownModal || !procContracts) return;
     const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
     const localStorageValue = localStorage.getItem(localStorageKey);
-    const contractId = localStorageValue !== null ? decrypt(localStorageValue) : "";
+    const contractId =
+      localStorageValue !== null ? decrypt(localStorageValue) : "";
     console.log("12094urfc932u", contractId);
     if (!contractId || !procContracts) return;
     if (contractId && procContracts && procContracts.length > 0) {
-      const matchedContract = procContracts.find((c) => c.contId === contractId);
+      const matchedContract = procContracts.find(
+        (c) => c.contId === contractId
+      );
 
       if (matchedContract) {
         setSelectedContract(matchedContract);
@@ -309,13 +311,16 @@ function ProceedingContracts() {
     }
   }, []);
 
-  const handleContractSignaturePageNavigate = async contId => {
+  const handleContractSignaturePageNavigate = async (contId) => {
     try {
       // 1. 서버에 contSignYn 조회 요청
-      const { success, signYn, _message } = await axios.post(`cont/proc/sign-status`, {
-        contId: contId
-        , _method: "GET"
-      });
+      const { success, signYn, _message } = await axios.post(
+        `cont/proc/sign-status`,
+        {
+          contId: contId,
+          _method: "GET",
+        }
+      );
 
       if (!success || signYn === "N") {
         Swal.fire({
@@ -340,7 +345,8 @@ function ProceedingContracts() {
     const contract = procContracts.find((c) => c.contId === contId);
     if (!contract) return;
 
-    const { listingInfo, tenancyInfo, lesseeInfo, contDtm, contTypeCode } = contract;
+    const { listingInfo, tenancyInfo, lesseeInfo, contDtm, contTypeCode } =
+      contract;
     const result = await Swal.fire({
       title: "계약 개설 확인",
       html: `
@@ -362,35 +368,35 @@ function ProceedingContracts() {
       showCancelButton: true,
       confirmButtonText: "서명 페이지 열기",
       cancelButtonText: "취소",
+      confirmButtonColor: "#f59e0b", // amber-500
+      cancelButtonColor: "#d1d5db", // gray-300
       scrollbarPadding: false,
     });
 
     if (!result.isConfirmed) return;
 
     try {
-      const data = await axios.post("cont/proc/open-signpage", {
+      const _data = await axios.post("cont/proc/open-signpage", {
         contId,
         _method: "UPDATE",
       });
 
-      axios
-        .post("cont/proc/list")
-        .then((data) => {
-          // console.log("proceeding-contracts:: ", data);
-          if (!isEqual(data, procContracts)) {
-            setProcContracts(data);
-          }
-          return data;
-        })
-        .then((data) =>
-          console.log(
-            `%c[RE_STATE] procContracts`,
-            "color:yellow; font-weight:bold",
-            procContracts
-          )
-        );
-      // // (3) 서명 페이지로 이동
-      // navigate("/contract", { state: { contId } });
+      const data = await axios.post("cont/proc/list");
+      if (!isEqual(data, procContracts)) setProcContracts(data);
+
+      const result2 = await Swal.fire({
+        title: "전자서명 개설 완료",
+        text: "서명 페이지가 성공적으로 개설되었습니다. 바로 이동하시겠습니까?",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "이동",
+        cancelButtonText: "확인",
+        confirmButtonColor: "#f59e0b", // amber-500
+        cancelButtonColor: "#d1d5db", // gray-300
+        scrollbarPadding: false,
+      });
+
+      if (result2.isConfirmed) navigate("/contract", { state: { contId } });
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({
@@ -415,8 +421,10 @@ function ProceedingContracts() {
         console.log("📢 계약 만료 감지됨!", expiredContId);
 
         // 📌 필요한 경우 상태값 갱신
-        setProcContracts(prev =>
-          prev.map(c => c.contId === expiredContId ? { ...c, contSignYn: "N" } : c)
+        setProcContracts((prev) =>
+          prev.map((c) =>
+            c.contId === expiredContId ? { ...c, contSignYn: "N" } : c
+          )
         );
 
         Swal.fire({
@@ -439,8 +447,6 @@ function ProceedingContracts() {
       socket.close();
     };
   }, []);
-
-
 
   return (
     <>
@@ -486,7 +492,22 @@ function ProceedingContracts() {
                   onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
                   onKeyDown={(e) => {
-                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
                     if (!allowed.includes(e.key)) {
                       e.preventDefault(); // 숫자와 하이픈 외 입력 차단
                     }
@@ -508,7 +529,22 @@ function ProceedingContracts() {
                   onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
                   onKeyDown={(e) => {
-                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
                     if (!allowed.includes(e.key)) {
                       e.preventDefault(); // 숫자와 하이픈 외 입력 차단
                     }
@@ -609,7 +645,9 @@ function ProceedingContracts() {
                         <Checkbox
                           checked={
                             paginatedList.length > 0 &&
-                            paginatedList.every((item) => selectedIds.includes(item.contId))
+                            paginatedList.every((item) =>
+                              selectedIds.includes(item.contId)
+                            )
                           }
                           onChange={handleToggleAllCurrentPage}
                           onClick={(e) => e.stopPropagation()}
@@ -761,7 +799,7 @@ function ProceedingContracts() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                            " 원"
+                              " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -772,7 +810,7 @@ function ProceedingContracts() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                          {proc.contSignYn === 'N' ? (
+                          {proc.contSignYn === "N" ? (
                             <button
                               className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
                               onClick={(e) => {
@@ -787,7 +825,9 @@ function ProceedingContracts() {
                               className="w-[50px] text-xs text-blue-700 border border-blue-700 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleContractSignaturePageNavigate(proc.contId); // 동일한 함수 재사용
+                                handleContractSignaturePageNavigate(
+                                  proc.contId
+                                ); // 동일한 함수 재사용
                               }}
                             >
                               이동
@@ -795,7 +835,6 @@ function ProceedingContracts() {
                           )}
                         </div>
                       </TableCell>
-
                     </TableRow>
                   ))
                 ) : (
@@ -814,10 +853,11 @@ function ProceedingContracts() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
@@ -825,7 +865,7 @@ function ProceedingContracts() {
             ))}
           </div>
         </div>
-      </ComponentCard >
+      </ComponentCard>
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
