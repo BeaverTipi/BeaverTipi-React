@@ -6,25 +6,33 @@ const ProtectedRoute = ({ children }) => {
   const [checking, setChecking] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const location = useLocation();
-  const BACKEND_PORT = 80;
-  const PROTOCOL = window.location.protocol; // 'http:'
-  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
-  const baseURL = `${PROTOCOL}//${HOSTNAME}:${BACKEND_PORT}`;
+
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+  if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+
+  const baseURL = `${PROTOCOL}//${HOSTNAME}`; // ❌ :80 제거
 
   useEffect(() => {
     axios
-      .get(`${baseURL}/rest/auth`, {
-        withCredentials: true,
-      })
+      .get(`${baseURL}/rest/auth`, { withCredentials: true })
       .then(() => {
         setAuthenticated(true);
       })
       .catch(() => {
-        // ✅ 1. 먼저 서버에 logout 요청
         axios
           .post(`${baseURL}/account/logout`, {}, { withCredentials: true })
           .finally(() => {
-            // ✅ 2. 그런 다음 redirect 수행
             const currentUrl = encodeURIComponent(window.location.href);
             window.location.href = `${baseURL}/?redirect=${currentUrl}`;
           });

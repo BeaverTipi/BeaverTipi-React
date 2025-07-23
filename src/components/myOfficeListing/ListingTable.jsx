@@ -30,9 +30,9 @@ export default function ListingTable({
                   번호
                 </TableCell>
                 <TableCell
-                  isHeader
-                  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
-                >
+  isHeader
+  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300 w-[120px]"
+>
                   매물유형
                 </TableCell>
                 <TableCell
@@ -50,7 +50,7 @@ export default function ListingTable({
                 <TableCell
                   isHeader
                   className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
-                >
+                  >
                   임대인
                 </TableCell>
                 <TableCell
@@ -81,55 +81,75 @@ export default function ListingTable({
             </TableHeader>
 
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {lstgList.map((lstg, i) => (
-                <TableRow
-                  key={lstg.lstgId}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-xs text-gray-500 dark:text-gray-300">
-                    {i + 1}
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    <Badge size="sm" color="info">
-                      {getListingTypeName(lstg.lstgTypeCode1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    <Badge size="sm" color="info">
-                      {getListingDetailTypeName(lstg.lstgTypeCode2)}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    <div
-                      className="cursor-pointer hover:underline text-gray-500 dark:text-gray-200"
-                      onClick={() => onSelectListing(lstg.lstgId)}
-                    >
-                      {lstg.lstgNm}
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    {lstg.tenancyInfo ? lstg.tenancyInfo.mbrNm : "-"}
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    {getTypeSaleCodeName(lstg.lstgTypeSale)}
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    {getProdStatCodesName(lstg.lstgProdStat)}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    {lstg.lstgRegDate ? lstg.lstgRegDate.split("T")[0] : "-"}
-                  </TableCell>
-
-                  <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                    -
+              {lstgList.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-4 text-gray-400">
+                    매물 없음
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                lstgList.map((lstg, i) => (
+                  <TableRow
+                    key={lstg.lstgId}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-xs text-gray-500 dark:text-gray-300">
+                      {i + 1}
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      <Badge size="sm" color="info">
+                        {getListingTypeName(lstg.lstgTypeCode1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      <Badge size="sm" color="info">
+                        {getListingDetailTypeName(lstg.lstgTypeCode2)}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      {Array.isArray(lstg.lstgTypeCode1) ? (
+                        lstg.lstgTypeCode1.map((_, index) => (
+                          <div
+                            key={index}
+                            className="cursor-pointer hover:underline text-gray-500 dark:text-gray-200"
+                            onClick={() => onSelectListing(lstg.lstgId)}
+                          >
+                            {lstg.lstgNm}
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          className="cursor-pointer hover:underline text-gray-500 dark:text-gray-200"
+                          onClick={() => onSelectListing(lstg.lstgId)}
+                        >
+                          {lstg.lstgNm}
+                        </div>
+                      )}
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      {lstg.tenancyInfo ? lstg.tenancyInfo.mbrNm : "-"}
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      {getTypeSaleCodeName(lstg.lstgTypeSale)}
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      {getProdStatCodesName(lstg.lstgProdStat)}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      {lstg.lstgRegDate ? lstg.lstgRegDate.split("T")[0] : "-"}
+                    </TableCell>
+
+                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
+                      -
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

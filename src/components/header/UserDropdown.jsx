@@ -8,11 +8,21 @@ import axios from "axios";
 // 마이페이지 이동 내려오는거 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const BACKEND_PORT = 80;
-  const PROTOCOL = window.location.protocol; // 'http:'
-  const HOSTNAME = window.location.hostname; // 'localhost' 또는 '192.168.x.x'
-  const baseURL = `${PROTOCOL}//${HOSTNAME}:${BACKEND_PORT}`;
-
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
+  }
+      if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
   const brokerAxios = useAxios();
@@ -30,7 +40,7 @@ export default function UserDropdown() {
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
     try {
-      const resp = await axios.post(`${baseURL}/account/logout`, {},
+      const resp = await axios.post(`${SPRING_URL_ORIGIN}/account/logout`, {},
         { withCredentials: true }
       );
       if (resp.status === 200) {
@@ -45,7 +55,7 @@ export default function UserDropdown() {
             confirmButton: "custom-ok-button", // 버튼 스타일 커스터마이징하려면 추가
           },
         });
-        window.location.href = baseURL;
+        window.location.href = SPRING_URL_ORIGIN;
       } else {
         console.error("예상치 않은 응답 코드:", resp.status);
       }
