@@ -20,7 +20,7 @@ export default function ListingExtraInfoSection({
           <Input
             type="number"
             name="floor"
-            value={formData.floor}
+            value={formData.lstgFloor}
             onChange={onChange}
           />
         </div>
@@ -29,7 +29,7 @@ export default function ListingExtraInfoSection({
           <Input
             type="number"
             name="lstgBath"
-            value={formData.lstgBath}
+            value={formData.lstgBathCnt}
             onChange={onChange}
           />
         </div>

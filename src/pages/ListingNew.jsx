@@ -10,12 +10,21 @@ import ListingPhotoUploadSection from "../components/myOfficeListing/newList/Lis
 import { useSecureAxios } from "../hooks/useSecureAxios";
 import ComponentCard from "../components/common/ComponentCard";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const ListingNew = () => {
   const navigate = useNavigate();
-  const axios = useSecureAxios();
+  const secureAxios = useSecureAxios();
   const { lstgId } = useParams();
   const isEditMode = !!lstgId;
+  const BACKEND_PORT = 80;
+  const SPRING_URL_ORIGIN = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+
+  const axiosForFormData = axios.create({
+    baseURL: SPRING_URL_ORIGIN,
+    withCredentials: true,
+  });
 
   const [commonCodes, setCommonCodes] = useState({
     typeSale: [],
@@ -23,106 +32,149 @@ const ListingNew = () => {
     lstgType2: [],
     facType: [],
   });
-  
+
   const [facilityAppliances, setFacilityAppliances] = useState([]);
   const [facilityFurnitures, setFacilityFurnitures] = useState([]);
   const [facilityBuildings, setFacilityBuildings] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
-
   const [formData, setFormData] = useState({
-    lstgNm: "",
-    lstgTypeCode1: "",
-    lstgTypeSale: "",
-    roomType: "",
-    roomFeature: [],
-    heating: "",
-    cooling: [],
-    lstgDesc: "",
-    imageUpload: [],
-    appliance: [],
-    furniture: [],
-    building: [],
-    lstgFloor: "",
-    lstgBath: "",
-    lstgRoomCnt: "",
-    lstgAdd: "",
-    lstgAdd2: "",
-    lstgPostal: "",
+    lstgNm: "", // LISTING_NM
+    lstgTypeCode1: "", // LSTG_TYPE_CODE1
+    lstgTypeCode2: "", // LSTG_TYPE_CODE2
+    lstgTypeSale: "", // LSTG_TYPE_SALE
+    lstgLease: "", // LSTG_LEASE
+    lstgLeaseM: "", // LSTG_LEASE_M
+    lstgLeaseAmt: "", // LSTG_LEASE_AMT
+    lstgFee: "", // LSTG_FEE
+    lstgAdd: "", // LSTG_ADD
+    lstgAdd2: "", // LSTG_ADD2
+    lstgPostal: "", // LSTG_POSTAL
+    lstgRoomNum: "", // LSTG_ROOM_NUM
+    lstgRoomCnt: "", // LSTG_ROOM_CNT
+    lstgBathCnt: "", // LSTG_BATH_CNT
+    lstgFloor: "", // LSTG_FLOOR
+    lstgGArea: "", // LSTG_GR_AREA
+    lstgExArea: "", // LSTG_EX_AREA
+    parkingYn: false, // LSTG_PARK_YN
+    roomType: "", // 커스텀 필드
+    roomFeature: [], // 커스텀 필드
+    heating: "", // 커스텀 필드
+    cooling: [], // 커스텀 필드
+    lstgDst: "", // LSTG_DESC
+    imageUpload: [], // 업로드 이미지 리스트
+    appliance: [], // FAC_TYPE_CC_CD = 001
+    furniture: [], // FAC_TYPE_CC_CD = 002
+    building: [], // FAC_TYPE_CC_CD = 003
   });
-    // 📍 filtered 소분류 코드 만들기
+
   const filteredLstgType2 = commonCodes.lstgType2.filter(
     (item) => item.parentCodeValue === formData.lstgTypeCode1
   );
-  
+
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        // 공통 코드 불러오기
-        const { typeSale, lstgType1, lstgType2, facType } = await axios.post("/form", {
-          codeGroup: {
-            typeSale: "TRDST",
-            lstgType1: "LSTG1",
-            lstgType2: "LSTG2",
-            facType: "FAC",
-          },
-        });
+        const { typeSale, lstgType1, lstgType2, facType } =
+          await secureAxios.post("/form", {
+            codeGroup: {
+              typeSale: "TRDST",
+              lstgType1: "LSTG1",
+              lstgType2: "LSTG2",
+              facType: "FAC",
+            },
+          });
         setCommonCodes({ typeSale, lstgType1, lstgType2, facType });
-        
-        // 시설 옵션 불러오기
-        const options = await axios.post("/lstg/facilityOption");
+
+        const options = await secureAxios.post("/lstg/facilityOption");
         if (!Array.isArray(options)) throw new Error("옵션 결과가 배열이 아님");
 
-        setFacilityAppliances(options.filter((opt) => opt.facTypeCcCd === "001"));
-        setFacilityFurnitures(options.filter((opt) => opt.facTypeCcCd === "002"));
-        setFacilityBuildings(options.filter((opt) => opt.facTypeCcCd === "003"));
-
-        // 수정 모드일 경우 상세 정보 조회
+        setFacilityAppliances(
+          options.filter((opt) => opt.facTypeCcCd === "001")
+        );
+        setFacilityFurnitures(
+          options.filter((opt) => opt.facTypeCcCd === "002")
+        );
+        setFacilityBuildings(
+          options.filter((opt) => opt.facTypeCcCd === "003")
+        );
+        console.log("✏️ 현재 모드:", isEditMode ? "수정 모드" : "등록 모드");
         if (isEditMode) {
-          const res = await axios.post("/lstg/listing-details", { lstgId });
-          setFormData((prev) => ({
-            ...prev,
-            lstgNm: res.lstgNm,
-            lstgTypeCode1: res.lstgTypeCode1,
-            lstgTypeSale: res.lstgTypeSale,
-            lstgPrice: res.lstgPrice,
-            lstgAreaSupply: res.lstgAreaSupply,
-            lstgRoomCnt: res.lstgRoomCnt,
-            lstgBathCnt: res.lstgBathCnt,
-            lstgFloor: res.lstgFloor,
-            parkingYn: res.lstgParkYn === "Y",
-            roomType: res.roomType,
-            roomFeature: res.roomFeature || [],
-            heating: res.heating,
-            cooling: res.cooling || [],
-            lstgDesc: res.lstgDesc,
-            appliance: res.appliance || [],
-            furniture: res.furniture || [],
-            building: res.building || [],
-          }));
+          const res = await secureAxios.post("/lstg/listing-details", {
+            lstgId,
+          });
+          console.log(res);
+          setFormData((prev) => {
+            const facilityOptions = res.facOptions || [];
 
-          const images = res.lstgImageUrls ?? (res.lstgThumbnailUrl ? [res.lstgThumbnailUrl] : []);
+            return {
+              ...prev,
+              lstgNm: res.lstgNm,
+              lstgTypeCode1: res.lstgTypeCode1,
+              lstgTypeCode2: res.lstgTypeCode2,
+              lstgTypeSale: res.lstgTypeSale,
+              lstgLeaseAmt: res.lstgLeaseAmt,
+              lstgLeaseM: res.lstgLeaseM,
+              lstgFee: res.lstgFee,
+              lstgGArea: res.lstgGArea,
+              lstgExArea: res.lstgExArea,
+              lstgRoomCnt: res.lstgRoomCnt,
+              lstgBathCnt: res.lstgBathCnt,
+              lstgFloor: res.lstgFloor,
+              lstgRoomNum: res.lstgRoomNum,
+              lstgAdd: res.lstgAdd,
+              lstgAdd2: res.lstgAdd2,
+              lstgPostal: res.lstgPostal,
+              parkingYn: res.lstgParkYn === "Y",
+              roomType: res.roomType,
+              roomFeature: res.roomFeature || [],
+              heating: res.heating,
+              cooling: res.cooling || [],
+              lstgDst: res.lstgDst,
+
+              // ✅ 여기에서 facilityOptions 필터링해서 각각 분리
+              appliance: facilityOptions
+                .filter((opt) => opt.facTypeCcCd === "001")
+                .map((opt) => opt.facOptId),
+              furniture: facilityOptions
+                .filter((opt) => opt.facTypeCcCd === "002")
+                .map((opt) => opt.facOptId),
+              building: facilityOptions
+                .filter((opt) => opt.facTypeCcCd === "003")
+                .map((opt) => opt.facOptId),
+            };
+          });
+
+          const images =
+            res.lstgImageUrls ??
+            (res.lstgThumbnailUrl ? [res.lstgThumbnailUrl] : []);
           setExistingImages(images);
         }
       } catch (err) {
         console.error("초기 데이터 불러오기 실패", err);
       }
 
-      // 카카오 주소 검색 스크립트 삽입
       const script = document.createElement("script");
-      script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.src =
+        "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
       script.async = true;
       document.body.appendChild(script);
       return () => document.body.removeChild(script);
     };
 
     fetchAll();
-  }, [axios, isEditMode, lstgId]);
+  }, [secureAxios, isEditMode, lstgId]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     if (type === "checkbox") {
-      const isMulti = ["roomFeature", "cooling", "appliance", "furniture", "building"].includes(name);
+      const isMulti = [
+        "roomFeature",
+        "cooling",
+        "appliance",
+        "furniture",
+        "building",
+      ].includes(name);
       setFormData((prev) => {
         if (isMulti) {
           const current = new Set(prev[name]);
@@ -152,7 +204,11 @@ const ListingNew = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
+
     Object.entries(formData).forEach(([key, value]) => {
+      if (["appliance", "furniture", "building", "imageUpload"].includes(key))
+        return;
+
       if (Array.isArray(value)) {
         value.forEach((v) => data.append(key, v));
       } else {
@@ -160,47 +216,95 @@ const ListingNew = () => {
       }
     });
 
+    // ✅ 시설 옵션 통합
+    const selectedFacOptIds = [
+      ...(formData.appliance || []),
+      ...(formData.furniture || []),
+      ...(formData.building || []),
+    ];
+    selectedFacOptIds.forEach((id) => {
+      data.append("facilities", id);
+    });
+
+    // ✅ 이미지 업로드 추가
+    if (Array.isArray(formData.imageUpload)) {
+      formData.imageUpload.forEach((file) => {
+        data.append("imageUpload", file);
+      });
+    }
+
     try {
       if (isEditMode) {
         data.append("lstgId", lstgId);
-        await axios.post("/building/product/update", data);
-        alert("수정 성공");
+        console.log(data);
+        await axiosForFormData.post(
+          "/rest/broker/myoffice/lstg/product/update",
+          data
+        );
+        Swal.fire({
+          icon: "success",
+          title: "수정 완료",
+          text: "매물 정보가 성공적으로 수정되었습니다.",
+          confirmButtonColor: "#a47148",
+        }).then(() => navigate("/broker/myoffice/lstg/mng"));
       } else {
-        await axios.post("/building/product/add", data);
-        alert("등록 성공");
+        console.log("✅ FormData 내용 확인:");
+        for (let [key, value] of data.entries()) {
+          console.log(`${key}:`, value);
+        }
+        await axiosForFormData.post(
+          "/rest/broker/myoffice/lstg/product/add",
+          data
+        );
+        Swal.fire({
+          icon: "success",
+          title: "등록 완료",
+          text: "매물이 성공적으로 등록되었습니다.",
+          confirmButtonColor: "#a47148",
+        }).then(() => navigate("/broker/myoffice/lstg/mng"));
       }
-      navigate("/broker/myoffice/lstg/mng");
     } catch (err) {
       console.error(err);
-      alert(isEditMode ? "수정 실패" : "등록 실패");
+      Swal.fire({
+        icon: "error",
+        title: isEditMode ? "수정 실패" : "등록 실패",
+        text: "서버 요청 중 오류가 발생했습니다.",
+        confirmButtonColor: "#a47148",
+      });
     }
   };
-// ✅ 주소검색 함수
-const handleAddressSearch = () => {
-  new window.daum.Postcode({
-    oncomplete: function (data) {
-      const fullAddress = data.address; // 도로명 주소 또는 지번 주소
-      const postalCode = data.zonecode; // 우편번호
 
-      setFormData((prev) => ({
-        ...prev,
-        lstgAdd: fullAddress,
-        lstgPostal: postalCode,
-        // lstgAdd2는 사용자가 직접 입력하게 두는 것이 일반적
-      }));
-    },
-  }).open();
-};
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        const fullAddress = data.address;
+        const postalCode = data.zonecode;
+        setFormData((prev) => ({
+          ...prev,
+          lstgAdd: fullAddress,
+          lstgPostal: postalCode,
+        }));
+      },
+    }).open();
+  };
 
   return (
     <>
       <PageBreadcrumb pageTitle={isEditMode ? "매물 수정" : "매물 등록"} />
-      <ComponentCard title={isEditMode ? "수정" : "신규 등록"} onBack={() => navigate(-1)}>
-        <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-8">
+      <ComponentCard
+        title={isEditMode ? `${formData.lstgNm} 수정` : "신규 등록"}
+        onBack={() => navigate(-1)}
+      >
+        <form
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          className="space-y-8"
+        >
           <ListingInfoSection
             formData={formData}
             onRadioChange={handleRadioChange}
             onAddressSearch={handleAddressSearch}
+            onChange={handleChange}
             commonCodes={commonCodes}
             filteredLstgType2={filteredLstgType2}
           />
@@ -220,13 +324,18 @@ const handleAddressSearch = () => {
             buildingOptions={facilityBuildings}
             onCheckboxChange={handleCheckboxChange}
           />
-          <ListingDescriptionSection formData={formData} onChange={handleChange} />
+          <ListingDescriptionSection
+            formData={formData}
+            onChange={handleChange}
+          />
           <ListingPhotoUploadSection
-            onChange={(files) => setFormData((prev) => ({ ...prev, imageUpload: files }))}
+            onChange={(files) =>
+              setFormData((prev) => ({ ...prev, imageUpload: files }))
+            }
             isEditMode={isEditMode}
             existingImages={existingImages}
           />
-          <SubmitSection />
+          <SubmitSection isEdit={isEditMode} />
         </form>
       </ComponentCard>
     </>
