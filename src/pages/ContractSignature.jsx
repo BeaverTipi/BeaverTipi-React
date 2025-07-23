@@ -46,6 +46,7 @@ export default function ContractSignature() {
             icon: "info",
             title: "서명 만료",
             text: "전자서명의 유효 시간이 만료되었습니다.",
+            confirmButtonColor: "#085D89", // sky-800
           }).then(() => {
             if (window.history.length > 1) navigate(-1);
             else navigate("/"); //window.close();

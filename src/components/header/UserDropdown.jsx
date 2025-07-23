@@ -25,7 +25,6 @@ export default function UserDropdown() {
     return;
   }, [])
 
-
   /* KAR */
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
@@ -76,7 +75,7 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="block mr-1 font-medium text-theme-sm">{BROKER_INFO.mbrNnm}&nbsp;</span>
+        <span className="block mr-1 font-medium text-base">{BROKER_INFO.mbrNm}&nbsp;</span>
         <span className="mr-3 overflow-hidden rounded-full h-9 w-9">
           <img src={BROKER_INFO?.memberFile?.filePathUrl || "/images/재윤비버.png"} alt="User" />
         </span>
@@ -104,11 +103,11 @@ export default function UserDropdown() {
         onClose={closeDropdown}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
-        <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {BROKER_INFO.mbrNm}
+        <div className="pt-1 pl-2">
+          <span className="block font-medium text-lg text-gray-700 dark:text-gray-400">
+            {BROKER_INFO.mbrNnm}
           </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
+          <span className="mt-0.5 block text-theme-sm text-gray-500 dark:text-gray-400">
             {BROKER_INFO.mbrEmlAddr !== null ? BROKER_INFO.mbrEmlAddr : "register your NEW EMAIL"}
           </span>
         </div>

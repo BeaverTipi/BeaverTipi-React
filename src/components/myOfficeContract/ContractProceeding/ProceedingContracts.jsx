@@ -33,6 +33,8 @@ function ProceedingContracts() {
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [clickedRowId, setClickedRowId] = useState(null);
+
 
   /*(1/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
   const [filterStartDate, setFilterStartDate] = useState("");
@@ -204,6 +206,8 @@ function ProceedingContracts() {
       return now.toISOString().split("T")[0]; // 예: "2025-07-21"
     });
     setSelectedIds([]); // 모드 변경 시 선택 초기화
+    setClickedRowId(null);
+
   };
   /*(1/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
 
@@ -327,9 +331,11 @@ function ProceedingContracts() {
           icon: "info",
           title: "서명페이지가 만료되었습니다",
           text: "해당 계약의 서명 가능 기간이 종료되었습니다.",
+          confirmButtonColor: "#085D89", // sky-800
+          scrollbarPadding: false,
         });
       } else {
-        navigate("/contract", { state: { contId } });
+        navigate(`/contract/${contId}`, { state: { contId } });
       }
     } catch (err) {
       console.error(err);
@@ -337,6 +343,7 @@ function ProceedingContracts() {
         icon: "error",
         title: "요청 실패",
         text: "계약 상태를 확인하는 데 실패했습니다.",
+        scrollbarPadding: false,
       });
     }
   };
@@ -391,7 +398,7 @@ function ProceedingContracts() {
         showCancelButton: true,
         confirmButtonText: "이동",
         cancelButtonText: "확인",
-        confirmButtonColor: "#f59e0b", // amber-500
+        confirmButtonColor: "#085D89", // sky-800
         cancelButtonColor: "#d1d5db", // gray-300
         scrollbarPadding: false,
       });
@@ -403,6 +410,7 @@ function ProceedingContracts() {
         icon: "error",
         title: "오류 발생",
         text: "서명 페이지 개설에 실패했습니다. 다시 시도해주세요.",
+        scrollbarPadding: false,
       });
     }
   };
@@ -431,6 +439,8 @@ function ProceedingContracts() {
           icon: "info",
           title: "서명 페이지 만료됨",
           text: `계약 [${expiredContId}]의 서명 페이지가 만료되었습니다.`,
+          confirmButtonColor: "#085D89",
+          scrollbarPadding: false,
         });
       }
     };
@@ -708,7 +718,7 @@ function ProceedingContracts() {
                     isHeader
                     className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
-                    개설
+                    서명 페이지
                   </TableCell>
                 </TableRow>
               </TableHeader>
@@ -719,15 +729,18 @@ function ProceedingContracts() {
                     <TableRow
                       key={proc.contId}
                       onClick={(e) => {
-                        if (e.currentTarget !== e.target) return;
+                        // if (e.currentTarget !== e.target) return;
 
                         console.log("Row 클릭 핸들러");
+                        setClickedRowId(proc.contId); // 클릭된 Row 기억
+
                         setSelectedContract(proc);
                         setShowModal(true);
                       }}
-                      className={
-                        "cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5"
-                      }
+                      className={`cursor-pointer ${clickedRowId === proc.contId
+                        ? "bg-gray-200 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
+                        : "hover:bg-gray-100 dark:hover:bg-white/5"
+                        }`}
                     >
                       {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                       <TableCell className="relative px-5 py-4 sm:px-6 text-center">
@@ -799,7 +812,7 @@ function ProceedingContracts() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                              " 원"
+                            " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -822,7 +835,7 @@ function ProceedingContracts() {
                             </button>
                           ) : (
                             <button
-                              className="w-[50px] text-xs text-blue-700 border border-blue-700 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
+                              className="w-[50px] text-xs text-sky-800 border border-sky-800 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleContractSignaturePageNavigate(
@@ -853,11 +866,10 @@ function ProceedingContracts() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${
-                  i + 1 === currentPage
-                    ? "bg-amber-600 border border-amber-400 text-white"
-                    : "bg-gray-100 border border-gray-300 text-gray-400"
-                }`}
+                className={`px-3 py-1 rounded ${i + 1 === currentPage
+                  ? "bg-amber-600 border border-amber-400 text-white"
+                  : "bg-gray-100 border border-gray-300 text-gray-400"
+                  }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
