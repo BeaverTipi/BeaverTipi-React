@@ -46,7 +46,15 @@ function ContractListingSelect({ onSave }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [clickedRowId, setClickedRowId] = useState(null);
+  useEffect(() => {
+    if (clickedRowId !== null) {
+      const timer = setTimeout(() => {
+        setClickedRowId(null);
+      }, 2500);
 
+      return () => clearTimeout(timer); // 💡 컴포넌트 언마운트나 clickedRowId 재변경 시 클린업
+    }
+  }, [clickedRowId]);
 
   const isValidDate = (dateStr) => {
     if (!dateStr) return false;
@@ -57,6 +65,7 @@ function ContractListingSelect({ onSave }) {
       dateStr === date.toISOString().slice(0, 10)
     );
   };
+
 
   useEffect(() => {
     axios
@@ -490,9 +499,9 @@ function ContractListingSelect({ onSave }) {
                         handleSelectListing(lstg.lstgId);
                       }}
                       className={`cursor-pointer ${clickedRowId === lstg.lstgId
-                        ? "bg-gray-200 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
+                        ? "bg-gray-100 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
                         : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        }`}
+                        } transition-colors duration-150`}
                     >
                       <TableCell className="px-5 py-4 sm:px-6 text-center">
                         <div className="pointer-events-none flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">

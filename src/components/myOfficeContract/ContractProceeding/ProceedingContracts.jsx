@@ -34,7 +34,15 @@ function ProceedingContracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [clickedRowId, setClickedRowId] = useState(null);
+  useEffect(() => {
+    if (clickedRowId !== null) {
+      const timer = setTimeout(() => {
+        setClickedRowId(null);
+      }, 2500);
 
+      return () => clearTimeout(timer); // 💡 컴포넌트 언마운트나 clickedRowId 재변경 시 클린업
+    }
+  }, [clickedRowId]);
 
   /*(1/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
   const [filterStartDate, setFilterStartDate] = useState("");
@@ -738,9 +746,9 @@ function ProceedingContracts() {
                         setShowModal(true);
                       }}
                       className={`cursor-pointer ${clickedRowId === proc.contId
-                        ? "bg-gray-200 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
+                        ? "bg-gray-100 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
                         : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        }`}
+                        } transition-colors duration-150`}
                     >
                       {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                       <TableCell className="relative px-5 py-4 sm:px-6 text-center">

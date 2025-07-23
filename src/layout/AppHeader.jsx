@@ -87,15 +87,15 @@ const AppHeader = () => {
             {/* Cross Icon */}
           </button>
 
-          <Link to="/" className="lg:hidden">
+          <Link to={`${baseURL}`} className="lg:hidden">
             <img
-              className="dark:hidden"
-              src="./images/logo/logo.svg"
+              className="dark:hidden max-w-15 p-0"
+              src="/images/logo/logo-icon.png"
               alt="Logo"
             />
             <img
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
+              className="hidden dark:block max-w-15 p-0"
+              src="/images/logo/logo-icon.png"
               alt="Logo"
             />
           </Link>

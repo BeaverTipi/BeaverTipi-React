@@ -14,6 +14,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  DocsIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -34,11 +35,11 @@ const navItems = [
   {
     icon: <PageIcon />,
     name: " 매물 관리",
-      path: "/broker/myoffice/lstg/mng",
-  pro: false
+    path: "/broker/myoffice/lstg/mng",
+    pro: false
   },
   {
-    icon: <ListIcon />,
+    icon: <DocsIcon />,
     name: "계약 정보",
     subItems: [
       { name: "내 계약 관리", path: "/broker/myoffice/cont/mng", pro: false }
