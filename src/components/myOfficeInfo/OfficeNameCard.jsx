@@ -7,16 +7,12 @@ import Swal from "sweetalert2";
 import Input from "../form/input/InputField";
 
 const templates = [
-  { id: 1, name: "블루", color: "#3a5dfb" },
-  { id: 2, name: "그린", color: "#48c774" },
-  { id: 3, name: "오렌지", color: "#ffb347" }
-];
-const textColors = [
-  { code: "#222", name: "블랙" },
-  { code: "#fff", name: "화이트" },
-  { code: "#3a5dfb", name: "블루" },
-  { code: "#2e7d32", name: "그린" },
-  { code: "#d65f12", name: "오렌지" }
+  { id: 1, name: "화이트리넨", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_whitelinen.png" },
+  { id: 2, name: "크림코튼", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_creamcotton.png" },
+  { id: 3, name: "스펙클", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_recyclespecle.png" },
+  { id: 4, name: "브라운크라프트", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_browncraft.png" },
+  { id: 5, name: "차콜카드", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_charcole.png" },
+  { id: 6, name: "파스텔블루린넨", bg: "https://beavertipi.s3.ap-southeast-2.amazonaws.com/public/broker/introcard/static/template_namecard_pastelbluelinen.png" }
 ];
 
 const defaultTexts = [
@@ -30,8 +26,9 @@ const defaultTexts = [
 export default function OfficeNameCard() {
   const [profiles, setProfiles] = useState([]);
   const [form, setForm] = useState({
-    template: templates[0].id,
+    template: null,
     bgImageUrl: "",
+    bgColor: "#f8f8f8",
     textColor: "#222"
   });
   const [texts, setTexts] = useState(defaultTexts);
@@ -43,26 +40,18 @@ export default function OfficeNameCard() {
   const previewRef = useRef();
 
   useEffect(() => {
-    console.log("여기가시작이얌");
-    axios.get("/rest/broker/namecard/user").then(res => setMbrCd(res.data.mbrCd)
-    );
-    console.log("mbrCd를 찾아봐", mbrCd);
-    console.log("요청 주소:", `/rest/broker/namecard/list/${mbrCd}`);
-    
+    axios.get("/rest/broker/namecard/user").then(res => setMbrCd(res.data.mbrCd));
   }, []);
   useEffect(() => {
     if (mbrCd) {
       axios.get(`/rest/broker/namecard/list/${mbrCd}`).then(res => {
-        console.log("응답 데이터:", res.data);
         setNameCards(Array.isArray(res.data) ? res.data : []);
-        console.log("주소나오냐?", `/rest/broker/namecard/list/${mbrCd}`);
         const mainCard = (Array.isArray(res.data) ? res.data : []).find(card => card.docTypeCd === "NAMECARD_MAIN");
         setMainNameCardId(mainCard?.fileId || null);
       });
     }
   }, [mbrCd, refresh]);
 
-  // 텍스트 박스 추가/삭제
   const handleAddText = () => {
     setTexts(prev => [
       ...prev,
@@ -77,13 +66,9 @@ export default function OfficeNameCard() {
   const handleRemoveText = idx => {
     setTexts(prev => prev.filter((_, i) => i !== idx));
   };
-
-  // 텍스트 value 변경
   const handleTextChange = (idx, value) => {
     setTexts(prev => prev.map((t, i) => i === idx ? { ...t, value } : t));
   };
-
-  // 텍스트 크기/위치 변경 (Preview에서 내려받음)
   const handleTextFontSize = (idx, size) => {
     setTexts(prev => prev.map((t, i) => i === idx ? { ...t, fontSize: size } : t));
   };
@@ -91,17 +76,33 @@ export default function OfficeNameCard() {
     setTexts(prev => prev.map((t, i) => i === idx ? { ...t, pos } : t));
   };
 
-  // 입력/툴 핸들러
-  const handleTemplate = (tid) => setForm(prev => ({ ...prev, template: tid, bgImageUrl: "" }));
+  const handleTemplate = (tid) => {
+    const bg = templates.find(t => t.id === tid)?.bg || "";
+    setForm(prev => ({
+      ...prev,
+      template: tid,
+      bgImageUrl: bg
+    }));
+  };
+  const handleBgColor = (e) => {
+    setForm(prev => ({
+      ...prev,
+      bgColor: e.target.value,
+      bgImageUrl: "",
+      template: null
+    }));
+  };
   const handleBgUpload = (e) => {
     const file = e.target.files[0];
     if (file) setForm(prev => ({
       ...prev,
-      bgImageUrl: URL.createObjectURL(file)
+      bgImageUrl: URL.createObjectURL(file),
+      template: null
     }));
   };
-  const handleTextColor = (color) => setForm(prev => ({ ...prev, textColor: color }));
-  // 프로필
+  const handleTextColor = (e) =>
+    setForm(prev => ({ ...prev, textColor: e.target.value }));
+
   const handleProfileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -126,7 +127,6 @@ export default function OfficeNameCard() {
     setProfiles(prev => prev.map((p, i) => (i === prev.length - 1 ? { ...p, shape } : p)));
   };
 
-  // 저장/다운로드
   const handleSave = async () => {
     if (!previewRef.current) {
       await Swal.fire('오류', "미리보기 없음!", "error");
@@ -171,7 +171,6 @@ export default function OfficeNameCard() {
     link.click();
   };
 
-  // 삭제/대표명함 지정
   const handleDelete = async (fileId, fileAttachSeq) => {
     const confirm = await Swal.fire({
       title: '명함을 삭제할까요?',
@@ -214,7 +213,6 @@ export default function OfficeNameCard() {
     }
   };
 
-  // Input 스타일
   const grayInput = {
     width: 320,
     padding: "9px 12px",
@@ -229,13 +227,19 @@ export default function OfficeNameCard() {
   };
 
   return (
-    <div style={{ width: "100%", maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{
+      width: "100%", maxWidth: 900,
+      margin: "0 auto",
+      display: "flex", flexDirection: "column", alignItems: "center",
+      transform: "translateX(-20px)"
+    }}>
       <style>
         {`
         .namecard-toolbar {
           display: flex;
-          align-items: center;
-          gap: 32px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
           margin: 22px 0 18px 0;
         }
         .namecard-toolbar__item {
@@ -250,7 +254,6 @@ export default function OfficeNameCard() {
         }
         `}
       </style>
-
       {/* 명함 미리보기 */}
       <div style={{ margin: "36px 0 28px 0" }}>
         <NameCardPreview
@@ -258,7 +261,7 @@ export default function OfficeNameCard() {
           width={360}
           height={200}
           bgImage={form.bgImageUrl}
-          color={templates.find(t => t.id === form.template)?.color}
+          bgColor={form.bgColor}
           textColor={form.textColor}
           profiles={profiles}
           onProfileDelete={handleProfileDelete}
@@ -269,63 +272,141 @@ export default function OfficeNameCard() {
           onRemoveText={handleRemoveText}
         />
       </div>
-
       {/* 툴바 */}
       <div className="namecard-toolbar">
-        <div className="namecard-toolbar__item">
-          <span className="namecard-toolbar__label">명함색상</span>
-          {templates.map(t => (
-            <button key={t.id} onClick={() => handleTemplate(t.id)}
+        {/* 1행 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 32, marginBottom: 4, width: "100%" }}>
+          <div className="namecard-toolbar__item">
+            <span className="namecard-toolbar__label">배경 템플릿</span>
+            {templates.map(t => (
+              <button key={t.id} onClick={() => handleTemplate(t.id)}
+                style={{
+                  width: 32, height: 32,
+                  backgroundImage: `url(${t.bg})`,
+                  backgroundSize: "cover",
+                  border: form.template === t.id ? "2.5px solid #222" : "1.5px solid #bbb",
+                  borderRadius: 8, outline: "none", cursor: "pointer"
+                }}
+                aria-label={t.name}
+                title={t.name}
+              />
+            ))}
+          </div>
+          <div className="namecard-toolbar__item">
+            <span className="namecard-toolbar__label">배경색상</span>
+            <input
+              type="color"
+              value={form.bgColor}
+              onChange={handleBgColor}
               style={{
+                width: 32, height: 32, border: "1.5px solid #bbb", borderRadius: 8, padding: 0, background: "none", cursor: "pointer"
+              }}
+              aria-label="배경 색상 선택"
+            />
+          </div>
+          {/* 배경직접설정 부분! */}
+          <div className="namecard-toolbar__item" style={{ alignItems: "center" }}>
+            <span className="namecard-toolbar__label">배경직접설정</span>
+            <span style={{
+              display: "flex",
+              alignItems: "center",
+              marginLeft: 5
+            }}>
+              <label style={{
+                cursor: "pointer",
+                color: "#4260ff",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center"
+              }}>
+                사진 불러오기
+                <input type="file" accept="image/*" onChange={handleBgUpload} style={{ display: "none" }} />
+              </label>
+              <div style={{
                 width: 32, height: 32,
-                background: t.color,
-                border: form.template === t.id ? "2.5px solid #222" : "1.5px solid #bbb",
-                borderRadius: 8, outline: "none", cursor: "pointer"
-              }} aria-label={t.name} />
-          ))}
+                borderRadius: 8,
+                border: "1.5px solid #ccc",
+                overflow: "hidden",
+                marginLeft: 6,
+                background: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                {form.bgImageUrl ? (
+                  <img src={form.bgImageUrl} alt="bg" style={{
+                    width: "100%", height: "100%",
+                    objectFit: "cover"
+                  }} />
+                ) : (
+                  <div style={{
+                    width: "100%", height: "100%",
+                    background: form.bgColor,
+                  }} />
+                )}
+              </div>
+            </span>
+          </div>
         </div>
-        <div className="namecard-toolbar__item">
-          <span className="namecard-toolbar__label">배경사진설정</span>
-          <label style={{ cursor: "pointer", color: "#4260ff", fontWeight: 500 }}>
-            사진 불러오기
-            <input type="file" accept="image/*" onChange={handleBgUpload} style={{ display: "none" }} />
-          </label>
-          {form.bgImageUrl &&
-            <img src={form.bgImageUrl} alt="bg" style={{
-              width: 30, height: 30, borderRadius: 6,
-              objectFit: "cover", border: "1.5px solid #ccc", marginLeft: 2
-            }} />}
-        </div>
-        <div className="namecard-toolbar__item">
-          <span className="namecard-toolbar__label">프로필</span>
-          <label style={{ cursor: "pointer", color: "#4260ff", fontWeight: 500 }}>
-            사진 불러오기
-            <input type="file" accept="image/*" onChange={handleProfileUpload} style={{ display: "none" }} />
-          </label>
-          <button style={{
-            border: profiles.length && profiles[profiles.length - 1].shape === "circle" ? "2px solid #3a5dfb" : "1px solid #aaa",
-            borderRadius: "50%", width: 26, height: 26, marginLeft: 7, fontSize: 15
-          }} onClick={() => handleProfileShape("circle")} title="원형">●</button>
-          <button style={{
-            border: profiles.length && profiles[profiles.length - 1].shape === "rect" ? "2px solid #3a5dfb" : "1px solid #aaa",
-            borderRadius: 6, width: 26, height: 26, marginLeft: 3, fontSize: 15
-          }} onClick={() => handleProfileShape("rect")} title="사각">■</button>
-        </div>
-        <div className="namecard-toolbar__item">
-          <button onClick={handleAddText} style={{
-            border: "1.5px solid #2e7d32",
-            color: "#2e7d32",
-            background: "#fff",
-            borderRadius: 6,
-            padding: "3px 13px",
-            fontWeight: 600,
-            fontSize: 14,
-            cursor: "pointer"
-          }}>텍스트 추가</button>
+        {/* 2행 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 32, width: "100%" }}>
+          <div className="namecard-toolbar__item">
+            <span className="namecard-toolbar__label">글씨색상</span>
+            <input
+              type="color"
+              value={form.textColor}
+              onChange={handleTextColor}
+              style={{
+                width: 32, height: 32, border: "1.5px solid #bbb", borderRadius: 8, padding: 0, background: "none", cursor: "pointer"
+              }}
+              aria-label="텍스트 색상 선택"
+            />
+          </div>
+          <div className="namecard-toolbar__item">
+            <button onClick={handleAddText} style={{
+              border: "1.5px solid #2e7d32",
+              color: "#2e7d32",
+              background: "#fff",
+              borderRadius: 6,
+              padding: "3px 13px",
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: "pointer"
+            }}>텍스트 추가</button>
+          </div>
+          <div style={{ flex: 1 }} />
+          {/* 프로필 부분! */}
+          <div className="namecard-toolbar__item" style={{ alignItems: "center" }}>
+            <span className="namecard-toolbar__label">프로필</span>
+            <span style={{
+              display: "flex",
+              alignItems: "center",
+              marginLeft: 5
+            }}>
+              <label style={{
+                cursor: "pointer",
+                color: "#4260ff",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center"
+              }}>
+                사진 불러오기
+                <input type="file" accept="image/*" onChange={handleProfileUpload} style={{ display: "none" }} />
+              </label>
+              <button style={{
+                border: profiles.length && profiles[profiles.length - 1].shape === "circle" ? "2px solid #3a5dfb" : "1px solid #aaa",
+                borderRadius: "50%", width: 26, height: 26, marginLeft: 7, fontSize: 15
+              }} onClick={() => handleProfileShape("circle")} title="원형">●</button>
+              <button style={{
+                border: profiles.length && profiles[profiles.length - 1].shape === "rect" ? "2px solid #3a5dfb" : "1px solid #aaa",
+                borderRadius: 6, width: 26, height: 26, marginLeft: 3, fontSize: 15
+              }} onClick={() => handleProfileShape("rect")} title="사각">■</button>
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* 텍스트 입력 박스들 */}
+      {/* 텍스트 입력 */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
@@ -362,7 +443,6 @@ export default function OfficeNameCard() {
           </div>
         ))}
       </div>
-
       <div style={{
         display: "flex",
         gap: 18,
@@ -383,7 +463,6 @@ export default function OfficeNameCard() {
           boxShadow: "0 2px 7px #e3332a11", cursor: "pointer"
         }}>저장</button>
       </div>
-
       <div style={{ width: "100%", maxWidth: 900, margin: "30px 0 0 0", display: "flex", justifyContent: "center" }}>
         {mbrCd &&
           <NameCardCarousel
@@ -394,7 +473,6 @@ export default function OfficeNameCard() {
           />
         }
       </div>
-
       <div style={{
         marginTop: 18, fontSize: 14, color: "#7a88a9", textAlign: "center"
       }}>

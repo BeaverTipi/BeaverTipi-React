@@ -15,6 +15,7 @@ import { useAES256 } from "../../../hooks/useAES256";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useDomain } from "../../../hooks/useDomain";
 
 function ProceedingContracts() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function ProceedingContracts() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [clickedRowId, setClickedRowId] = useState(null);
+  const { SPRING_URL_ORIGIN } = useDomain();
 
   useEffect(() => {
     if (clickedRowId !== null) {
@@ -326,31 +328,42 @@ function ProceedingContracts() {
 
   const handleContractSignaturePageNavigate = async (contId) => {
     try {
-      // 1. 서버에 contSignYn 조회 요청
-      const { success, signYn, _message } = await axios.post(
-        `cont/proc/sign-status`,
-        {
+      // Response data = { success, signYn, message }
+      // 1. 서명페이지 개설 여부 확인
+      const { success, signYn, message: signStatusMsg }
+        = await axios.post(`cont/proc/sign-status`, {
           contId: contId,
           _method: "GET",
-        }
-      );
+        });
 
       if (!success || signYn === "N") {
-        Swal.fire({
+        return Swal.fire({
           icon: "info",
           title: "서명페이지가 만료되었습니다",
-          text: "해당 계약의 서명 가능 기간이 종료되었습니다.",
+          text: signStatusMsg || "해당 계약의 서명 가능 기간이 종료되었습니다.",
           confirmButtonColor: "#085D89", // sky-800
           scrollbarPadding: false,
         });
-      } else {
-        // navigate(`/contract/${contId}`, { state: { contId } });
-        axios.post(`contract/${contId}`, {
-          contId: contId
-        });
       }
-    } catch (err) {
-      console.error(err);
+
+      // 2.인가 요청
+      const authData = await axios.post("/rest/contract/authorize", {
+        contId,
+        _method: "GET"
+      });
+      if (!authData.success) {
+        //비로그인 상태 처리
+        if (authData.message === "로그인이 필요합니다.") return navigate("/signin");
+
+        //기타 인가 실패
+        return Swal.fire({ icon: "info", title: "접근 불가", text: authData.message || "해당 계약 정보에 접근할 권한이 없습니다.", })
+      }
+
+      // 3. 서명페이지 이동
+      const encryptedContId = encrypt(contId);
+      window.location.href = `${SPRING_URL_ORIGIN}/contract/${encryptedContId}`;
+    } catch (err_open) {
+      console.error(err_open);
       Swal.fire({
         icon: "error",
         title: "요청 실패",
@@ -359,6 +372,7 @@ function ProceedingContracts() {
       });
     }
   };
+  // console.log("Encrypted ID:", encrypt("CN250723002"));
 
   const handleContractSignaturePageOpen = async (contId) => {
     const contract = procContracts.find((c) => c.contId === contId);
@@ -382,7 +396,7 @@ function ProceedingContracts() {
           <b>계약일시:</b> ${contDtm || "-"}<br/>
           <b>계약유형:</b> ${getContractTypeName(contTypeCode)}
         </div>
-`,
+      `,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "서명 페이지 열기",
@@ -415,7 +429,7 @@ function ProceedingContracts() {
         scrollbarPadding: false,
       });
 
-      if (result2.isConfirmed) navigate("/contract", { state: { contId } });
+      if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({
