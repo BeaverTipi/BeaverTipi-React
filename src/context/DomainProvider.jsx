@@ -8,7 +8,7 @@ export const DomainProvider = ({ prefix = "", children }) => {
   const domainMap = {
     "react.beavertipi.com": "beavertipi.com",
     "dev.beavertipi.com": "dev1.beavertipi.com",
-    "hbdev.beavertipi.com": "hbdev1.beavertipi.com",
+    "hbdev1.beavertipi.com": "hbdev.beavertipi.com",
   };
 
   HOSTNAME = domainMap[HOSTNAME] || HOSTNAME;
