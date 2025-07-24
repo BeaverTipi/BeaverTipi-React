@@ -87,9 +87,9 @@ export default function UserDropdown() {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
+        className="min-w-32 max-w-32 flex justify-end-safe items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="block mr-1 font-medium text-base">{BROKER_INFO.mbrNm}&nbsp;</span>
+        <span className="block mr-1 font-medium text-base">{BROKER_INFO?.mbrNm || "재윤비버"}&nbsp;</span>
         <span className="mr-3 overflow-hidden rounded-full h-9 w-9">
           <img
             src={BROKER_INFO?.memberFile?.filePathUrl || "/images/재윤비버.png"}

@@ -2,11 +2,14 @@ import axios from "axios";
 import { useContext, useMemo } from "react";
 import { AESContext } from "../context/AESContext";
 import CryptoJS from "crypto-js";
+import { useNavigate } from "react-router";
 
-export function useSecureAxios() {
+export function useSecureAxios(prefix) {
+  const navigate = useNavigate();
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
   const BACKEND_PORT = 80;
   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+
   let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
 
   // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
@@ -20,8 +23,8 @@ export function useSecureAxios() {
     HOSTNAME = "hbdev.beavertipi.com";
   }
   const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  const SPRING_URL_PREFIX = prefix ? prefix : "/rest/broker/myoffice";
 
-  const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const secureAxios = useMemo(() => {
     const instance = axios.create({
       baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX
@@ -55,6 +58,7 @@ export function useSecureAxios() {
     // 응답 인터셉터: 동적 IV 기반 복호화
     instance.interceptors.response.use(
       (response) => {
+        if (response.status == 401) navigate("/signin")
         const { iv, encrypted } = response.data || {};
         if (iv && encrypted) {
           try {

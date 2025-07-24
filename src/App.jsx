@@ -80,12 +80,12 @@ export default function App() {
                 path="/broker"
                 element={<Navigate to="/broker/myoffice" replace />}
               />
-              <Route path="/contract" element={
+              <Route path="/contract/:" element={
                 <ProtectedRoute>
                   <ContractSignature />
                 </ProtectedRoute>
               } />
-              <Route path="/signin" element={
+              <Route path="/signin/:" element={
                 <ProtectedRoute>
                   <SignIn />
                 </ProtectedRoute>} />
