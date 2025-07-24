@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import OfficeIntroCard from "./myOfficeInfoChildBox/OfficeIntroCard";
-import OfficeIntroPreview from "./myOfficeInfoChildBox/OfficeIntroPreviewBox";
+// import OfficeIntroPreview from "./myOfficeInfoChildBox/OfficeIntroPreviewBox";
 import NameCardPreviewBox from "./myOfficeInfoChildBox/NameCardPreviewBox";
 
 export default function OfficeInfoChild({ onEditTabMove }) {
@@ -19,7 +19,7 @@ export default function OfficeInfoChild({ onEditTabMove }) {
         <OfficeIntroCard onSaved={handleSaved} />
       </div>
       <div style={{ flex: "0 0 420px", display: "flex", flexDirection: "column", gap: 28, alignItems: "center" }}>
-        <OfficeIntroPreview ref={introPreviewRef} />
+        {/* <OfficeIntroPreview ref={introPreviewRef} /> */}
         <NameCardPreviewBox onEditClick={onEditTabMove} />
       </div>
     </div>

@@ -60,8 +60,7 @@ export default function App() {
       document.removeEventListener("contextmenu", blockDefaultContext);
   }, []);
   return (
-
-    <Router>
+    <>
       <ScrollToTop />
       <GlobalContextMenu />
       <Routes>
@@ -148,7 +147,7 @@ export default function App() {
         {/* 404 Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Router>
+    </>
 
   );
 }

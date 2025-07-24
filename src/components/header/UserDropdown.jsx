@@ -3,7 +3,6 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import { useAxios } from "../../hooks/useAxios"
 import axios from "axios";
 // 마이페이지 이동 내려오는거 
 
