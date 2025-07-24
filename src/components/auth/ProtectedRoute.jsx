@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children }) => {
   if (HOSTNAME === "dev.beavertipi.com") {
     HOSTNAME = "dev1.beavertipi.com";
   }
-      if (HOSTNAME === "hbdev.beavertipi.com") {
+  if (HOSTNAME === "hbdev.beavertipi.com") {
     HOSTNAME = "hbdev1.beavertipi.com";
   }
 
