@@ -4,7 +4,6 @@ import ContractFileUpLoader from "./ContractFileUpLoader";
 import ContractPDFLoader from "./ContractPDFLoader";
 import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
-import { useAxios } from "../../../hooks/useAxios";
 import Swal from "sweetalert2";
 import { useContractInfo } from "../../../context/ContractInfoContext";
 import { useSecureAxios } from "../../../hooks/useSecureAxios";

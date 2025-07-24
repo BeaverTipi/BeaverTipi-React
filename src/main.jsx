@@ -5,11 +5,13 @@ import "flatpickr/dist/flatpickr.css";
 import App from "./App.jsx";
 import { AppWrapper } from "./components/common/PageMeta";
 import { ThemeProvider } from "./context/ThemeContext";
-
+import { DomainProvider } from "./context/DomainProvider";
 createRoot(document.getElementById("root")).render(
-  <ThemeProvider>
-    <AppWrapper>
-      <App />
-    </AppWrapper>
-  </ThemeProvider>
+  <DomainProvider>
+    <ThemeProvider>
+      <AppWrapper>
+        <App />
+      </AppWrapper>
+    </ThemeProvider>
+  </DomainProvider>
 );
