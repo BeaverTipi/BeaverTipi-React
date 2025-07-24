@@ -81,7 +81,7 @@ export default function ListingFilterBar({
             <span className="text-xs text-gray-500">~</span>
             <Input
               type="date"
-              defalutValue={filterEndDate}
+              value={filterEndDate}
               onChange={(e) => setFilterEndDate(e.target.value)}
               className="max-h-9 text-xs w-[130px]"
             />
