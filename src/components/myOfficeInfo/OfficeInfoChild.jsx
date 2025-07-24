@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import OfficeIntroCard from "./myOfficeInfoChildBox/OfficeIntroCard";
-import OfficeIntroPreview from "./myOfficeInfoChildBox/OfficeIntroPreviewBox";
 import NameCardPreviewBox from "./myOfficeInfoChildBox/NameCardPreviewBox";
 
 export default function OfficeInfoChild({ onEditTabMove }) {

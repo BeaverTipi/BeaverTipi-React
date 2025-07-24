@@ -4,6 +4,7 @@ import { AESContext } from "../context/AESContext";
 import CryptoJS from "crypto-js";
 
 export function useSecureAxios() {
+  
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
   const BACKEND_PORT = 80;
   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
