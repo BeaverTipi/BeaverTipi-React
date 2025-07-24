@@ -3,12 +3,10 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 
 export default function ListingFilterBar({
-  filterListingTypeValue,
   filterTypeSaleValue,
   filterProdStatValue,
   searchCategory,
   searchText,
-  listingTypeOptions,
   listingDetailTypeOptions,
   typeSaleOptions,
   prodStatOptions,
@@ -19,7 +17,6 @@ export default function ListingFilterBar({
   setSearchText,
   setFilterListingDetailTypeValue,
   handleResetFilters,
-  onListingTypeChange,
   filterStartDate,
   filterEndDate,
   setFilterStartDate,
@@ -29,19 +26,7 @@ export default function ListingFilterBar({
     <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50">
       <div className="flex flex-row justify-between">
         <div className="flex flex-row gap-3">
-          {/* 매물 유형 */}
-          <div className="flex flex-col justify-start">
-            <Label className="h-fit text-xs font-semibold">＊ 매물 유형</Label>
-            <SelectControlled
-              value={filterListingTypeValue}
-              onChange={(value) => {
-                onListingTypeChange?.(value); // ✅ 연동처리
-              }}
-              options={listingTypeOptions}
-              placeholder="--매물유형 선택--"
-              className="max-h-9 text-xs w-[90px]"
-            />
-          </div>
+
 
           {/* 상세유형 */}
           <div className="flex flex-col justify-start">
@@ -88,6 +73,7 @@ export default function ListingFilterBar({
             <Input
               type="date"
               value={filterStartDate}
+              defaultValue={""}
               onChange={(e) => setFilterStartDate(e.target.value)}
               className="max-h-9 text-xs w-[130px]"
             />
@@ -95,7 +81,7 @@ export default function ListingFilterBar({
             <span className="text-xs text-gray-500">~</span>
             <Input
               type="date"
-              value={filterEndDate}
+              defalutValue={filterEndDate}
               onChange={(e) => setFilterEndDate(e.target.value)}
               className="max-h-9 text-xs w-[130px]"
             />

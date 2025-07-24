@@ -100,18 +100,15 @@ export default function ListingMng() {
         setLstgList(data);
       })
       .catch((error) => console.error("'lstgList' loading failed", error));
-  }, []);
+    const today = new Date().toISOString().split("T")[0];
+    setFilterEndDate(today);
+    }, []);
 
   const filteredList = useMemo(() => {
     const trimmedSearch = searchText.trim().toLowerCase();
     return lstgList.filter((lstg) => {
       if (filterStartDate && lstg.lstgRegDate < filterStartDate) return false;
       if (filterEndDate && lstg.lstgRegDate > filterEndDate) return false;
-      if (
-        filterListingTypeValue !== "000" &&
-        String(lstg.lstgTypeCode1).trim() !== filterListingTypeValue
-      )
-        return false;
       if (
         filterListingDetailTypeValue !== "000" &&
         String(lstg.lstgTypeCode2).trim() !== filterListingDetailTypeValue
@@ -157,7 +154,6 @@ export default function ListingMng() {
     searchText,
     backspaceUsed,
     filterListingDetailTypeValue,
-    filterListingTypeValue,
     filterTypeSaleValue,
     filterProdStatValue,
     filterStartDate,

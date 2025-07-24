@@ -11,7 +11,6 @@ import Badge from "../ui/badge/Badge";
 export default function ListingTable({
   onSelectListing,
   lstgList,
-  getListingTypeName,
   getProdStatCodesName,
   getTypeSaleCodeName,
   getListingDetailTypeName,
@@ -29,12 +28,7 @@ export default function ListingTable({
                 >
                   번호
                 </TableCell>
-                <TableCell
-  isHeader
-  className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300 w-[120px]"
->
-                  매물유형
-                </TableCell>
+
                 <TableCell
                   isHeader
                   className="px-5 py-3 text-start text-theme-xs text-gray-500 dark:text-gray-300"
@@ -95,12 +89,6 @@ export default function ListingTable({
                   >
                     <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-xs text-gray-500 dark:text-gray-300">
                       {i + 1}
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
-                      <Badge size="sm" color="info">
-                        {getListingTypeName(lstg.lstgTypeCode1)}
-                      </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-300">
                       <Badge size="sm" color="info">
