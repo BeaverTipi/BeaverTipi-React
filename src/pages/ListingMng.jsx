@@ -108,7 +108,11 @@ export default function ListingMng() {
     const trimmedSearch = searchText.trim().toLowerCase();
     return lstgList.filter((lstg) => {
       if (filterStartDate && lstg.lstgRegDate < filterStartDate) return false;
-      if (filterEndDate && lstg.lstgRegDate > filterEndDate) return false;
+      if (filterEndDate) {
+        const endDate = new Date(filterEndDate);
+        endDate.setDate(endDate.getDate() + 1); // 종료일 다음날
+        if (new Date(lstg.lstgRegDate) >= endDate) return false;
+      }
       if (
         filterListingDetailTypeValue !== "000" &&
         String(lstg.lstgTypeCode2).trim() !== filterListingDetailTypeValue
