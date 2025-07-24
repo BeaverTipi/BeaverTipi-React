@@ -75,9 +75,7 @@ export default function NameCardCarousel({ cards = [], onSetMain, mainNameCardId
                 title="삭제"
                 onClick={e => {
                   e.stopPropagation();
-                  console.log("삭제 되는지 확인", card.fileId)
                   onDelete && onDelete(card.fileId, card.fileAttachSeq);
-
                 }}
               >
                 <svg width="12" height="12" viewBox="0 0 12 12">

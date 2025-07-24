@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const NameCardPreview = React.forwardRef(({
   width = 360,
@@ -14,6 +14,10 @@ const NameCardPreview = React.forwardRef(({
   onTextPos,
   onRemoveText
 }, ref) => {
+  // Hover 상태 관리
+  const [hoveredTextIdx, setHoveredTextIdx] = useState(null);
+  const [hoveredProfileIdx, setHoveredProfileIdx] = useState(null);
+
   // 텍스트 이동
   const handleTextMoveMouseDown = (idx, e) => {
     e.preventDefault();
@@ -42,7 +46,7 @@ const NameCardPreview = React.forwardRef(({
     const startFontSize = texts[idx].fontSize;
     const onMouseMove = moveEvt => {
       const diff = moveEvt.clientX - startX;
-      const newFontSize = Math.max(10, startFontSize + diff * 0.5); // 0.5배율로 부드럽게
+      const newFontSize = Math.max(10, startFontSize + diff * 0.5); // 0.5배율
       onTextFontSize(idx, newFontSize);
     };
     const onMouseUp = () => {
@@ -53,7 +57,7 @@ const NameCardPreview = React.forwardRef(({
     window.addEventListener("mouseup", onMouseUp);
   };
 
-  // 프로필 이미지 이동/크기조절 동일(생략, 기존코드 유지)
+  // 프로필 이미지 이동
   const handleProfileMoveMouseDown = (idx, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -73,6 +77,7 @@ const NameCardPreview = React.forwardRef(({
     window.addEventListener("mouseup", onMouseUp);
   };
 
+  // 프로필 크기조절
   const handleProfileResizeMouseDown = (idx, e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -115,7 +120,7 @@ const NameCardPreview = React.forwardRef(({
             top: t.pos.y,
             color: textColor,
             fontSize: t.fontSize,
-            fontWeight: idx === 0 ? 700 : 500, // 첫줄(이름)은 두껍게
+            fontWeight: idx === 0 ? 700 : 500,
             letterSpacing: ".5px",
             cursor: "move",
             zIndex: 20 + idx,
@@ -123,6 +128,8 @@ const NameCardPreview = React.forwardRef(({
             alignItems: "center"
           }}
           onMouseDown={e => handleTextMoveMouseDown(idx, e)}
+          onMouseEnter={() => setHoveredTextIdx(idx)}
+          onMouseLeave={() => setHoveredTextIdx(null)}
         >
           <span
             style={{
@@ -143,31 +150,60 @@ const NameCardPreview = React.forwardRef(({
                       ? "주소/기타 정보"
                       : `Text${idx + 1}`)}
           </span>
-          {/* 크기조절 핸들 */}
-          <div
-            onMouseDown={e => handleTextResizeMouseDown(idx, e)}
-            style={{
-              position: "absolute",
-              right: -19,
-              bottom: -16,
-              width: 23,
-              height: 23,
-              background: "#fff",
-              border: "2px solid #3a5dfb",
-              borderRadius: 8,
-              cursor: "nwse-resize",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 15,
-              color: "#3a5dfb",
-              boxShadow: "0 2px 8px #3a5dfb11",
-              userSelect: "none",
-              zIndex: 1
-            }}
-            tabIndex={-1}
-          >↔</div>
-          
+          {/* ↔/X: hover일 때만 보임 */}
+          {hoveredTextIdx === idx && (
+            <>
+              {/* 크기조절 핸들 */}
+              <div
+                onMouseDown={e => handleTextResizeMouseDown(idx, e)}
+                style={{
+                  position: "absolute",
+                  right: -19,
+                  bottom: -16,
+                  width: 23,
+                  height: 23,
+                  background: "#fff",
+                  border: "2px solid #3a5dfb",
+                  borderRadius: 8,
+                  cursor: "nwse-resize",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 15,
+                  color: "#3a5dfb",
+                  boxShadow: "0 2px 8px #3a5dfb11",
+                  userSelect: "none",
+                  zIndex: 1
+                }}
+                tabIndex={-1}
+              >↔</div>
+              {/* 삭제(X) 버튼 */}
+              <button
+                onClick={e => { e.stopPropagation(); onRemoveText(idx); }}
+                style={{
+                  position: "absolute",
+                  top: -17,
+                  right: -7,
+                  width: 20,
+                  height: 20,
+                  background: "#fff",
+                  border: "1px solid #bbb",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  color: "#e33",
+                  zIndex: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  lineHeight: 1
+                }}
+                tabIndex={-1}
+                aria-label="삭제"
+              >×</button>
+            </>
+          )}
         </div>
       ))}
 
@@ -186,6 +222,8 @@ const NameCardPreview = React.forwardRef(({
             cursor: "move"
           }}
           onMouseDown={e => handleProfileMoveMouseDown(idx, e)}
+          onMouseEnter={() => setHoveredProfileIdx(idx)}
+          onMouseLeave={() => setHoveredProfileIdx(null)}
         >
           <div
             style={{
@@ -212,55 +250,59 @@ const NameCardPreview = React.forwardRef(({
                 background: "#fff"
               }}
             />
-            <button
-              style={{
-                position: "absolute", 
-                top: 0, 
-                right: 0, 
-                background: "#fff", 
-                transform: "translate(50%, -50%)",
-                border: "1px solid #bbb", 
-                borderRadius: "50%",
-                width: 22, 
-                height: 22, 
-                cursor: "pointer", 
-                fontWeight: 900, 
-                color: "#e33",
-                zIndex: 100,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 0,              
-                lineHeight: 1 
-              }}
-              onClick={e => { e.stopPropagation(); onProfileDelete(idx); }}
-              tabIndex={-1}
-              aria-label="삭제"
-            >×</button>
+            {/* X/핸들: hover일 때만 보임 */}
+            {hoveredProfileIdx === idx && (
+              <>
+                <button
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    background: "#fff",
+                    transform: "translate(50%, -50%)",
+                    border: "1px solid #bbb",
+                    borderRadius: "50%",
+                    width: 22,
+                    height: 22,
+                    cursor: "pointer",
+                    fontWeight: 900,
+                    color: "#e33",
+                    zIndex: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                    lineHeight: 1
+                  }}
+                  onClick={e => { e.stopPropagation(); onProfileDelete(idx); }}
+                  tabIndex={-1}
+                  aria-label="삭제"
+                >×</button>
+                <div
+                  onMouseDown={e => handleProfileResizeMouseDown(idx, e)}
+                  style={{
+                    position: "absolute",
+                    right: -16,
+                    bottom: -16,
+                    width: 24,
+                    height: 24,
+                    background: "#fff",
+                    border: "2px solid #3a5dfb",
+                    borderRadius: 8,
+                    cursor: "nwse-resize",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 16,
+                    color: "#3a5dfb",
+                    boxShadow: "0 2px 8px #3a5dfb11",
+                    userSelect: "none"
+                  }}
+                  tabIndex={-1}
+                >↔</div>
+              </>
+            )}
           </div>
-          {/* 크기조절 핸들 */}
-          <div
-            onMouseDown={e => handleProfileResizeMouseDown(idx, e)}
-            style={{
-              position: "absolute",
-              right: -16,
-              bottom: -16,
-              width: 24,
-              height: 24,
-              background: "#fff",
-              border: "2px solid #3a5dfb",
-              borderRadius: 8,
-              cursor: "nwse-resize",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 16,
-              color: "#3a5dfb",
-              boxShadow: "0 2px 8px #3a5dfb11",
-              userSelect: "none"
-            }}
-            tabIndex={-1}
-          >↔</div>
         </div>
       ))}
     </div>

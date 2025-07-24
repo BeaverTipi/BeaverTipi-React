@@ -43,12 +43,19 @@ export default function OfficeNameCard() {
   const previewRef = useRef();
 
   useEffect(() => {
-    axios.get("/rest/broker/namecard/user").then(res => setMbrCd(res.data.mbrCd));
+    console.log("여기가시작이얌");
+    axios.get("/rest/broker/namecard/user").then(res => setMbrCd(res.data.mbrCd)
+    );
+    console.log("mbrCd를 찾아봐", mbrCd);
+    console.log("요청 주소:", `/rest/broker/namecard/list/${mbrCd}`);
+    
   }, []);
   useEffect(() => {
     if (mbrCd) {
       axios.get(`/rest/broker/namecard/list/${mbrCd}`).then(res => {
+        console.log("응답 데이터:", res.data);
         setNameCards(Array.isArray(res.data) ? res.data : []);
+        console.log("주소나오냐?", `/rest/broker/namecard/list/${mbrCd}`);
         const mainCard = (Array.isArray(res.data) ? res.data : []).find(card => card.docTypeCd === "NAMECARD_MAIN");
         setMainNameCardId(mainCard?.fileId || null);
       });
@@ -391,7 +398,7 @@ export default function OfficeNameCard() {
       <div style={{
         marginTop: 18, fontSize: 14, color: "#7a88a9", textAlign: "center"
       }}>
-        명함을 자유롭게 커스텀하고, 저장/다운받기 버튼으로 내 정보를 멋지게 관리해보세요!
+        💡 명함을 자유롭게 커스텀하고, 저장/다운받기 버튼으로 내 정보를 멋지게 관리해보세요!
       </div>
     </div>
   );
