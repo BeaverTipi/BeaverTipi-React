@@ -1,5 +1,18 @@
+/*
+[React: ProceedingContracts]
+  └─ checkSignStatus
+  └─ authorize (인가 성공 시)
+      └─ encrypt(contId)
+      └─ window.location.href = /contract/{encId}
+
+[React: ContractSignature.jsx]
+  └─ useParams → decrypt(encId)
+  └─ localStorage.getItem(contId)
+  └─ render UI (PDF, WS, Sign UI)
+*/
+
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useParams, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { useSecureAxios } from "../hooks/useSecureAxios";
 import { useAxios } from "../hooks/useAxios";
@@ -20,6 +33,7 @@ export default function ContractSignature() {
   }
   const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
 
+  const { encryptedContId } = useParams();
   const axios = useSecureAxios();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,14 +45,32 @@ export default function ContractSignature() {
 
   useEffect(() => {
     // JWT 인증 여부 확인
-    axios
-      .get(`${SPRING_URL_ORIGIN}/rest/auth`, { withCredentials: true })
-      .then(() => console.log("✅ 인증됨"))
-      .catch(() => navigate("/signin", { replace: true }));
-
     const timer = setTimeout(() => setLoading(false), 2200); // 3초 후 로딩 false
+    axios
+      .get(`${SPRING_URL_ORIGIN}/rest/auth`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        withCredentials: true
+      })
+      .then(() => console.log("✅ 인증됨"))
+      .catch((err) => {
+        console.error("❌ 인증 실패:", err);
+        if (err.response?.status === 401) {
+          navigate("/signin", { replace: true });
+        }
+      });
     return () => clearTimeout(timer); // cleanup
   }, []);
+
+  useEffect(() => {
+    const contId = decrypt(encryptedContId); // 복호화 후
+    localStorage.setItem("ACTIVE_SIGN_CONTID", contId); // 유효성 체크용
+    fetchContractInfo(contId); // 실제 계약 데이터 가져오기
+  }, [encryptedContId]);
+
+
   useEffect(() => {
     if (contId) localStorage.setItem("ACTIVE_SIGN_CONTID", contId);
   }, [contId]);
@@ -83,7 +115,7 @@ export default function ContractSignature() {
     };
   }, [currentContId]); // 현재 계약 ID를 상태로 두고 비교
 
-  if (!currentContId) {
+  if (!currentContId && !loading) {
     return <div>접근이 유효하지 않습니다.</div>; // 직접 접근 차단
   }
 

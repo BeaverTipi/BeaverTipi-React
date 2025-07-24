@@ -34,7 +34,7 @@ export function useSecureAxios(prefix) {
       }
       , withCredentials: true
     });
-
+    console.log("[[USE_SECURE_AXIOS]]:: PREFIX", SPRING_URL_ORIGIN, SPRING_URL_PREFIX);
     // 요청 인터셉터: 랜덤 IV 기반 암호화
     instance.interceptors.request.use(
       (config) => {
@@ -48,7 +48,9 @@ export function useSecureAxios(prefix) {
           `%c[요청승인]`,
           "color:green; font-weight:bold;",
           config.method?.toUpperCase(),
-          config.url
+          config.url,
+          config.baseURL,
+          SPRING_URL_PREFIX
         );
         return config;
       },
