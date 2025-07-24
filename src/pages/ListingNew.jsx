@@ -28,8 +28,8 @@ const ListingNew = () => {
     if (HOSTNAME === "dev.beavertipi.com") {
     HOSTNAME = "dev1.beavertipi.com";
   }
-      if (HOSTNAME === "hbdev1.beavertipi.com") {
-    HOSTNAME = "hbdev.beavertipi.com";
+      if (HOSTNAME === "hbdev.beavertipi.com") {
+    HOSTNAME = "hbdev1.beavertipi.com";
   }
   const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
   
@@ -127,7 +127,7 @@ const ListingNew = () => {
               lstgLeaseAmt: res.lstgLeaseAmt,
               lstgLeaseM: res.lstgLeaseM,
               lstgFee: res.lstgFee,
-              lstgGArea: res.lstgGArea,
+              lstgGrArea: res.lstgGrArea,
               lstgExArea: res.lstgExArea,
               lstgRoomCnt: res.lstgRoomCnt,
               lstgBathCnt: res.lstgBathCnt,
