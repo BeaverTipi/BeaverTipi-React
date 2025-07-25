@@ -1,3 +1,7 @@
+/*
+뱃지 클릭 시 서명 이미지, 서명된 PDF 미리보기, 이력 로그 
+*/
+
 import React from "react";
 
 const roleKorMap = {
@@ -10,7 +14,14 @@ function getInitials(name) {
   return name?.[0] || "👤";
 }
 
-function getStatusBadge(isValid, signedAt) {
+function getStatusBadge(isValid, signedAt, isRejected) {
+  if (isRejected) {
+    return (
+      <span className="bg-red-700 text-white px-2 py-0.5 rounded-full text-xs">
+        거절됨
+      </span>
+    );
+  }
   if (!signedAt) {
     return <span className="text-yellow-400">🕓 대기 중</span>;
   }

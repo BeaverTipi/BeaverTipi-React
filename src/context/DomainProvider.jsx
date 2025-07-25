@@ -18,7 +18,8 @@ export const DomainProvider = ({ prefix = "", children }) => {
   const contextValue = useMemo(() => ({
     SPRING_URL_ORIGIN,
     SPRING_URL_PREFIX,
-  }), [SPRING_URL_ORIGIN, SPRING_URL_PREFIX]);
+    HOSTNAME
+  }), [SPRING_URL_ORIGIN, SPRING_URL_PREFIX, HOSTNAME]);
 
   return (
     <DomainContext.Provider value={contextValue}>

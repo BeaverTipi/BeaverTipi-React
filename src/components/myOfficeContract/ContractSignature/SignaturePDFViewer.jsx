@@ -8,7 +8,7 @@ import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
  * @param {string} props.contId - 계약 ID (서명용 PDF 조회용)
  * @param {number} [props.refreshKey] - PDF 갱신용 키 (서명 직후 강제 리렌더링 용도)
  */
-export default function SignaturePDFViewer({ contId, refreshKey }) {
+export default function SignaturePDFViewer({ contId, refreshKey, overrideUrl }) {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const createSecureAxios = useSecureAxiosFactory();
@@ -23,7 +23,16 @@ export default function SignaturePDFViewer({ contId, refreshKey }) {
       setLoading(true);
 
       try {
-        const response = await authAxios.post("pdf/download", { contId });
+        // ✅ overrideUrl이 존재하면, 그걸 바로 보여줌
+        if (overrideUrl) {
+          currentUrl = overrideUrl;
+          setPdfUrl(currentUrl);
+          return;
+        }
+        const response = await authAxios.post("pdf/download", {
+          contId
+          , _method: "POST"
+        });
 
         const base64String = response?.base64;
         if (!base64String) throw new Error("PDF base64 응답 없음");
@@ -45,10 +54,10 @@ export default function SignaturePDFViewer({ contId, refreshKey }) {
     loadSignedPdf();
 
     return () => {
-      if (currentUrl) URL.revokeObjectURL(currentUrl); // 메모리 누수 방지
+      if (currentUrl && !overrideUrl) URL.revokeObjectURL(currentUrl); // 메모리 누수 방지
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contId, refreshKey]);
+  }, [contId, refreshKey, overrideUrl]);
 
   return (
     <div>

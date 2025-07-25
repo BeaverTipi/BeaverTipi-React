@@ -1,15 +1,17 @@
+/*
+🔄 useSignatureHash 제거	해시는 ContractSignature.jsx에서 관리함
+🧼 props 정리	contId는 상위에서 따로 들고 있음, signerInfo만 유지
+🧠 역할 분리	캔버스는 서명만, 로직 판단은 상위 컴포넌트로 분리
+🧠 예방 처리	signerInfo null 방어 처리 추가
+*/
 import React, { useRef, useEffect, useState } from "react";
-import SHA256 from "crypto-js/sha256";
-import Base64 from "crypto-js/enc-base64";
-import { useAES256 } from "../../../hooks/useAES256"
-import { useSignatureHash } from "../../../hooks/useSignatureHash";
 
-function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComplete }) {
+function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComplete, onReject }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [ctx, setCtx] = useState(null);
-  const createHash = useSignatureHash();
 
+  // 🖍️ 캔버스 초기화
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -19,7 +21,7 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
     setCtx(context);
   }, []);
 
-
+  // 🖌️ 드로잉 시작
   const startDrawing = (e) => {
     ctx.beginPath();
     ctx.moveTo(
@@ -29,6 +31,7 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
     setIsDrawing(true);
   };
 
+  // 🖌️ 드로잉 중
   const draw = (e) => {
     if (!isDrawing) return;
     const x = e.nativeEvent.offsetX || e.touches?.[0]?.clientX;
@@ -37,61 +40,60 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
     ctx.stroke();
   };
 
+  // ✋ 드로잉 종료
   const stopDrawing = () => {
     ctx.closePath();
     setIsDrawing(false);
   };
 
+  // 🧽 서명 초기화
   const clearCanvas = () => {
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
-
-
+  // ✅ 서명 완료 처리
   const handleComplete = () => {
+    if (!signerInfo) return;
     const dataUrl = canvasRef.current.toDataURL("image/png");
     const now = new Date().toISOString();
 
-    // ✅ 서명 해시 생성
-    const hashVal = createHash({
-      base64Image: dataUrl,
-      mbrId: signerInfo.mbrId,
-      contId: signerInfo.contId,
-      role: signerInfo.role,
-      signedAt: signerInfo.signedAt,
-    });
-
-    // ✅ 서명자 정보에 signedAt 추가
     const signedInfo = {
-      ...signerInfo
-      , signedAt: now
-      , hashVal: hashVal
+      ...signerInfo,
+      signedAt: now, // 해시는 상위 컴포넌트에서 생성
     };
-    // ✅ onSignatureComplete 콜백에 전체 정보 전달
+
+    // 1️⃣ 서명 이미지 & signedAt 전달
     if (onSignatureComplete)
-      onSignatureComplete({ dataUrl, signerInfo: signedInfo, });
+      onSignatureComplete({ dataUrl, signerInfo: signedInfo });
 
-    if (typeof onSignComplete === "function") {
-      onSignComplete(); // → 부모에서 PDF 갱신 트리거
-    }
+    // 2️⃣ PDF 강제 갱신 트리거
+    if (typeof onSignComplete === "function") onSignComplete();
 
-
-    // ✅ 실시간 WebSocket 알림
+    // 3️⃣ WebSocket 서명 전파
     if (onSign && signerInfo?.role) onSign(signerInfo.role);
-    // ✅ 디버깅용 콘솔 출력
+
+    // ✅ 디버깅 로그
     console.log(
       `%c[서명자] ${signedInfo.name} (${signedInfo.role}) 서명 완료 at ${signedInfo.signedAt}`,
       "color:magenta;font-weight:bold"
     );
   };
 
-
+  // ✅ 서명 거절 버튼 클릭 시
+  const handleReject = () => {
+    if (typeof onReject === "function") {
+      onReject(); // → 상위에서 Swal.confirm + 전파
+    }
+  };
 
   return (
     <div className="flex flex-col items-center space-y-4">
+      {/* 👤 서명자 정보 */}
       <p className="text-sm text-gray-300">
         {signerInfo?.name}님 ({signerInfo?.role}) - {signerInfo?.telno}
       </p>
+
+      {/* ✍️ 서명판 */}
       <canvas
         ref={canvasRef}
         width={400}
@@ -106,6 +108,7 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
         onTouchEnd={stopDrawing}
       ></canvas>
 
+      {/* 🧭 액션 버튼 */}
       <div className="flex gap-3">
         <button
           className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
@@ -118,6 +121,12 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
           onClick={handleComplete}
         >
           서명 완료
+        </button>
+        <button
+          className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-600"
+          onClick={handleReject}
+        >
+          서명 거절
         </button>
       </div>
     </div>
