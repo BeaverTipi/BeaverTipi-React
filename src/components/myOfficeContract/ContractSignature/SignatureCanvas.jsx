@@ -6,7 +6,13 @@
 */
 import React, { useRef, useEffect, useState } from "react";
 
-function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComplete, onReject }) {
+function SignatureCanvas({
+  signerInfo,
+  onSignatureComplete,
+  onSign,
+  onSignComplete,
+  onReject,
+}) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [ctx, setCtx] = useState(null);
@@ -65,9 +71,6 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComple
     // 1️⃣ 서명 이미지 & signedAt 전달
     if (onSignatureComplete)
       onSignatureComplete({ dataUrl, signerInfo: signedInfo });
-
-    // 2️⃣ PDF 강제 갱신 트리거
-    if (typeof onSignComplete === "function") onSignComplete();
 
     // 3️⃣ WebSocket 서명 전파
     if (onSign && signerInfo?.role) onSign(signerInfo.role);

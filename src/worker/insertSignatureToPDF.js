@@ -7,7 +7,11 @@ import { PDFDocument } from "pdf-lib";
  * @param {Uint8Array} originalPdfBytes - 기존 PDF 파일 (서명 전)
  * @returns {Blob} - 서명된 PDF Blob
  */
-export async function insertSignatureToPDF(base64Image, signerInfo, originalPdfBytes) {
+export async function insertSignatureToPDF(
+  base64Image,
+  signerInfo,
+  originalPdfBytes
+) {
   const { role } = signerInfo;
 
   const coord = {
@@ -27,7 +31,12 @@ export async function insertSignatureToPDF(base64Image, signerInfo, originalPdfB
     const page = pages[coord.page];
 
     // 🖼️ base64Image → PNG 형식 이미지 삽입
-    const pngImageBytes = await fetch(base64Image).then(res => res.arrayBuffer());
+    console.log("🖼️ base64Image → PNG 형식 이미지 삽입");
+    const pngImageBytes = await fetch(base64Image).then((res) =>
+      res.arrayBuffer()
+    );
+    console.log("되겠냐");
+
     const pngImage = await pdfDoc.embedPng(pngImageBytes);
 
     const imgDims = pngImage.scale(0.5); // 필요시 사이즈 조절
@@ -40,7 +49,6 @@ export async function insertSignatureToPDF(base64Image, signerInfo, originalPdfB
 
     const modifiedPdfBytes = await pdfDoc.save();
     return new Blob([modifiedPdfBytes], { type: "application/pdf" });
-
   } catch (err) {
     console.error("❌ PDF 서명 삽입 실패", err);
     return null;

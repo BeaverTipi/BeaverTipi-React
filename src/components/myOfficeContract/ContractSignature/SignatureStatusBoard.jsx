@@ -26,7 +26,11 @@ function getStatusBadge(isValid, signedAt, isRejected) {
     return <span className="text-yellow-400">🕓 대기 중</span>;
   }
   if (isValid === true) {
-    return <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">정상</span>;
+    return (
+      <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">
+        정상
+      </span>
+    );
   }
   if (isValid === false) {
     return (
@@ -41,9 +45,9 @@ function getStatusBadge(isValid, signedAt, isRejected) {
 function SignatureStatusBoard({ signers = [] }) {
   return (
     <div className="space-y-3">
-      {signers.map((s) => (
+      {signers.map((s, index) => (
         <div
-          key={s.role}
+          key={`${s.role}-${s.telno || s.mbrCd || s.name || index}`}
           className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
         >
           {/* Left: Avatar + Role + Name */}
@@ -55,7 +59,9 @@ function SignatureStatusBoard({ signers = [] }) {
 
             {/* Role + Name */}
             <div className="text-white">
-              <div className="text-sm font-semibold">{roleKorMap[s.role] || s.role}</div>
+              <div className="text-sm font-semibold">
+                {roleKorMap[s.role] || s.role}
+              </div>
               <div className="text-xs text-gray-300">{s.name}</div>
             </div>
           </div>

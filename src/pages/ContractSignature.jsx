@@ -72,6 +72,22 @@ type ContractSignDTO = {
 🔸 명확한 prefix (contDt) 존재
 🔸 일부 필드는 signerInfo와 이름이 다름 (ex. mbrCd vs mbrId)
 */
+
+// [명시적인 기본 구조 선언]
+// ⚠️ 아래는 signers의 구조를 문서화하기 위한 선언입니다.
+//     실제 값은 서버에서 받아오며, 이 구조에 맞게 렌더링됩니다.
+const defaultSignerShape = {
+  role: "",
+  name: "",
+  telno: "",
+  connected: false,
+  signedAt: null,
+  isValid: null,
+  isRejected: false,
+  tempPdfUrl: null,
+  hashVal: null,
+  ipAddr: null
+};
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
@@ -86,6 +102,7 @@ import { useSignatureHash } from "../hooks/useSignatureHash";
 import { insertSignatureToPDF } from "../worker/insertSignatureToPDF";
 import { uploadSignedPDFToS3 } from "../worker/uploadSignedPDFToS3";
 import { uploadSignedPDFTemporarily } from "../worker/uploadSignedPDFTemporarily";
+
 export default function ContractSignature() {
   const { encryptedContId } = useParams();// 암호화된 ID ← URL 파라미터
   const navigate = useNavigate();
@@ -98,7 +115,7 @@ export default function ContractSignature() {
   const createHash = useSignatureHash();
   const [refreshPdfUrl, setRefreshPdfUrl] = useState(null);
   const { SPRING_URL_ORIGIN, SPRING_URL_PREFIX, HOSTNAME } = useDomain();
-
+const [signers, setSigners] = useState([]);
 
   const handleSignComplete = () => {
     setRefreshCount(Date.now()); // PDF 강제 갱신
@@ -120,7 +137,9 @@ export default function ContractSignature() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { contId, loading, error } = state;
   const signerRole = state.signerInfo?.role;
-
+useEffect(() => {
+  console.log("🎯 signers 상태:", state.signers);
+}, [state.signers]);
   function reducer(state, action) {
     switch (action.type) {
       case "SET_CONTID":
@@ -144,8 +163,20 @@ export default function ContractSignature() {
             s.role === action.payload ? { ...s, connected: true } : s
           ),
         };
-      case "SET_SIGNER_INFO":
-        return { ...state, signerInfo: action.payload };
+case "SET_SIGNER_INFO": {
+  const exists = state.signers.find(s => s.role === action.payload.role);
+  const updatedSigners = exists
+    ? state.signers.map(s =>
+        s.role === action.payload.role ? { ...s, ...action.payload } : s
+      )
+    : [...state.signers, { ...defaultSignerShape, ...action.payload }];
+
+  return {
+    ...state,
+    signerInfo: action.payload, // <- 꼭 signerInfo도 갱신해줘야 함!!
+    signers: updatedSigners,
+  };
+}
       case "SET_SIGNED_AT":
         return {
           ...state, signerInfo: { ...state.signerInfo, signedAt: action.payload }
@@ -160,14 +191,18 @@ export default function ContractSignature() {
   // ✅ 인가 처리
   useEffect(() => {
     console.log("encryptedContId", encryptedContId)
-    if (state.contId && encryptedContId) {
+    if (encryptedContId) {
       (async () => {
         try {
           const data = await authAxios.post("authorize", {
             encryptedContId,
             _method: "GET",
           });
-          console.log("data", data);
+            console.log("🔐 [useEffect] 인가 조건 체크", {
+    encryptedContId,
+              currentContId: state.contId,
+              data
+  });
           if (!data.success) {
             Swal.fire("접근 불가", data.message, "info");
             navigate("/signin");
@@ -188,6 +223,7 @@ export default function ContractSignature() {
                 hashVal: null,
               },
             });
+            console.log("");
           }
         } catch (err) {
           dispatch({ type: "SET_ERROR", payload: err });
@@ -243,8 +279,9 @@ export default function ContractSignature() {
   useEffect(() => {
     if (!contId || !signerRole) return;
 
+    //WebSocket "연결 시도" 의미상 정확>> "handshake 시도" 기술적>> "인스턴스 생성" soso
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${protocol}://${HOSTNAME}/signers?contId=${contId}&role=${signerRole}`);
+    const ws = new WebSocket(`${protocol}://${HOSTNAME}/ws/signers?contId=${contId}&role=${signerRole}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -368,6 +405,11 @@ export default function ContractSignature() {
   -여기서 hashVal, signedAt, ipAddr, base64 등을 함께 서버에 전달함
   */
   async function handleSignatureImageToServer({ contId, base64Image, signerInfo }) {
+    console.log("📦 서버 전송 signerInfo = ", signerInfo);
+      console.log("📦 hashVal = ", signerInfo.hashVal);
+      if (!signerInfo.hashVal) {
+  console.warn("⚠️ 해시값 누락으로 업로드 실패 가능성 있음");
+}
     const payload = {
       contractDigitalSign: {
         contId,
@@ -407,13 +449,15 @@ export default function ContractSignature() {
           contId,
           _method: "GET", // 백엔드에서 이걸 기준으로 GET 동작함
         });
+        console.log("🛰 contId for status check", contId); // 🔥 반드시 찍어봐야 함
+        console.log("✅ signers from server", response.signers);
         if (response.success) {
           const validatedSigners = response.signers.map((signer) => {
-            const { base64, mbrId, signedAt, contDtSignType, contDtSignHashVal, contDtSignDtm } = signer;
+            const { base64, mbrCd, mbrNm, signedAt, contDtSignType, contDtSignHashVal, contDtSignDtm } = signer;
 
             const expectedHash = createHash({
               base64Image: base64,
-              mbrId,
+              mbrCd,
               contId,
               role: contDtSignType,
               signedAt: contDtSignDtm,
@@ -421,7 +465,7 @@ export default function ContractSignature() {
 
             return {
               role: contDtSignType,
-              name: mbrId, // 또는 user name이 있을 경우 사용
+              name: mbrNm, // 또는 user name이 있을 경우 사용
               connected: false, // 이후 WebSocket에서 업데이트됨
               signedAt: contDtSignDtm,
               isValid: contDtSignDtm ? expectedHash === contDtSignHashVal : undefined,
@@ -467,13 +511,23 @@ export default function ContractSignature() {
   PDF 원본 자체(blob)를 불러오는 함수
   -insertSignatureToPDF()에 넘기기 위한 originalPdfBytes를 생성
   */
-  const getOriginalPdf = async (contId) => {
-    const res = await authAxios.post("pdf/url", {
-      contId,
-      _method: "GET",
-    });
-    return fetch(res.pdfUrl).then(r => r.arrayBuffer());
-  };
+const getOriginalPdf = async (contId) => {
+  const encryptedRes = await authAxios.post("pdf/base64", {
+    contId,
+    _method: "GET",
+  });
+
+  const base64 = encryptedRes.base64; // 서버에서 받은 PDF base64
+  const binary = atob(base64);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes.buffer; // ← insertSignatureToPDF(originalBytes) 에 넘겨줄 수 있음
+};
 
   /*
   1. hash 생성
@@ -489,24 +543,53 @@ export default function ContractSignature() {
   const handleSignatureComplete = async ({ dataUrl, signerInfo }) => {
     const hashVal = createHash({
       base64Image: dataUrl,
-      mbrId: signerInfo.mbrId,
+      telno: signerInfo.telno,
       contId,
       role: signerInfo.role,
       signedAt: signerInfo.signedAt,
     });
-
+    console.log("hashVal 생성한당 ^0^^0^^0^^)^", dataUrl, signerInfo.telno, contId, signerInfo.role, signerInfo.signedAt);
     const completeInfo = { ...signerInfo, hashVal };
 
     try {
-      const originalBytes = await getOriginalPdf(contId);
-      const signedPdfBlob = await insertSignatureToPDF(dataUrl, completeInfo, originalBytes);
+  //     const originalBytes = await getOriginalPdf(contId);
+  //     const signedPdfBlob = await insertSignatureToPDF(dataUrl, completeInfo, originalBytes);
 
-      if (!signedPdfBlob) throw new Error("PDF 서명 삽입 실패");
+  //     if (!signedPdfBlob) throw new Error("PDF 서명 삽입 실패");
 
-      const tempFileUrl = await uploadSignedPDFTemporarily(contId, signerInfo.role, signedPdfBlob);
+  // // blob → base64 변환
+  // const blobToBase64 = (blob) =>
+  //   new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       const base64 = reader.result.split(",")[1];
+  //       resolve(base64);
+  //     };
+  //     reader.onerror = reject;
+  //     reader.readAsDataURL(blob);
+  //   });
+  //     const base64 = await blobToBase64(signedPdfBlob);
 
-      if (!tempFileUrl) throw new Error("임시 서명 PDF 업로드 실패");
-
+  //       // 서버로 전송할 payload 구성
+  const payload = {
+    _method: "POST",
+    contractDigitalSign: {
+      contId,
+      contDtSignId: null,
+      contDtSignType: signerInfo.role,
+      contDtBaseData: dataUrl,//`data:image/png;base64,${dataUrl}`,
+      contDtSignDtm: signerInfo.signedAt,
+      contDtSignHashVal: hashVal,
+      mbrCd: localStorage.getItem("mbrCd") || "TEMP",
+      contDtSignStat: "N",
+    },
+  };
+      const data = await authAxios.post("signature/upload", payload);
+  if (!data?.success || !data?.fileUrl) {
+    throw new Error("임시 서명 PDF 업로드 실패");
+  }
+      const tempFileUrl = data.fileUrl;
+      
       // WebSocket으로 전파 (SIGNED_TEMP)
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)
         wsRef.current.send(`SIGNED_TEMP:${contId}:${signerInfo.role}:${tempFileUrl}`);
@@ -604,7 +687,10 @@ export default function ContractSignature() {
       console.error("❌ 계약 확정 요청 실패", err);
     }
   };
-
+useEffect(() => {
+  console.log("✅ encryptedContId = ", encryptedContId);
+  console.log("✅ authorized contId = ", state.contId);
+}, [encryptedContId, state.contId]);
   /*##################################################################################*/
   /** PAGE RENDERER **/
   if (error) {
