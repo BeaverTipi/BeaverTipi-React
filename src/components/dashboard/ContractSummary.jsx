@@ -1,14 +1,9 @@
 import { useState } from "react";
 import Chart from "react-apexcharts";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "../../icons";
 
 const ContractSummaryChart = () => {
   const [filter, setFilter] = useState("이번 주");
-  const [isOpen, setIsOpen] = useState(false);
 
-  // 샘플 데이터 (실제 API 연동 시 filter에 따라 갱신)
   const summaryData = {
     "이번 주": [8, 2, 5],
     "이번 달": [30, 6, 12],
@@ -27,33 +22,35 @@ const ContractSummaryChart = () => {
     },
   };
 
+  const tabs = ["이번 주", "이번 달", "올해"];
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-2 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div className="h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 dark:border-gray-800 dark:bg-white/[0.03]">
+      {/* 상단: 제목 + 탭 */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
           계약 상태 비율
         </h3>
-        <div className="relative inline-block">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            <MoreDotIcon className="size-6 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
-          </button>
-          <Dropdown isOpen={isOpen} onClose={() => setIsOpen(false)} className="w-32 p-2">
-            {["이번 주", "이번 달", "올해"].map((item) => (
-              <DropdownItem
-                key={item}
-                onItemClick={() => {
-                  setFilter(item);
-                  setIsOpen(false);
-                }}
-              >
-                {item}
-              </DropdownItem>
-            ))}
-          </Dropdown>
+        <div className="flex gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-full">
+          {tabs.map((item) => (
+            <button
+              key={item}
+              onClick={() => setFilter(item)}
+              className={`px-3 py-1 text-sm rounded-full transition-all 
+                ${filter === item
+                  ? "bg-white text-blue-600 shadow-sm dark:bg-white/20 dark:text-white"
+                  : "text-gray-500 hover:text-blue-600"}`}
+            >
+              {item}
+            </button>
+          ))}
         </div>
       </div>
 
-      <Chart options={options} series={series} type="donut" height={250} />
+      {/* 그래프: flex-grow 시키기 */}
+      <div className="flex-1">
+        <Chart key={filter} options={options} series={series} type="donut" height="100%" />
+      </div>
     </div>
   );
 };

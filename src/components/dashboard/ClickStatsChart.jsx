@@ -1,15 +1,39 @@
 import { useState } from "react";
 import Chart from "react-apexcharts";
-import { MoreDotIcon } from "../../icons";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { Dropdown } from "../ui/dropdown/Dropdown";
 
 const ClickStatsChart = () => {
+  const [filter, setFilter] = useState("이번 달");
+
+  const chartData = {
+    당일: {
+      categories: ["강남 오피스텔", "마포 투룸", "서초 전세"],
+      views: [122, 88, 95],
+      inquiries: [6, 2, 4],
+    },
+    "이번 달": {
+      categories: ["강남 오피스텔", "마포 투룸", "서초 전세", "한남동 원룸", "노원 오피스텔", "분당 상가"],
+      views: [532, 480, 610, 442, 390, 505],
+      inquiries: [23, 12, 30, 19, 8, 16],
+    },
+    "지난 달": {
+      categories: ["강남 오피스텔", "마포 투룸", "서초 전세", "한남동 원룸", "노원 오피스텔", "분당 상가"],
+      views: [480, 455, 588, 420, 360, 490],
+      inquiries: [18, 9, 28, 16, 6, 12],
+    },
+    "올해 누적": {
+      categories: ["강남 오피스텔", "마포 투룸", "서초 전세", "한남동 원룸", "노원 오피스텔", "분당 상가"],
+      views: [6230, 5540, 6900, 5821, 4910, 6112],
+      inquiries: [220, 140, 310, 190, 80, 160],
+    },
+  };
+
+  const { categories, views, inquiries } = chartData[filter];
+
   const options = {
-    colors: ["#3b82f6", "#f59e0b"], // 조회수(파랑), 클릭수(노랑)
+    colors: ["#3b82f6", "#f97316"],
     chart: {
       type: "bar",
-      height: 180,
+      height: 200,
       toolbar: { show: false },
       fontFamily: "inherit",
     },
@@ -27,7 +51,7 @@ const ClickStatsChart = () => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: ["1월", "2월", "3월", "4월", "5월", "6월"],
+      categories,
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
@@ -45,38 +69,37 @@ const ClickStatsChart = () => {
   };
 
   const series = [
-    {
-      name: "조회수",
-      data: [320, 412, 390, 298, 380, 420],
-    },
-    {
-      name: "클릭수",
-      data: [112, 210, 150, 198, 222, 275],
-    },
+    { name: "조회수", data: views },
+    { name: "문의수", data: inquiries },
   ];
 
-  const [isOpen, setIsOpen] = useState(false);
+  const tabOptions = ["당일", "이번 달", "지난 달", "올해 누적"];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03]">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-3 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          조회수 / 클릭수
+          매물별 조회수 / 문의수
         </h3>
-        <div className="relative inline-block">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            <MoreDotIcon className="size-6 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
-          </button>
-          <Dropdown isOpen={isOpen} onClose={() => setIsOpen(false)} className="w-40 p-2">
-            <DropdownItem onItemClick={() => setIsOpen(false)}>이번 달</DropdownItem>
-            <DropdownItem onItemClick={() => setIsOpen(false)}>지난 달</DropdownItem>
-            <DropdownItem onItemClick={() => setIsOpen(false)}>올해 누적</DropdownItem>
-          </Dropdown>
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-full">
+          {tabOptions.map((item) => (
+            <button
+              key={item}
+              onClick={() => setFilter(item)}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                filter === item
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-500 hover:text-blue-600"
+              }`}
+            >
+              {item}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="custom-scrollbar -ml-5 min-w-[650px] xl:min-w-full pl-2">
-        <Chart options={options} series={series} type="bar" height={180} />
+        <Chart options={options} series={series} type="bar" height={200} />
       </div>
     </div>
   );
