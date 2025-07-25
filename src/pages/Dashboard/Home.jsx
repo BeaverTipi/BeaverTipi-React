@@ -1,39 +1,48 @@
-import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
-import DemographicCard from "../../components/ecommerce/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
+import ClickStatsChart from "../../components/dashboard/ClickStatsChart";
+import CommissionTotal from "../../components/dashboard/CommissionTotal";
+import ContractSummaryChart from "../../components/dashboard/ContractSummary";
+import ContractTrendChart from "../../components/dashboard/ContractTrendChart";
+import NewListings from "../../components/dashboard/NewListings";
+import PopularListings from "../../components/dashboard/PopularListings";
+import WeeklySchedule from "../../components/dashboard/WeeklySchedule";
 
 export default function Home() {
-  return (
+ return (
     <>
       <PageMeta
-        title="React.js Ecommerce Dashboard | TailAdmin - React.js Admin Dashboard Template"
-        description="This is React.js Ecommerce Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="중개사 대시보드"
+        description="매물/계약/수수료 통계와 최신 활동을 확인하세요."
       />
+
       <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <EcommerceMetrics />
+        {/* 좌측 영역 (통계) */}
+        <div className="col-span-12 xl:col-span-7 space-y-6">
+          {/* 계약 상태 요약 */}
+          <ContractSummaryChart />
 
-          <MonthlySalesChart />
+          {/* 클릭/조회수 요약 */}
+          <ClickStatsChart />
+
+          {/* 계약 성사 추이 */}
+          <ContractTrendChart />
         </div>
 
-        <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
-        </div>
+        {/* 우측 영역 (최근 활동) */}
+        <div className="col-span-12 xl:col-span-5 space-y-6">
+          {/* 수수료 합계 */}
+          <CommissionTotal />
 
-        <div className="col-span-12">
-          <StatisticsChart />
-        </div>
+          {/* 최근 매물 */}
+          <NewListings />
 
-        <div className="col-span-12 xl:col-span-5">
-          <DemographicCard />
-        </div>
 
-        <div className="col-span-12 xl:col-span-7">
-          <RecentOrders />
+          {/* 인기 매물 Top3 */}
+          <PopularListings />
+
+
+          {/* 일정 요약 */}
+          <WeeklySchedule />
         </div>
       </div>
     </>
