@@ -13,13 +13,17 @@ import { Modal } from "../../ui/modal";
 import isEqual from "lodash.isequal";
 import { useAES256 } from "../../../hooks/useAES256";
 import Swal from "sweetalert2";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
+import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
 
 function ProceedingContracts() {
+  console.log("🌐 DOMAIN:", useDomain());
+
   const navigate = useNavigate();
   const axios = useSecureAxios();
+  const createSecureAxios = useSecureAxiosFactory({ maxAgeMs: 300_000, retryCount: 2 });
+  const authAxios = createSecureAxios("/rest/contract");
   const { encrypt, decrypt } = useAES256();
   const [procContracts, setProcContracts] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);
@@ -329,7 +333,7 @@ function ProceedingContracts() {
   const handleContractSignaturePageNavigate = async (contId) => {
     try {
       // Response data = { success, signYn, message }
-      // 1. 서명페이지 개설 여부 확인
+      // 1. 서명페이지 개설 여부(유효성) 확인
       const { success, signYn, message: signStatusMsg }
         = await axios.post(`cont/proc/sign-status`, {
           contId: contId,
@@ -340,14 +344,14 @@ function ProceedingContracts() {
         return Swal.fire({
           icon: "info",
           title: "서명페이지가 만료되었습니다",
-          text: signStatusMsg || "해당 계약의 서명 가능 기간이 종료되었습니다.",
+          text: signStatusMsg || "해당 계약의 서명 유효 시간이 종료되었습니다.",
           confirmButtonColor: "#085D89", // sky-800
           scrollbarPadding: false,
         });
       }
 
       // 2.인가 요청
-      const authData = await axios.post("/rest/contract/authorize", {
+      const authData = await authAxios.post("authorize", {
         contId,
         _method: "GET"
       });
@@ -361,7 +365,17 @@ function ProceedingContracts() {
 
       // 3. 서명페이지 이동
       const encryptedContId = encrypt(contId);
-      window.location.href = `${SPRING_URL_ORIGIN}/contract/${encryptedContId}`;
+      // navigate(`/contract/${encryptedContId}`);
+      window.location.href = `/contract/${encryptedContId}`;
+      // navigate(`/contract/${encrypt(contId)}`, {
+      //   state: {
+      //     contId,
+      //     role: authData.role,
+      //     signYn: authData.signYn,
+      //     authorized: true,
+      //   },
+      // });
+
     } catch (err_open) {
       console.error(err_open);
       Swal.fire({
@@ -429,7 +443,8 @@ function ProceedingContracts() {
         scrollbarPadding: false,
       });
 
-      if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
+      // if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
+      await handleContractSignaturePageNavigate(contId);
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({

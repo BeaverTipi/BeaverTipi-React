@@ -12,13 +12,13 @@ export const DomainProvider = ({ prefix = "", children }) => {
   };
 
   HOSTNAME = domainMap[HOSTNAME] || HOSTNAME;
+  const SPRING_URL_ORIGIN = `${window.location.protocol}//${domainMap[window.location.hostname] || window.location.hostname}`;
+  const SPRING_URL_PREFIX = prefix || "/rest/broker/myoffice";
 
-  const contextValue = useMemo(() => {
-    return {
-      SPRING_URL_ORIGIN: `${PROTOCOL}//${HOSTNAME}`,
-      SPRING_URL_PREFIX: prefix || "/rest/broker/myoffice",
-    };
-  }, [PROTOCOL, HOSTNAME, prefix]);
+  const contextValue = useMemo(() => ({
+    SPRING_URL_ORIGIN,
+    SPRING_URL_PREFIX,
+  }), [SPRING_URL_ORIGIN, SPRING_URL_PREFIX]);
 
   return (
     <DomainContext.Provider value={contextValue}>

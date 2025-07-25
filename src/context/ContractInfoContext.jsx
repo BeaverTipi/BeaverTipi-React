@@ -58,7 +58,7 @@ export const ContractInfoProvider = ({ children }) => {
       , lessorMbrCd: lessor.lessorMbrCd || ""
       , lessorMbrId: lessor.lessorMbrId || ""
       , lessorName: lessor.mbrNm || ""
-      , lessorTelno: lessor.mbrTelno || ""
+      , lessorTelno: lessor.mbrTelNo || ""
       , lessorEmlAddr: lessor.mbrEmlAddr || ""
       , lessorBasicAddr: lessor.mbrBasicAddr || ""
       , lessorDetailAddr: lessor.mbrDetailAddr || ""

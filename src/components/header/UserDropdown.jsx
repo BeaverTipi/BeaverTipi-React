@@ -7,12 +7,11 @@ import Swal from "sweetalert2";
 
 import { PageIcon, DocsIcon, AlertHexaIcon, CalenderIcon } from "../../icons";
 import { useSecureAxios } from "../../hooks/useSecureAxios";
-import axios from "axios";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
-  let HOSTNAME = window.location.hostname; // e.g., react.beavertipi.com
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
 
   // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
   if (HOSTNAME === "react.beavertipi.com") {
@@ -29,23 +28,22 @@ export default function UserDropdown() {
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
   const [ROLES, setROLES] = useState([]);
-  const secureAxios = useSecureAxios();
+
+  const axios = useSecureAxios();
   useEffect(() => {
-    secureAxios.get("/member/read").then((data) => {
-      console.log("하하 ㅈ대로 되라", data);
-      setBROKER_INFO(data);
-      setROLES(data.memRoleList.map((r) => r.userRoleId));
-    });
+    axios.get("/member/read")
+      .then(data => {
+        console.log("하하 ㅈ대로 되라", data);
+        setBROKER_INFO(data);
+      });
     return;
-  }, []);
+  }, [])
 
   /* KAR */
   const [logout, setLogout] = useState(false);
   const doLogout = async () => {
     try {
-      const resp = await axios.post(
-        `${SPRING_URL_ORIGIN}/account/logout`,
-        {},
+      const resp = await axios.post(`${SPRING_URL_ORIGIN}/account/logout`, {},
         { withCredentials: true }
       );
       if (resp.status === 200) {
@@ -80,7 +78,6 @@ export default function UserDropdown() {
   const closeDropdown = () => setIsOpen(false);
 
   const logoutFn = () => setLogout(true);
-
   const hasRole = (role) => ROLES.includes(role);
   return (
     <div className="relative">
@@ -88,9 +85,7 @@ export default function UserDropdown() {
         onClick={toggleDropdown}
         className="min-w-32 max-w-32 flex justify-end-safe items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
-        <span className="block mr-1 font-medium text-base">
-          {BROKER_INFO?.mbrNm || "재윤비버"}&nbsp;
-        </span>
+        <span className="block mr-1 font-medium text-base">{BROKER_INFO?.mbrNm || "재윤비버"}&nbsp;</span>
         <span className="mr-3 overflow-hidden rounded-full h-9 w-9">
           <img
             src={BROKER_INFO?.memberFile?.filePathUrl || "/images/재윤비버.png"}
@@ -99,9 +94,8 @@ export default function UserDropdown() {
           />
         </span>
         <svg
-          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
           width="18"
           height="20"
           viewBox="0 0 18 20"
@@ -123,7 +117,7 @@ export default function UserDropdown() {
         onClose={closeDropdown}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
-        
+
         <DropdownItem
           onItemClick={closeDropdown}
           tag="a"
@@ -142,9 +136,7 @@ export default function UserDropdown() {
               </span>
             </div>
             <span className="mt-0.5 block text-theme-sm text-gray-500 dark:text-gray-400">
-              {BROKER_INFO.mbrEmlAddr !== null
-                ? BROKER_INFO.mbrEmlAddr
-                : "register your NEW EMAIL"}
+              {BROKER_INFO.mbrEmlAddr !== null ? BROKER_INFO.mbrEmlAddr : "register your NEW EMAIL"}
             </span>
           </div>
           {/* </a> */}
@@ -179,21 +171,21 @@ export default function UserDropdown() {
             </li>
           )}
           {hasRole("ROLE_USER") && (
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              to="http://localhost/resident/myhouse"
-              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-            >
-              <CalenderIcon
-                className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
-                width={24}
-                height={24}
-              />
-              마이하우스(입주민)
-            </DropdownItem>
-          </li>
+            <li>
+              <DropdownItem
+                onItemClick={closeDropdown}
+                tag="a"
+                to="http://localhost/resident/myhouse"
+                className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+              >
+                <CalenderIcon
+                  className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
+                  width={24}
+                  height={24}
+                />
+                마이하우스(입주민)
+              </DropdownItem>
+            </li>
           )}
           {hasRole("ROLE_BROKER") && (
             <li>
@@ -292,6 +284,6 @@ export default function UserDropdown() {
           Sign out
         </button>
       </Dropdown>
-    </div>
+    </div >
   );
 }
