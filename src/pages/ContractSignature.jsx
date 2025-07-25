@@ -26,13 +26,18 @@ import Swal from "sweetalert2";
 import { useSecureAxios } from "../hooks/useSecureAxios";
 import { useDomain } from "../hooks/useDomain";
 import SignatureCanvas from "../components/myOfficeContract/ContractSignature/SignatureCanvas";
+import { useAES256 } from "../hooks/useAES256";
+import { useSecureAxiosFactory } from "../hooks/useSecureAxiosFactory";
 
 export default function ContractSignature() {
   const { encryptedContId } = useParams();// 암호화된 ID ← URL 파라미터
   const navigate = useNavigate();
   const location = useLocation();
-  const axios = useSecureAxios("/rest/contract");
+  const createSecureAxios = useSecureAxiosFactory();
+  const authAxios = createSecureAxios("/rest/contract");
   const wsRef = useRef(null); // ✅ WebSocket 참조
+  const { decryptWithAES256 } = useAES256(); // ← 이게 있는지 확인
+
 
   const initialState = {
     contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
@@ -86,30 +91,31 @@ export default function ContractSignature() {
 
   // ✅ 인가 처리
   useEffect(() => {
-    if (!state.contId && encryptedContId) {
+    console.log("encryptedContId", encryptedContId)
+    if (state.contId && encryptedContId) {
       (async () => {
         try {
-          const res = await axios.post("authorize", {
+          const data = await authAxios.post("authorize", {
             encryptedContId,
             _method: "GET",
           });
-
-          if (!res.success) {
-            Swal.fire("접근 불가", res.message, "info");
+          console.log("data", data);
+          if (!data.success) {
+            Swal.fire("접근 불가", data.message, "info");
             navigate("/signin");
           } else {
-            dispatch({ type: "SET_CONTID", payload: res.contId });
-            localStorage.setItem("ACTIVE_SIGN_CONTID", res.contId);
+            dispatch({ type: "SET_CONTID", payload: data.contId });
+            localStorage.setItem("ACTIVE_SIGN_CONTID", data.contId);
 
             // ✅ signer 정보 설정
             dispatch({
               type: "SET_SIGNER_INFO",
               payload: {
-                mbrId: res.mbrId,
-                role: res.role,
-                name: res.name,
-                telNo: res.telNo,
-                ipAddr: res.ipAddr,
+                mbrId: data.mbrId,
+                role: data.role,
+                name: data.name,
+                telNo: data.telNo,
+                ipAddr: data.ipAddr,
                 signedAt: null,
                 hashVal: null,
               },
@@ -254,6 +260,10 @@ export default function ContractSignature() {
     }
   }
 
+  /** DEBUGGING **/
+  useEffect(() => {
+    console.log("👤 signerInfo 상태", state.signerInfo);
+  }, [state.signerInfo]);
 
 
   /*##################################################################################*/

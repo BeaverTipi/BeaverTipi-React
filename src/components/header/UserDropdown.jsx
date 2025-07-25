@@ -27,6 +27,8 @@ export default function UserDropdown() {
 
   /* KCY */
   const [BROKER_INFO, setBROKER_INFO] = useState({});
+  const [ROLES, setROLES] = useState([]);
+
   const axios = useSecureAxios();
   useEffect(() => {
     axios.get("/member/read")
@@ -71,16 +73,12 @@ export default function UserDropdown() {
     doLogout();
   }, [logout]);
 
-  function toggleDropdown() {
-    setIsOpen(!isOpen);
-  }
+  const toggleDropdown = () => setIsOpen(!isOpen);
 
-  function closeDropdown() {
-    setIsOpen(false);
-  }
-  function logoutFn() {
-    setLogout(true);
-  }
+  const closeDropdown = () => setIsOpen(false);
+
+  const logoutFn = () => setLogout(true);
+  const hasRole = (role) => ROLES.includes(role);
   return (
     <div className="relative">
       <button

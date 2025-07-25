@@ -1,10 +1,10 @@
-import React, { useContext, useMemo, } from "react";
+import React, { useContext, useMemo, useRef, } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { AESContext } from "../context/AESContext";
 import { SecureAxiosContext } from "./SecureAxiosContext";
 
-export const SecureAxiosProvider = ({ prefix = "/rest/broker/myoffice", children }) => {
+export const SecureAxiosProvider = ({ children }) => {
   const { encryptWithRandomIV, decryptWithIV } = useContext(AESContext);
   const navigate = useNavigate();
   const secureAxiosInstance = useMemo(() => {
@@ -17,7 +17,7 @@ export const SecureAxiosProvider = ({ prefix = "/rest/broker/myoffice", children
     if (HOSTNAME === "hbdev.beavertipi.com") HOSTNAME = "hbdev1.beavertipi.com";
 
     const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
-    const SPRING_URL_PREFIX = prefix;
+    const SPRING_URL_PREFIX = "/rest/broker/myoffice";
 
     const instance = axios.create({
       baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX,

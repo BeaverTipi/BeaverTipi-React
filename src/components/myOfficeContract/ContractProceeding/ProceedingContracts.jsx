@@ -15,13 +15,15 @@ import { useAES256 } from "../../../hooks/useAES256";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
+import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
 
 function ProceedingContracts() {
   console.log("🌐 DOMAIN:", useDomain());
 
   const navigate = useNavigate();
   const axios = useSecureAxios();
-  const authAxios = useSecureAxios("/rest/contract");
+  const createSecureAxios = useSecureAxiosFactory({ maxAgeMs: 300_000, retryCount: 2 });
+  const authAxios = createSecureAxios("/rest/contract");
   const { encrypt, decrypt } = useAES256();
   const [procContracts, setProcContracts] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);

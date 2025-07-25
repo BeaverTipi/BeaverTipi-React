@@ -92,10 +92,10 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign }) {
   const metadataJSON = JSON.stringify(meta);
 
   // 같이 전송하거나, 파일명에 포함시켜도 됨
-  uploadSignatureImage({
-    fileBase64: dataUrl,
-    metadata: metadataJSON,
-  });
+  // uploadSignatureImage({
+  //   fileBase64: dataUrl,
+  //   metadata: metadataJSON,
+  // });
   //#############################################
   return (
     <div className="flex flex-col items-center space-y-4">
