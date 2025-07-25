@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarIcon } from "lucide-reactnpm ";
+import { CalendarIcon } from "lucide-react";
 import dayjs from "dayjs";
 
 const WeeklySchedule = () => {
