@@ -10,14 +10,42 @@
   └─ localStorage.getItem(contId)
   └─ render UI (PDF, WS, Sign UI)
 
+[사용자 서명 완료]
+  ↓
+handleComplete() 내부에서 → onSignComplete() 호출
+  ↓
+ContractSignature.jsx의 handleSignComplete() → setRefreshCount(Date.now())
+  ↓
+SignaturePDFViewer의 useEffect → refreshKey 변화 감지 → 최신 PDF 재요청
+
+
+
 signerInfo: {
-  mbrId: string;     // DB 식별자
-  role: string;      // "LESSOR" | "LESSEE" | "AGENT"
-  name: string;      // 성명
-  telNo: string;     // 전화번호
+  mbrId: string;     // 프론트/DB 식별자
+  role: "LESSOR" | "LESSEE" | "AGENT"
+  name: string;
+  telno: string;
   ipAddr: string;    // 접속 IP (인가 시)
-  signedAt: string;  // 서명 확인 시점 (초기 null)
-}
+  signedAt: string | null;
+  hashVal: string | null;
+🔹 상태 관리 / UI 표시 용도
+🔹 필드명은 camelCase
+🔹 내부적으로만 사용
+};
+
+type ContractSignDTO = {
+  contId: string;                 // 계약 ID
+  contDtSignType: string;         // 역할 (AGENT, LESSOR, ...)
+  contDtSignStat: "SIGNED";       // 고정값
+  contDtSignDtm: string;          // ISO datetime (서명시각)
+  contDtSignHashVal: string;      // hash(base64 + mbrId + contId + role + signedAt)
+  contDtBaseData: string;         // base64 image
+  contDtIpAddr: string;           // IP 주소
+  mbrCd: string;                  // 서명자 코드 (mbrId)
+};
+🔸 백엔드 DTO 기준
+🔸 명확한 prefix (contDt) 존재
+🔸 일부 필드는 signerInfo와 이름이 다름 (ex. mbrCd vs mbrId)
 */
 
 import React, { useEffect, useReducer, useRef, useState } from "react";
@@ -28,6 +56,8 @@ import { useDomain } from "../hooks/useDomain";
 import SignatureCanvas from "../components/myOfficeContract/ContractSignature/SignatureCanvas";
 import { useAES256 } from "../hooks/useAES256";
 import { useSecureAxiosFactory } from "../hooks/useSecureAxiosFactory";
+import SignaturePDFViewer from "../components/myOfficeContract/ContractSignature/SignaturePDFViewer";
+import SignatureStatusBoard from "../components/myOfficeContract/ContractSignature/SignatureStatusBoard";
 
 export default function ContractSignature() {
   const { encryptedContId } = useParams();// 암호화된 ID ← URL 파라미터
@@ -37,7 +67,10 @@ export default function ContractSignature() {
   const authAxios = createSecureAxios("/rest/contract");
   const wsRef = useRef(null); // ✅ WebSocket 참조
   const { decryptWithAES256 } = useAES256(); // ← 이게 있는지 확인
-
+  const [refreshCount, setRefreshCount] = useState(Date.now());
+  const handleSignComplete = () => {
+    setRefreshCount(Date.now()); // PDF 강제 갱신
+  };
 
   const initialState = {
     contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
@@ -114,7 +147,7 @@ export default function ContractSignature() {
                 mbrId: data.mbrId,
                 role: data.role,
                 name: data.name,
-                telNo: data.telNo,
+                telno: data.telno,
                 ipAddr: data.ipAddr,
                 signedAt: null,
                 hashVal: null,
@@ -238,27 +271,75 @@ export default function ContractSignature() {
     dispatch({ type: "SET_SIGNED_AT", payload: { ...state.signerInfo, signedAt: now } });
   };
 
-  async function handleSignatureImageToServer({ base64Image, mbrId, role, name, telNo, signedAt, ipAddr }) {
-    try {
-      const response = await axios.post("signature/upload", {
-        base64Image,
-        mbrId,
-        role,
-        name,
-        telNo,
-        signedAt,
-        ipAddr,
-      });
+  async function handleSignatureImageToServer({ contId, base64Image, signerInfo }) {
+    const payload = {
+      contractDigitalSign: {
+        contId,
+        contDtSignType: signerInfo.role,
+        contDtSignDtm: signerInfo.signedAt,
+        contDtSignHashVal: signerInfo.hashVal,
+        contDtSignStat: "SIGNED",
+        contDtBaseData: base64Image,
+        contDtIpAddr: signerInfo.ipAddr,
+        mbrCd: signerInfo.mbrId,
+      },
+      _method: "POST",
+    }
 
-      if (response.success) {
-        console.log("✅ 서명 이미지 업로드 성공");
-      } else {
-        console.warn("⚠️ 업로드 실패:", response.message);
-      }
+    try {
+      const response = await authAxios.post("signature/upload", payload);
+      if (response.success) console.log("✅ 서명 이미지 업로드 성공");
+      else console.warn("⚠️ 업로드 실패:", response.message);
     } catch (err) {
       console.error("❌ 서명 업로드 오류:", err);
     }
   }
+
+  // ✅ 서명 상태 및 해시 검증 결과 조회
+  useEffect(() => {
+    if (!contId) return;
+
+    const fetchSignatureStatus = async () => {
+      try {
+        const response = await authAxios.post("signature/status", {
+          contId,
+          _method: "GET", // 백엔드에서 이걸 기준으로 GET 동작함
+        });
+
+        if (response.success) {
+          dispatch({ type: "SET_SIGNERS", payload: response.signers });
+          console.log("✅ 서명 상태 로딩 완료:", response.signers);
+        } else {
+          console.warn("⚠️ 서명 상태 조회 실패:", response.message);
+        }
+      } catch (err) {
+        console.error("❌ 서명 상태 조회 오류", err);
+      }
+    };
+
+    fetchSignatureStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contId]);
+
+
+  /** PDF 렌더링 **/
+  useEffect(() => {
+    if (!contId) return;
+    (async () => {
+      try {
+        const response = await authAxios.post("pdf", {
+          contId,
+          _method: "GET",
+        });
+        dispatch({ type: "SET_PDF_DATA", payload: response });
+      } catch (err) {
+        console.error("❌ 계약 PDF 정보 로딩 실패", err);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contId]);
+
+
 
   /** DEBUGGING **/
   useEffect(() => {
@@ -317,14 +398,14 @@ export default function ContractSignature() {
         {/* 좌측: PDF 미리보기 */}
         <div className="bg-gray-800 p-4 rounded-lg shadow-md overflow-auto max-h-[75vh]">
           <h2 className="text-lg font-semibold mb-4">계약서 미리보기</h2>
-          {/* <ContractPDFViewer /> */}
+          <SignaturePDFViewer contId={contId} refreshKey={refreshCount} />
         </div>
 
         {/* 우측: 서명판 + 상태표시 */}
         <div className="flex flex-col gap-6">
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">서명 상태</h2>
-            {/* <SignatureStatusBoard /> */}
+            <SignatureStatusBoard signers={state.signers} />
           </div>
 
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
@@ -332,23 +413,19 @@ export default function ContractSignature() {
             <SignatureCanvas
               signerInfo={state.signerInfo}
               onSignatureComplete={({ dataUrl, signerInfo }) => {
-                console.log("🖋️ 최종 서명 이미지:", dataUrl);
-                console.log("🧾 서명자 정보:", signerInfo);
+                //   console.log("🖋️ 최종 서명 이미지:", dataUrl);
+                //   console.log("🧾 서명자 정보:", signerInfo);
                 // 👉 1. DB 전송
                 handleSignatureImageToServer({
                   contId: contId,
-                  contDtSignType: signerInfo.role,
-                  contDtSignDtm: signerInfo.signedAt,
-                  contDtSignHashVal: signerInfo.hashVal, // ✅ 해시 포함
-                  contDtSignStat: "SIGNED",
-                  mbrCd: signerInfo.mbrId,
-                  contDtIpAddr: signerInfo.ipAddr,
-                  contDtBaseData: dataUrl,
+                  base64Image: dataUrl,
+                  signerInfo: signerInfo,
                 });
                 // 👉 2. PDF에 삽입
                 // insertSignatureToPDF(dataUrl, signerInfo);
               }}
-              onSign={role => onSigned(role)} />
+              onSign={role => onSigned(role)}
+              onSignComplete={handleSignComplete} />
           </div>
         </div>
       </div>

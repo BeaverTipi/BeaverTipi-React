@@ -2,17 +2,13 @@ import React, { useRef, useEffect, useState } from "react";
 import SHA256 from "crypto-js/sha256";
 import Base64 from "crypto-js/enc-base64";
 import { useAES256 } from "../../../hooks/useAES256"
+import { useSignatureHash } from "../../../hooks/useSignatureHash";
 
-function SignatureCanvas({ signerInfo, onSignatureComplete, onSign }) {
+function SignatureCanvas({ signerInfo, onSignatureComplete, onSign, onSignComplete }) {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [ctx, setCtx] = useState(null);
-
-  //🔐 서명 해시 (SHA256): 위조 검증용
-  function generateSignatureHash({ base64Image, mbrId, contId, role, signedAt }) {
-    const raw = `${base64Image}|${mbrId}|${contId}|${role}|${signedAt}`;
-    return Base64.stringify(SHA256(raw));
-  }
+  const createHash = useSignatureHash();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -56,21 +52,30 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign }) {
     const dataUrl = canvasRef.current.toDataURL("image/png");
     const now = new Date().toISOString();
 
+    // ✅ 서명 해시 생성
+    const hashVal = createHash({
+      base64Image: dataUrl,
+      mbrId: signerInfo.mbrId,
+      contId: signerInfo.contId,
+      role: signerInfo.role,
+      signedAt: signerInfo.signedAt,
+    });
+
     // ✅ 서명자 정보에 signedAt 추가
     const signedInfo = {
       ...signerInfo
       , signedAt: now
-      , hashVal: generateSignatureHash({
-        base64Image: dataUrl
-        , mbrId: signerInfo.mbrId
-        , contId: signerInfo.contId
-        , role: signerInfo.role
-        , signedAt: now
-      })
+      , hashVal: hashVal
     };
     // ✅ onSignatureComplete 콜백에 전체 정보 전달
     if (onSignatureComplete)
       onSignatureComplete({ dataUrl, signerInfo: signedInfo, });
+
+    if (typeof onSignComplete === "function") {
+      onSignComplete(); // → 부모에서 PDF 갱신 트리거
+    }
+
+
     // ✅ 실시간 WebSocket 알림
     if (onSign && signerInfo?.role) onSign(signerInfo.role);
     // ✅ 디버깅용 콘솔 출력
@@ -81,22 +86,7 @@ function SignatureCanvas({ signerInfo, onSignatureComplete, onSign }) {
   };
 
 
-  //#############################################
-  // 추후 파일 서버 저장 or DB 전송 시
-  const meta = {
-    role: "LESSOR",
-    name: "홍길동",
-    telNo: "010-1234-5678",
-    signedAt: new Date().toISOString(),
-  };
-  const metadataJSON = JSON.stringify(meta);
 
-  // 같이 전송하거나, 파일명에 포함시켜도 됨
-  // uploadSignatureImage({
-  //   fileBase64: dataUrl,
-  //   metadata: metadataJSON,
-  // });
-  //#############################################
   return (
     <div className="flex flex-col items-center space-y-4">
       <p className="text-sm text-gray-300">
