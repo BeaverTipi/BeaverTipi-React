@@ -63,8 +63,8 @@ export default defineConfig({
     allowedHosts: ['.beavertipi.com'],
     proxy: {
       '/rest': {
-        // target: `http://${localIP}:80`,
-        target: `https://${localIP}:443`, //^0^
+        target: `http://${localIP}:80`,
+        // target: `https://${localIP}:443`, //^0^
         changeOrigin: true,
         secure: false
       }
