@@ -73,21 +73,10 @@ type ContractSignDTO = {
 🔸 일부 필드는 signerInfo와 이름이 다름 (ex. mbrCd vs mbrId)
 */
 
-// [명시적인 기본 구조 선언]
+
 // ⚠️ 아래는 signers의 구조를 문서화하기 위한 선언입니다.
 //     실제 값은 서버에서 받아오며, 이 구조에 맞게 렌더링됩니다.
-const defaultSignerShape = {
-  role: "",
-  name: "",
-  telno: "",
-  connected: false,
-  signedAt: null,
-  isValid: null,
-  isRejected: false,
-  tempPdfUrl: null,
-  hashVal: null,
-  ipAddr: null
-};
+
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import Swal from "sweetalert2";
@@ -103,6 +92,61 @@ import { insertSignatureToPDF } from "../worker/insertSignatureToPDF";
 import { uploadSignedPDFToS3 } from "../worker/uploadSignedPDFToS3";
 import { uploadSignedPDFTemporarily } from "../worker/uploadSignedPDFTemporarily";
 
+// [명시적인 기본 구조 선언]
+const MSG = {
+  U_NOT_JOINED: "NOT_JOINED",
+  U_JOINED: "JOINED",
+  U_SIGNED: "SIGNED",
+  U_REJECTED: "REJECTED",
+  U_DISCONNECTED: "DISCONNECTED",
+  P_EXPIRED: "EXPIRED",
+  SET_ERROR: "ERROR",
+  SET_LOADING: "LOADING",
+};
+const ROLE = {
+  LESSEE: "LESSEE",
+  LESSOR: "LESSOR",
+  AGENT: "AGENT"
+}
+const initialState = {
+  LESSEE: {
+    status: MSG.NOT_JOINED,
+    role: ROLE.LESSEE,
+    mbrCd: null,
+    mbrNm: null,
+    telno: null,
+    signedAt: null,
+    hashVal: null,
+    isValid: null,
+    ipAddr: null,
+    contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
+  },
+  LESSOR: {
+    status: MSG.NOT_JOINED,
+    role: ROLE.LESSOR,
+    mbrCd: null,
+    mbrNm: null,
+    telno: null,
+    signedAt: null,
+    hashVal: null,
+    isValid: null,
+    ipAddr: null,
+    contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
+  },
+  AGENT: {
+    status: MSG.NOT_JOINED,
+    role: ROLE.AGENT,
+    mbrCd: null,
+    mbrNm: null,
+    telno: null,
+    signedAt: null,
+    hashVal: null,
+    isValid: null,
+    ipAddr: null,
+    contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
+  }
+};
+
 export default function ContractSignature() {
   const { encryptedContId } = useParams();// 암호화된 ID ← URL 파라미터
   const navigate = useNavigate();
@@ -115,79 +159,38 @@ export default function ContractSignature() {
   const createHash = useSignatureHash();
   const [refreshPdfUrl, setRefreshPdfUrl] = useState(null);
   const { SPRING_URL_ORIGIN, SPRING_URL_PREFIX, HOSTNAME } = useDomain();
-const [signers, setSigners] = useState([]);
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
+  const contId = useParams();
   const handleSignComplete = () => {
     setRefreshCount(Date.now()); // PDF 강제 갱신
   };
 
-  const initialState = {
-    contId: location.state?.contId || localStorage.getItem("ACTIVE_SIGN_CONTID") || "",
-    loading: true,
-    error: null,
-    isExpired: false,
-    pdfData: null,
-    signers: [],            //LESSEE, LESSOR, AGENT
-    signatureStatus: null,  //ex) { lessee: 'SIGNED', lessor: 'PENDING', agent: 'SIGNED' }
-    signerInfo: null,        //{ role, name, telno}
-    signedAt: null,
-    hashVal: null,
-  };
-
+  const [myRole, setMyRole] = useState();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { contId, loading, error } = state;
-  const signerRole = state.signerInfo?.role;
-useEffect(() => {
-  console.log("🎯 signers 상태:", state.signers);
-}, [state.signers]);
   function reducer(state, action) {
-    switch (action.type) {
-      case "SET_CONTID":
-        return { ...state, contId: action.payload };
-      case "SET_LOADING":
-        return { ...state, loading: action.payload };
-      case "SET_ERROR":
-        return { ...state, error: action.payload };
-      case "SET_EXPIRED":
-        return { ...state, isExpired: action.payload };
-      case "SET_PDF_DATA":
-        return { ...state, pdfData: action.payload };
-      case "SET_SIGNERS":
-        return { ...state, signers: action.payload };
-      case "SET_SIGNATURE_STATUS":
-        return { ...state, signatureStatus: action.payload };
-      case "SIGNER_CONNECTED":
-        return {
-          ...state
-          , signers: state.signers.map(s =>
-            s.role === action.payload ? { ...s, connected: true } : s
-          ),
-        };
-case "SET_SIGNER_INFO": {
-  const exists = state.signers.find(s => s.role === action.payload.role);
-  const updatedSigners = exists
-    ? state.signers.map(s =>
-        s.role === action.payload.role ? { ...s, ...action.payload } : s
-      )
-    : [...state.signers, { ...defaultSignerShape, ...action.payload }];
+    const { role } = action;
 
-  return {
-    ...state,
-    signerInfo: action.payload, // <- 꼭 signerInfo도 갱신해줘야 함!!
-    signers: updatedSigners,
-  };
-}
-      case "SET_SIGNED_AT":
-        return {
-          ...state, signerInfo: { ...state.signerInfo, signedAt: action.payload }
-        };
+    switch (action.type) {
+      case MSG.U_NOT_JOINED:
+        return { ...state, [role]: { ...state[role] } };
+      case MSG.U_JOINED: {
+        const { role, name, mbrCd, telno, ipAddr } = action.payload;
+        return { ...state, [role]: { ...state[role], status: MSG.U_JOINED, role, name, mbrCd, telno, ipAddr } };
+      }
+      case MSG.U_SIGNED:
+        return { ...state, [role]: { ...state[role], status: MSG.U_SIGNED, ...action.payload } };
+      case MSG.U_REJECTED:
+        return { ...state, [role]: { ...state[role], status: MSG.U_REJECTED, ...action.payload } };
+      case MSG.U_DISCONNECTED:
+        return { ...state, [role]: { ...state[role], status: MSG.U_DISCONNECTED, ...action.payload } };
       default:
         return state;
     }
   }
-  useEffect(() => {
-    console.log("📦 현재 상태.signers", state.signers);
-  }, [state.signers]);
+  // useEffect(() => {
+  //   console.log("📦 현재 상태.signers", state.signers);
+  // }, [state.signers]);
   // ✅ 인가 처리
   useEffect(() => {
     console.log("encryptedContId", encryptedContId)
@@ -198,62 +201,67 @@ case "SET_SIGNER_INFO": {
             encryptedContId,
             _method: "GET",
           });
-            console.log("🔐 [useEffect] 인가 조건 체크", {
-    encryptedContId,
-              currentContId: state.contId,
-              data
-  });
+          // console.log("🔐 [useEffect] 인가 조건 체크", {
+          //   encryptedContId,
+          //   currentContId: state.contId,
+          //   data
+          // });
           if (!data.success) {
             Swal.fire("접근 불가", data.message, "info");
             navigate("/signin");
           } else {
-            dispatch({ type: "SET_CONTID", payload: data.contId });
             localStorage.setItem("ACTIVE_SIGN_CONTID", data.contId);
-
-            // ✅ signer 정보 설정
-            dispatch({
-              type: "SET_SIGNER_INFO",
+            const joined_payload = {
               payload: {
-                mbrId: data.mbrId,
                 role: data.role,
+                status: MSG.U_JOINED,
+                mbrCd: data.mbrCd,
+                mbrId: data.mbrId,
                 name: data.name,
                 telno: data.telno,
-                ipAddr: data.ipAddr,
-                signedAt: null,
                 hashVal: null,
-              },
+                isValid: null,
+                signedAt: null,
+                ipAddr: data.ipAddr,
+              }
+            }
+            dispatch({
+              type: MSG.U_JOINED,
+              payload: joined_payload,
             });
-            console.log("");
+            setMyRole(data.role);
+            wsRef.current.send(
+              `${MSG.U_JOINED}:${contId}:${JSON.stringify(joined_payload)}`
+            );
           }
         } catch (err) {
-          dispatch({ type: "SET_ERROR", payload: err });
+          dispatch({ type: MSG.SET_ERROR, payload: err });
           Swal.fire("오류", "접근 실패", "error");
           navigate("/");
         } finally {
-          dispatch({ type: "SET_LOADING", payload: false });
+          dispatch({ type: MSG.SET_LOADING, payload: false });
         }
       })();
     } else {
-      dispatch({ type: "SET_LOADING", payload: false });
+      dispatch({ type: MSG.SET_LOADING, payload: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [encryptedContId]);
 
   useEffect(() => {
     if (contId) localStorage.setItem("ACTIVE_SIGN_CONTID", contId);
-  }, [contId]);
+  }, [contId, myRole]);
 
 
   /*##################################################################################*/
   /** WebSocket Handler **/
   //서명페이지 유효 시간 만료 상태 전파
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:80/ws/contractExpire");
-    //    socket.onopen = () => console.log("✅ [SIGNPAGE] WebSocket 연결 성공");
+    const socket = new WebSocket(`${protocol}://${HOSTNAME}/ws/contractExpire`);
 
     socket.onmessage = (event) => {
       const msg = event.data;
-      if (msg.startsWith("EXPIRED:")) {
+      if (msg.startsWith(MSG.P_EXPIRED)) {
         const expiredContId = msg.split(":")[1];
 
         if (expiredContId === contId) {
@@ -264,73 +272,67 @@ case "SET_SIGNER_INFO": {
             confirmButtonColor: "#085D89", // sky-800
           }).then(() => {
             if (window.history.length > 1) navigate(-1);
-            else navigate("/"); //window.close();
+            else navigate("/");
           });
         }
       }
     };
-    // socket.onerror = (err) => console.error("❌ [SIGNPAGE] WebSocket 에러", err);
-    // socket.onclose = () => console.log("🔌 [SIGNPAGE] WebSocket 연결 종료");
+    socket.onerror = (err) => console.error("❌ [SIGNPAGE] WebSocket 에러", err);
+    socket.onclose = () => console.log("🔌 [SIGNPAGE] WebSocket 연결 종료");
     return () => socket.close();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contId]); // 현재 계약 ID를 상태로 두고 비교
 
-  // SIGNER 접속 상태 전파
+  // 메시지 수신
   useEffect(() => {
-    if (!contId || !signerRole) return;
-
+    if (!contId || !myRole) return;
     //WebSocket "연결 시도" 의미상 정확>> "handshake 시도" 기술적>> "인스턴스 생성" soso
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const ws = new WebSocket(`${protocol}://${HOSTNAME}/ws/signers?contId=${contId}&role=${signerRole}`);
     wsRef.current = ws;
 
-    ws.onopen = () => {
-      console.log("✅ [SIGNER] WebSocket 연결됨");
-      const myRole = "LESSEE"; // 본인의 접속 역할 role은 추후 props/context에서 가져온다고 가정
-      ws.send(`JOIN:${contId}:${myRole}`);
-    };
+    ws.onopen = () => ws.send(`${MSG.P_OPENED}:${contId}:${myRole}`);
 
     ws.onmessage = event => {
-      const msg = event.data;
-      console.log("📨 받은 메시지:", msg);
+      const message = event.data;
+      console.log("📨 받은 메시지:", message);
 
       //---JOINED
-      if (msg.startsWith("JOINED:")) {
-        const [, msgContId, role] = msg.split(":");
-        if (msgContId === contId) dispatch({ type: "SIGNER_CONNECTED", payload: role });
+      if (message.startsWith(MSG.U_JOINED)) {
+        const [type, msgContId, role] = message.split(/:(.+?):/);
+        let payload = null;
+        if (msgContId === contId)
+          dispatch({
+            type: MSG.U_JOINED,
+            payload: {
+              role: data.role,
+              mbrNm: mbrNm,
+
+            }
+          });
       }
 
       //---SIGNED
-      if (msg.startsWith("SIGNED:")) {
-        const [, msgContId, role] = msg.split(":");
+      if (message.startsWith(MSG.U_SIGNED)) {
+        const [type, msgContId, role] = message.split(/:(.+?):/);
+        let payload = null;
         if (msgContId === contId) {
           dispatch({
-            type: "SET_SIGNATURE_STATUS",
+            type: MSG.U_SIGNED,
             payload: {
-              ...state.signatureStatus,
-              [role.toLowerCase()]: "SIGNED",
+              ...state,
+              [role.toLowerCase()]: MSG.U_SIGNED,
             },
           });
         }
       }
 
-      if (msg.startsWith("SIGNED_TEMP:")) {
-        const [, msgContId, role, fileUrl] = msg.split(":");
+      //---REJECTED
+      if (message.startsWith(MSG.U_REJECTED)) {
+        const [type, msgContId, role] = message.split(/:(.+?):/);
+        let payload = null;
         if (msgContId === contId) {
           dispatch({
-            type: "SET_SIGNERS",
-            payload: state.signers.map(s =>
-              s.role === role ? { ...s, tempPdfUrl: fileUrl } : s
-            ),
-          });
-        }
-      }
-
-      if (msg.startsWith("REJECTED:")) {
-        const [, msgContId, role] = msg.split(":");
-        if (msgContId === contId) {
-          dispatch({
-            type: "SET_SIGNERS",
+            type: MSG.U_REJECTED,
             payload: state.signers.map(s =>
               s.role === role ? { ...s, isRejected: true } : s
             ),
@@ -346,8 +348,10 @@ case "SET_SIGNER_INFO": {
         }
       }
 
-      if (msg.startsWith("COMPLETED:")) {
-        const [, msgContId] = msg.split(":");
+      //---DISCONNECTED
+      if (message.startsWith(MSG.U_DISCONNECTED)) {
+        const [type, msgContId, role] = message.split(/:(.+?):/);
+        let payload = null;
         if (msgContId === contId) {
           Swal.fire({
             icon: "success",
@@ -394,7 +398,7 @@ case "SET_SIGNER_INFO": {
     });
 
     // 서명 시각 기록
-    dispatch({ type: "SET_SIGNED_AT", payload: { ...state.signerInfo, signedAt: now } });
+    dispatch({ type: "SET_SIGNED_AT", payload: now });
   };
 
 
@@ -406,10 +410,10 @@ case "SET_SIGNER_INFO": {
   */
   async function handleSignatureImageToServer({ contId, base64Image, signerInfo }) {
     console.log("📦 서버 전송 signerInfo = ", signerInfo);
-      console.log("📦 hashVal = ", signerInfo.hashVal);
-      if (!signerInfo.hashVal) {
-  console.warn("⚠️ 해시값 누락으로 업로드 실패 가능성 있음");
-}
+    console.log("📦 hashVal = ", signerInfo.hashVal);
+    if (!signerInfo.hashVal) {
+      console.warn("⚠️ 해시값 누락으로 업로드 실패 가능성 있음");
+    }
     const payload = {
       contractDigitalSign: {
         contId,
@@ -507,27 +511,27 @@ case "SET_SIGNER_INFO": {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contId]);
 
-  /*
-  PDF 원본 자체(blob)를 불러오는 함수
-  -insertSignatureToPDF()에 넘기기 위한 originalPdfBytes를 생성
-  */
-const getOriginalPdf = async (contId) => {
-  const encryptedRes = await authAxios.post("pdf/base64", {
-    contId,
-    _method: "GET",
-  });
+  // /*
+  // PDF 원본 자체(blob)를 불러오는 함수
+  // -insertSignatureToPDF()에 넘기기 위한 originalPdfBytes를 생성
+  // */
+  // const getOriginalPdf = async (contId) => {
+  //   const encryptedRes = await authAxios.post("pdf/base64", {
+  //     contId,
+  //     _method: "GET",
+  //   });
 
-  const base64 = encryptedRes.base64; // 서버에서 받은 PDF base64
-  const binary = atob(base64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
+  //   const base64 = encryptedRes.base64; // 서버에서 받은 PDF base64
+  //   const binary = atob(base64);
+  //   const len = binary.length;
+  //   const bytes = new Uint8Array(len);
 
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
+  //   for (let i = 0; i < len; i++) {
+  //     bytes[i] = binary.charCodeAt(i);
+  //   }
 
-  return bytes.buffer; // ← insertSignatureToPDF(originalBytes) 에 넘겨줄 수 있음
-};
+  //   return bytes.buffer; // ← insertSignatureToPDF(originalBytes) 에 넘겨줄 수 있음
+  // };
 
   /*
   1. hash 생성
@@ -552,44 +556,44 @@ const getOriginalPdf = async (contId) => {
     const completeInfo = { ...signerInfo, hashVal };
 
     try {
-  //     const originalBytes = await getOriginalPdf(contId);
-  //     const signedPdfBlob = await insertSignatureToPDF(dataUrl, completeInfo, originalBytes);
+      //     const originalBytes = await getOriginalPdf(contId);
+      //     const signedPdfBlob = await insertSignatureToPDF(dataUrl, completeInfo, originalBytes);
 
-  //     if (!signedPdfBlob) throw new Error("PDF 서명 삽입 실패");
+      //     if (!signedPdfBlob) throw new Error("PDF 서명 삽입 실패");
 
-  // // blob → base64 변환
-  // const blobToBase64 = (blob) =>
-  //   new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       const base64 = reader.result.split(",")[1];
-  //       resolve(base64);
-  //     };
-  //     reader.onerror = reject;
-  //     reader.readAsDataURL(blob);
-  //   });
-  //     const base64 = await blobToBase64(signedPdfBlob);
+      // // blob → base64 변환
+      // const blobToBase64 = (blob) =>
+      //   new Promise((resolve, reject) => {
+      //     const reader = new FileReader();
+      //     reader.onloadend = () => {
+      //       const base64 = reader.result.split(",")[1];
+      //       resolve(base64);
+      //     };
+      //     reader.onerror = reject;
+      //     reader.readAsDataURL(blob);
+      //   });
+      //     const base64 = await blobToBase64(signedPdfBlob);
 
-  //       // 서버로 전송할 payload 구성
-  const payload = {
-    _method: "POST",
-    contractDigitalSign: {
-      contId,
-      contDtSignId: null,
-      contDtSignType: signerInfo.role,
-      contDtBaseData: dataUrl,//`data:image/png;base64,${dataUrl}`,
-      contDtSignDtm: signerInfo.signedAt,
-      contDtSignHashVal: hashVal,
-      mbrCd: localStorage.getItem("mbrCd") || "TEMP",
-      contDtSignStat: "N",
-    },
-  };
+      //       // 서버로 전송할 payload 구성
+      const payload = {
+        _method: "POST",
+        contractDigitalSign: {
+          contId,
+          contDtSignId: null,
+          contDtSignType: signerInfo.role,
+          contDtBaseData: dataUrl,
+          contDtSignDtm: signerInfo.signedAt,
+          contDtSignHashVal: hashVal,
+          mbrCd: localStorage.getItem("mbrCd") || "TEMP",
+          contDtSignStat: "N",
+        },
+      };
       const data = await authAxios.post("signature/upload", payload);
-  if (!data?.success || !data?.fileUrl) {
-    throw new Error("임시 서명 PDF 업로드 실패");
-  }
+      if (!data?.success || !data?.fileUrl) {
+        throw new Error("임시 서명 PDF 업로드 실패");
+      }
       const tempFileUrl = data.fileUrl;
-      
+
       // WebSocket으로 전파 (SIGNED_TEMP)
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN)
         wsRef.current.send(`SIGNED_TEMP:${contId}:${signerInfo.role}:${tempFileUrl}`);
@@ -602,6 +606,7 @@ const getOriginalPdf = async (contId) => {
 
       onSigned(completeInfo.role);
       handleSignComplete();
+      Swal.fire("서명 완료", "계약서에 서명을 성공적으로 등록했습니다.", "info");
     } catch (err) {
       console.error("❌ 서명 완료 처리 중 오류 발생", err);
       Swal.fire("오류", "서명 완료 처리에 실패했습니다.", "error");
@@ -653,6 +658,7 @@ const getOriginalPdf = async (contId) => {
 
     // ✅ 전부 서명됐는지 확인
     if (isAllSigned(state.signers)) completeContract(contId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.signerInfo]);
 
   const completeContract = async (contId) => {
@@ -687,10 +693,10 @@ const getOriginalPdf = async (contId) => {
       console.error("❌ 계약 확정 요청 실패", err);
     }
   };
-useEffect(() => {
-  console.log("✅ encryptedContId = ", encryptedContId);
-  console.log("✅ authorized contId = ", state.contId);
-}, [encryptedContId, state.contId]);
+  useEffect(() => {
+    console.log("✅ encryptedContId = ", encryptedContId);
+    console.log("✅ authorized contId = ", state.contId);
+  }, [encryptedContId, state.contId]);
   /*##################################################################################*/
   /** PAGE RENDERER **/
   if (error) {
@@ -761,7 +767,7 @@ useEffect(() => {
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">서명하기</h2>
             <SignatureCanvas
-              signerInfo={state.signerInfo}
+              signerInfo={state}
               onSignatureComplete={handleSignatureComplete}
               onSign={role => onSigned(role)}
               onSignComplete={handleSignComplete}
