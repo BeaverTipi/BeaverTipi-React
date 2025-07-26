@@ -1,14 +1,27 @@
+import { useEffect, useState } from "react";
+import { useSecureAxios } from "../../hooks/useSecureAxios";
 import PageMeta from "../../components/common/PageMeta";
-import ClickStatsChart from "../../components/dashboard/ClickStatsChart";
 import CommissionTotal from "../../components/dashboard/CommissionTotal";
+import WeeklySchedule from "../../components/dashboard/WeeklySchedule";
 import ContractSummaryChart from "../../components/dashboard/ContractSummary";
 import ContractTrendChart from "../../components/dashboard/ContractTrendChart";
-import LongVacantListings from "../../components/dashboard/LongVancantListings";
 import NewListings from "../../components/dashboard/NewListings";
 import UnPopularListings from "../../components/dashboard/UnPopularListings";
-import WeeklySchedule from "../../components/dashboard/WeeklySchedule";
+import LongVacantListings from "../../components/dashboard/LongVancantListings";
+import ClickStatsChart from "../../components/dashboard/ClickStatsChart";
 
 export default function Home() {
+  const secureAxios = useSecureAxios();
+  const [overview, setOverview] = useState(null);
+
+  // useEffect(() => {
+  //   secureAxios.post("/dashboard/overview",{}).then((res) => {
+  //     setOverview(res.data);
+  //   });
+  // }, [secureAxios]);
+
+  // if (!overview) return <div className="p-5 text-sm text-gray-500">로딩 중...</div>;
+
   return (
     <>
       <PageMeta
@@ -17,40 +30,34 @@ export default function Home() {
       />
 
       <div className="grid grid-cols-12 gap-4 md:gap-6 items-stretch">
-        {/* ✅ 1행: 수수료 합계+추이 / 일정 / 계약 상태 비율 */}
+        {/* ✅ 1행 */}
         <div className="col-span-12 xl:col-span-4">
-          <CommissionTotal />
+          <CommissionTotal /* total={overview.commissionTotal} */ />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <WeeklySchedule />
+          <WeeklySchedule /* scheduleList={overview.weeklySchedule} */ />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <ContractSummaryChart />
+          <ContractSummaryChart /* summary={overview.contractStatusSummary}  */ />
         </div>
 
-        {/* ✅ 2행: 계약 성사 추이 */}
+        {/* ✅ 2행 */}
         <div className="col-span-12">
-          <ContractTrendChart />
+          <ContractTrendChart /*trend={overview.contractTrend} *//>
         </div>
 
-        {/* ✅ 3행: 신규 / 관심없는 / 공실 */}
+        {/* ✅ 3행 */}
         <div className="col-span-12">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 h-full">
-            <div className="h-full">
-              <NewListings />
-            </div>
-            <div className="h-full">
-              <UnPopularListings />
-            </div>
-            <div className="h-full">
-              <LongVacantListings />
-            </div>
+            <NewListings /* listings={overview.newListings} */ />
+            <UnPopularListings /* listings={overview.unpopularListings} */ />
+            <LongVacantListings /* listings={overview.longVacantListings} */ />
           </div>
         </div>
 
-        {/* ✅ 4행: 조회수/문의수 */}
+        {/* ✅ 4행 */}
         <div className="col-span-12">
-          <ClickStatsChart />
+          <ClickStatsChart /* stats={overview.listingStats}  */ />
         </div>
       </div>
     </>
