@@ -350,9 +350,10 @@ function ProceedingContracts() {
         });
       }
 
+      const encryptedContId = encrypt(contId);
       // 2.인가 요청
       const authData = await authAxios.post("authorize", {
-        contId,
+        encryptedContId,
         _method: "GET"
       });
       if (!authData.success) {
@@ -364,17 +365,7 @@ function ProceedingContracts() {
       }
 
       // 3. 서명페이지 이동
-      const encryptedContId = encrypt(contId);
-      // navigate(`/contract/${encryptedContId}`);
       window.location.href = `/contract/${encryptedContId}`;
-      // navigate(`/contract/${encrypt(contId)}`, {
-      //   state: {
-      //     contId,
-      //     role: authData.role,
-      //     signYn: authData.signYn,
-      //     authorized: true,
-      //   },
-      // });
 
     } catch (err_open) {
       console.error(err_open);
