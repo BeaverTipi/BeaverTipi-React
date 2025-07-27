@@ -17,7 +17,7 @@ function SignatureCanvas({
   const [isDrawing, setIsDrawing] = useState(false);
   const [ctx, setCtx] = useState(null);
 
-  // 🖍️ 캔버스 초기화
+  // 🖍️ 캡바스 초기화
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -29,6 +29,7 @@ function SignatureCanvas({
 
   // 🖌️ 드로잉 시작
   const startDrawing = (e) => {
+    if (!ctx) return;
     ctx.beginPath();
     ctx.moveTo(
       e.nativeEvent.offsetX || e.touches?.[0]?.clientX,
@@ -39,7 +40,7 @@ function SignatureCanvas({
 
   // 🖌️ 드로잉 중
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || !ctx) return;
     const x = e.nativeEvent.offsetX || e.touches?.[0]?.clientX;
     const y = e.nativeEvent.offsetY || e.touches?.[0]?.clientY;
     ctx.lineTo(x, y);
@@ -48,12 +49,14 @@ function SignatureCanvas({
 
   // ✋ 드로잉 종료
   const stopDrawing = () => {
+    if (!ctx) return;
     ctx.closePath();
     setIsDrawing(false);
   };
 
   // 🧽 서명 초기화
   const clearCanvas = () => {
+    if (!ctx || !canvasRef.current) return;
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   };
 
@@ -65,38 +68,42 @@ function SignatureCanvas({
 
     const signedInfo = {
       ...signerInfo,
-      signedAt: now, // 해시는 상위 컴포넌트에서 생성
+      signedAt: now,
     };
 
-    // 1️⃣ 서명 이미지 & signedAt 전달
     if (onSignatureComplete)
       onSignatureComplete({ dataUrl, signerInfo: signedInfo });
 
-    // 3️⃣ WebSocket 서명 전파
     if (onSign && signerInfo?.role) onSign(signerInfo.role);
 
-    // ✅ 디버깅 로그
     console.log(
       `%c[서명자] ${signedInfo.name} (${signedInfo.role}) 서명 완료 at ${signedInfo.signedAt}`,
       "color:magenta;font-weight:bold"
     );
   };
 
-  // ✅ 서명 거절 버튼 클릭 시
   const handleReject = () => {
     if (typeof onReject === "function") {
-      onReject(); // → 상위에서 Swal.confirm + 전파
+      onReject();
     }
   };
 
+  if (!signerInfo || !signerInfo.role || !signerInfo.name) {
+    console.warn("❌ 서명 불가능한 상태, signerInfo: ", signerInfo);
+    return (
+      <div className="text-gray-400 italic text-sm">
+        현재 서명할 수 있는 사용자가 아닙니다.
+      </div>
+    );
+  }
+  console.log("🧾 현재 signerInfo: ", signerInfo);
+
   return (
     <div className="flex flex-col items-center space-y-4">
-      {/* 👤 서명자 정보 */}
       <p className="text-sm text-gray-300">
         {signerInfo?.name}님 ({signerInfo?.role}) - {signerInfo?.telno}
       </p>
 
-      {/* ✍️ 서명판 */}
       <canvas
         ref={canvasRef}
         width={400}
@@ -111,7 +118,6 @@ function SignatureCanvas({
         onTouchEnd={stopDrawing}
       ></canvas>
 
-      {/* 🧭 액션 버튼 */}
       <div className="flex gap-3">
         <button
           className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
