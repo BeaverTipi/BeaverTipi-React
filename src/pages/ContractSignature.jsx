@@ -201,13 +201,18 @@ function ContractSignature() {
 
   return (
     <div className="min-h-screen w-full bg-gray-900 text-white p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">전자계약 서명 {JSON.stringify(state.contId)}</h1>
+      <h1 className="text-2xl font-semibold">전자계약 서명 {contId}</h1>
+
+      {/* 계약 주요정보 요약 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* 좌측: PDF 미리보기 */}
         <div className="bg-gray-800 p-4 rounded-lg shadow-md overflow-auto max-h-[75vh]">
           <h2 className="text-lg font-semibold mb-4">계약서 미리보기</h2>
           {/* <SignaturePDFViewer
           /> */}
         </div>
+
+        {/* 우측: 서명판 + 상태표시 */}
         <div className="flex flex-col gap-6">
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">서명 상태</h2>
@@ -217,6 +222,7 @@ function ContractSignature() {
               contId={globalContId}
             />
           </div>
+
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">서명하기</h2>
             {/* <SignatureCanvas

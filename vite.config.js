@@ -12,8 +12,10 @@ function getBackendHost() {
   if (currentHost.startsWith("react")) {
     return "beavertipi.com"; // 운영 Spring 서버 도메인
   }
+
   if (currentHost.startsWith("hbdev")) {
     return "hbdev1.beavertipi.com";
+
   }
   if (currentHost.startsWith("dev")) {
     return "dev1.beavertipi.com";
