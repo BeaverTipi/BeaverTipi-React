@@ -201,7 +201,7 @@ function ContractSignature() {
 
   return (
     <div className="min-h-screen w-full bg-gray-900 text-white p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">전자계약 서명 {contId}</h1>
+      <h1 className="text-2xl font-semibold">전자계약 서명 {globalContId}</h1>
 
       {/* 계약 주요정보 요약 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
