@@ -107,6 +107,7 @@ export default function App() {
               >
                 <Route index element={<Home />} />
 
+<<<<<<< HEAD
                 {/* 실제 기능 라우트 */}
                 <Route path="info" element={<OfficeInfo />}>
                   <Route path="text" element={<OfficeText />} />
@@ -118,6 +119,13 @@ export default function App() {
                   <Route path="mng/edit/:lstgId" element={<ListingNew />} />
                   <Route path="mng" element={<ListingMng />} />
                 </Route>
+=======
+          {/* 실제 기능 라우트 */}
+          <Route path="info" element={<OfficeInfo />}>
+            <Route path="text" element={<OfficeText />} />
+            {/* <Route path="test" element={<SampleWebSocketChat />} /> */}
+          </Route>
+>>>>>>> 633b4d4b48d8e916543d923371c9e50c0c92d8d4
 
                 <Route path="cont" element={<Contract />}>
                   <Route path="mng" element={<ContractMng />} />
