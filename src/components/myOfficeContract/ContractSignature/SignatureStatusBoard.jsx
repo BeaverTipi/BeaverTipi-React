@@ -22,8 +22,8 @@ function getInitials(name) {
   return name?.[0] || "👤";
 }
 
-function getStatusBadge(status, isValid, signedAt, isRejected, connected) {
-  if (status === "REJECTED" || isRejected) {
+function getStatusBadge(s) {
+  if (s.isRejected === true && s.signedAt) {
     return (
       <span className="bg-red-700 text-white px-2 py-0.5 rounded-full text-xs">
         거절됨
@@ -31,15 +31,15 @@ function getStatusBadge(status, isValid, signedAt, isRejected, connected) {
     );
   }
 
-  if (status === "SIGNED") {
-    if (isValid === true) {
+  if (s.isSigned === true && s.signedAt) {
+    if (s.isValid === true) {
       return (
         <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs">
           정상
         </span>
       );
     }
-    if (isValid === false) {
+    if (s.isValid === false) {
       return (
         <span className="bg-red-600 text-white px-2 py-0.5 rounded-full text-xs animate-pulse">
           위조 의심
@@ -53,60 +53,115 @@ function getStatusBadge(status, isValid, signedAt, isRejected, connected) {
     );
   }
 
-  if (status === "JOINED" && connected) {
+  if (s.isJoined === true && s.ipAddr) {
     return <span className="text-sky-400 font-medium text-xs">🔵 접속 중</span>;
   }
 
-  if (!connected) {
+  if (!s.isJoined) {
     return <span className="text-gray-400 text-xs italic">⚫ 접속 안됨</span>;
   }
 
   return <span className="text-yellow-400 text-xs italic">🕓 대기 중</span>;
 }
 
-function SignatureStatusBoard({ signers = [], onPreview, contId }) {
+function SignatureStatusBoard({ signers, signature, contId }) {
   console.log("---<><><><><^0^^0^ signers \n", signers);
+  const lessorInfo = signers.LESSOR;
+  const lesseeInfo = signers.LESSEE;
+  const agentInfo = signers.AGENT;
+
   return (
-    <div className="space-y-3">
-      {signers.map((s, index) => (
+    <>
+      <div className="space-y-3">
         <div
-          key={`${contId}-${s.role}-${
-            s.telno || s.code || s.id || s.name || index
-          }`}
+          id={`${contId}-${lessorInfo.role}-${lessorInfo.telno || lessorInfo.code || lessorInfo.id || lessorInfo.name}`}
           className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-              {getInitials(s.name?.trim())}
+              {getInitials(lessorInfo.name?.trim())}
             </div>
             <div className="text-white">
-              <div className="text-sm font-semibold">{s.name}</div>
+              <div className="text-sm font-semibold">{lessorInfo.name}</div>
               <div className="text-xs text-gray-300">
-                {roleKorMap[s.role] || s.role}
+                {roleKorMap[lessorInfo.role] || lessorInfo.role}
               </div>
             </div>
           </div>
 
           {/* Right: Time + Status */}
           <div className="flex flex-col items-end gap-1">
-            {s.signedAt ? (
-              <span className="text-xs text-gray-400" title={s.signedAt}>
-                {new Date(s.signedAt).toLocaleString()}
+            {lessorInfo.signedAt ? (
+              <span className="text-xs text-gray-400" title={lessorInfo.signedAt}>
+                {new Date(lessorInfo.signedAt).toLocaleString()}
               </span>
             ) : (
               <span className="text-xs text-gray-400 italic">미서명</span>
             )}
-            {getStatusBadge(
-              s.status,
-              s.isValid,
-              s.signedAt,
-              s.isRejected,
-              s.connected
-            )}
+            {getStatusBadge(lessorInfo)}
           </div>
         </div>
-      ))}
-    </div>
+
+        <div
+          id={`${contId}-${lesseeInfo.role}-${lesseeInfo.telno || lesseeInfo.code || lesseeInfo.id || lesseeInfo.name}`}
+          className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              {getInitials(lesseeInfo.name?.trim())}
+            </div>
+            <div className="text-white">
+              <div className="text-sm font-semibold">{lesseeInfo.name}</div>
+              <div className="text-xs text-gray-300">
+                {roleKorMap[lesseeInfo.role] || lesseeInfo.role}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Time + Status */}
+          <div className="flex flex-col items-end gap-1">
+            {lesseeInfo.signedAt ? (
+              <span className="text-xs text-gray-400" title={lesseeInfo.signedAt}>
+                {new Date(lesseeInfo.signedAt).toLocaleString()}
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400 italic">미서명</span>
+            )}
+            {getStatusBadge(lesseeInfo)}
+          </div>
+        </div>
+
+        <div
+          id={`${contId}-${agentInfo.role}-${agentInfo.telno || agentInfo.code || agentInfo.id || agentInfo.name}`}
+          className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              {getInitials(agentInfo.name?.trim())}
+            </div>
+            <div className="text-white">
+              <div className="text-sm font-semibold">{agentInfo.name}</div>
+              <div className="text-xs text-gray-300">
+                {roleKorMap[agentInfo.role] || agentInfo.role}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Time + Status */}
+          <div className="flex flex-col items-end gap-1">
+            {agentInfo.signedAt ? (
+              <span className="text-xs text-gray-400" title={agentInfo.signedAt}>
+                {new Date(agentInfo.signedAt).toLocaleString()}
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400 italic">미서명</span>
+            )}
+            {getStatusBadge(agentInfo)}
+          </div>
+        </div>
+
+      </div>
+    </>
   );
 }
 
