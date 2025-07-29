@@ -32,8 +32,8 @@ export default function NotificationDropdown() {
   if (HOSTNAME === "react.beavertipi.com") {
     HOSTNAME = "beavertipi.com";
   }
-  if (HOSTNAME === "hbdev.beavertipi.com") {
-    HOSTNAME = "hbdev1.beavertipi.com";
+  if (HOSTNAME === "hbdev1.beavertipi.com") {
+    HOSTNAME = "hbdev.beavertipi.com";
   }
   if (HOSTNAME === "dev.beavertipi.com") {
     HOSTNAME = "dev1.beavertipi.com";

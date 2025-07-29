@@ -213,6 +213,9 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
 
   return (
     <div style={styles.box}>
+         <h4 style={{ margin: "0 0 12px 6px", fontWeight: 700, color: "#283355", fontSize: 20 }}>
+        내 사무소 소개
+      </h4>
       <div style={styles.toolbar}>
         <button style={styles.btn} title="굵게" onMouseDown={e => e.preventDefault()} onClick={() => doCommand("bold")}><b>B</b></button>
         <button style={styles.btn} title="이탤릭" onMouseDown={e => e.preventDefault()} onClick={() => doCommand("italic")}><i>I</i></button>
@@ -223,7 +226,7 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
           <option value="4">조금 크게</option>
           <option value="5">크게</option>
           <option value="6">더 크게</option>
-          <option value="7">왕크게</option>
+          <option value="7">매우 크게</option>
         </select>
         <input type="color" title="글씨 색상" style={styles.colorInput} onChange={handleColor} />
         <button style={styles.btn} title="왼쪽 정렬" onMouseDown={e => e.preventDefault()} onClick={() => handleAlign("justifyLeft")}>L</button>
@@ -234,8 +237,9 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
         </button>
         <input type="file" ref={fileRef} accept="image/*" style={styles.fileInput} onChange={handleImageChange} />
       </div>
-
+      
       <div style={styles.editorBox}>
+        
         <div
           ref={ref}
           style={styles.editor}
@@ -256,7 +260,10 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
           />
         )}
       </div>
-
+        <div>
+          <h8>매물 상세보기에 내 사무소 소개가 표시됩니다.</h8>
+          
+        </div>
       <button
         type="button"
         onClick={handleSave}

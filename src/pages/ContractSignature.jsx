@@ -10,6 +10,7 @@
   └─ localStorage.getItem(contId)
   └─ render UI (PDF, WS, Sign UI)
 
+
 [WebSocket Message 구조]
 `<U_JOINED>:<contId>:<role>:<payload>`
 
@@ -47,6 +48,7 @@ contract 확정 API 호출
 WebSocket: "COMPLETED:<contId>"
   ↓
 모든 사용자 알림 → 페이지 전환
+
 
 
 signerInfo: {
