@@ -127,7 +127,7 @@ const ListingNew = () => {
               lstgLeaseAmt: res.lstgLeaseAmt,
               lstgLeaseM: res.lstgLeaseM,
               lstgFee: res.lstgFee,
-              lstgGrArea: res.lstgGrArea,
+              lstgGArea: res.lstgGArea,
               lstgExArea: res.lstgExArea,
               lstgRoomCnt: res.lstgRoomCnt,
               lstgBathCnt: res.lstgBathCnt,

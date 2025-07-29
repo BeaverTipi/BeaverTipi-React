@@ -1,21 +1,17 @@
-import React from "react";
+import { createRoot } from "react-dom/client";
 import "./index.css";
 import "swiper/swiper-bundle.css";
 import "flatpickr/dist/flatpickr.css";
 import App from "./App.jsx";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
 import { AppWrapper } from "./components/common/PageMeta";
-import AppProviders from "./context/AppProviders";
-
+import { ThemeProvider } from "./context/ThemeContext";
+import { DomainProvider } from "./context/DomainProvider";
 createRoot(document.getElementById("root")).render(
-  <>
-    <BrowserRouter>
-      <AppProviders>
-        <AppWrapper>
-          <App />
-        </AppWrapper>
-      </AppProviders>
-    </BrowserRouter>
-  </>
+  <DomainProvider>
+    <ThemeProvider>
+      <AppWrapper>
+        <App />
+      </AppWrapper>
+    </ThemeProvider>
+  </DomainProvider>
 );
