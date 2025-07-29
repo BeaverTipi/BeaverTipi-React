@@ -23,7 +23,7 @@ function AddTenancy({
   useEffect(() => {
     if (lessor && Object.keys(lessor).length > 0 && Object.keys(lessor).length > 0) {
       setTenancyList({
-        "0": { ...lessor["0"], lessorMbrCd: lessor["0"].mbrCd, lessorMbrId: lessor["0"].mbrId, lessorTelno: lessor["0"].mbrTelNo, rentalPtyId: lessor["0"].rentalPtyId }
+        "0": { ...lessor["0"], lessorMbrCd: lessor["0"].mbrCd, lessorMbrId: lessor["0"].mbrId }
       });
     }
   }, [lessor]);
@@ -146,7 +146,7 @@ function AddTenancy({
         mbrNm: "홍길동",
         lessorBankNm: "004", // 예: 국민은행 (실제 codeValue에 맞게 입력)
         lessorBankAcc: "110-1234-5678",
-        mbrTelNo: "01012345678",
+        mbrTelNo: "+821012345678",
         mbrBasicAddr: "서울특별시 강남구 테헤란로",
         mbrDetailAddr: "101동 202호",
         mbrEmlAddr: "gildong@example.com",
@@ -158,7 +158,7 @@ function AddTenancy({
         mbrNm: "김철수",
         lessorBankNm: "088", // 예: 신한은행
         lessorBankAcc: "140-9876-5432",
-        mbrTelNo: "01055566677",
+        mbrTelNo: "+821055566677",
         mbrBasicAddr: "부산광역시 해운대구 해운대로",
         mbrDetailAddr: "301동 404호",
         mbrEmlAddr: "chulsoo@example.com",
@@ -313,7 +313,7 @@ function AddTenancy({
               </div>
               {/* 휴대폰 번호 */}
               <div className="pt-6">
-                <Input
+                <PhoneInput
                   id="mbrTelno"
                   name="mbrTelno"
                   countries={countries}
