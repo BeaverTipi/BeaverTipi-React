@@ -96,7 +96,7 @@ export default function App() {
           {/* 실제 기능 라우트 */}
           <Route path="info" element={<OfficeInfo />}>
             <Route path="text" element={<OfficeText />} />
-
+            {/* <Route path="test" element={<SampleWebSocketChat />} /> */}
           </Route>
 
           <Route path="lstg" element={<Listing />}>
