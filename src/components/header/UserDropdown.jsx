@@ -33,8 +33,10 @@ export default function UserDropdown() {
   useEffect(() => {
     axios.get("/member/read")
       .then(data => {
-        console.log("하하 ㅈ대로 되라", data);
         setBROKER_INFO(data);
+
+        const extractedRoles = data.memRoleList?.map(role => role.userRoleId) || [];
+        setROLES(extractedRoles);
       });
     return;
   }, [])

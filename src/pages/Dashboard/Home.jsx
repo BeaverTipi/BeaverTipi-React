@@ -14,13 +14,18 @@ export default function Home() {
   const secureAxios = useSecureAxios();
   const [overview, setOverview] = useState(null);
 
-  // useEffect(() => {
-  //   secureAxios.post("/dashboard/overview",{}).then((res) => {
-  //     setOverview(res.data);
-  //   });
-  // }, [secureAxios]);
+  useEffect(() => {
+    secureAxios.post("/dashboard/overview", {}).then((res) => {
+      console.log(res);
+      setOverview(res);
+    })
+    .catch((err) => {
+      console.error("Dashboard overview fetch error:", err);
+    });
+  }, [secureAxios]);
 
-  // if (!overview) return <div className="p-5 text-sm text-gray-500">로딩 중...</div>;
+  if (!overview)
+    return <div className="p-5 text-sm text-gray-500">로딩 중...</div>;
 
   return (
     <>
@@ -30,34 +35,31 @@ export default function Home() {
       />
 
       <div className="grid grid-cols-12 gap-4 md:gap-6 items-stretch">
-        {/* ✅ 1행 */}
         <div className="col-span-12 xl:col-span-4">
-          <CommissionTotal /* total={overview.commissionTotal} */ />
+          <CommissionTotal  total={overview.commissionTotal}  />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <WeeklySchedule /* scheduleList={overview.weeklySchedule} */ />
+          <WeeklySchedule  schedules={overview.weeklySchedule}  />
         </div>
         <div className="col-span-12 xl:col-span-4">
-          <ContractSummaryChart /* summary={overview.contractStatusSummary}  */ />
+          <ContractSummaryChart  summary={overview.contractStatusSummary}  
+          />
         </div>
 
-        {/* ✅ 2행 */}
         <div className="col-span-12">
-          <ContractTrendChart /*trend={overview.contractTrend} *//>
+          <ContractTrendChart trend={overview.contractTrend}  />
         </div>
 
-        {/* ✅ 3행 */}
         <div className="col-span-12">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 h-full">
-            <NewListings /* listings={overview.newListings} */ />
-            <UnPopularListings /* listings={overview.unpopularListings} */ />
-            <LongVacantListings /* listings={overview.longVacantListings} */ />
+            <NewListings  listings={overview.newListings}  />
+            <UnPopularListings  listings={overview.unpopularListings}  />
+            <LongVacantListings  listings={overview.longVacantListings}  />
           </div>
         </div>
 
-        {/* ✅ 4행 */}
         <div className="col-span-12">
-          <ClickStatsChart /* stats={overview.listingStats}  */ />
+          <ClickStatsChart  stats={overview.listingStats}   />
         </div>
       </div>
     </>
