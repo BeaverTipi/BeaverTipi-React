@@ -1,23 +1,9 @@
-import { useEffect, useState } from "react";
 import { CalendarIcon } from "lucide-react";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router";
 
-const WeeklySchedule = () => {
-  const [schedules, setSchedules] = useState([]);
+const WeeklySchedule = ({ schedules = [] }) => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const dummy = [
-      { id: "scd01", title: "세입자 미팅", date: dayjs().add(1, "day").toDate() },
-      { id: "scd02", title: "계약서 작성", date: dayjs().add(2, "day").toDate() },
-      { id: "scd03", title: "현장 방문", date: dayjs().add(4, "day").toDate() },
-      { id: "scd04", title: "Sibal", date: dayjs().add(4, "day").toDate() },
-      { id: "scd05", title: "Go Home", date: dayjs().add(4, "day").toDate() },
-      { id: "scd07", title: "Go My Home", date: dayjs().add(4, "day").toDate() },
-    ];
-    setSchedules(dummy);
-  }, []);
 
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 pb-4 dark:border-gray-800 dark:bg-white/[0.03] flex flex-col justify-between">
@@ -31,23 +17,32 @@ const WeeklySchedule = () => {
 
       {/* 일정 리스트 */}
       <div className="flex-1">
-        <ul className="space-y-3">
-          {schedules.slice(0, 4).map((item) => (
-            <li
-              key={item.id}
-              className="flex justify-between items-center p-3 bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition"
-            >
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  {item.title}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {dayjs(item.date).format("YYYY-MM-DD dddd")}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
+       
+  {schedules.length === 0 ? (
+    <div className="flex items-center justify-center h-full">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        예정된 일정이 없습니다.
+      </p>
+    </div>
+        ) : (
+          <ul className="space-y-3">
+            {schedules.slice(0, 4).map((item) => (
+              <li
+                key={item.SCD_ID}
+                className="flex justify-between items-center p-3 bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {item.SCD_TITL_NM}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {dayjs(item.SCD_STR_DTM).format("YYYY-MM-DD dddd")}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* 더보기 버튼 */}
