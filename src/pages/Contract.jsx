@@ -1,10 +1,13 @@
 import { Outlet } from 'react-router'
+import { ContractInfoProvider } from '../context/ContractInfoContext'
 
 function Contract() {
   return (
     <>
-      <div>Contract</div>
-      <Outlet />
+
+      <ContractInfoProvider>
+        <Outlet />
+      </ContractInfoProvider>
     </>
   )
 }

@@ -9,10 +9,12 @@ const PhoneInput = ({
   const [selectedCountry, setSelectedCountry] = useState("KR");
   const [phoneNumber, setPhoneNumber] = useState("+82");
 
-  const countryCodes = countries.reduce(
-    (acc, { code, label }) => ({ ...acc, [code]: label }),
-    {}
-  );
+  const countryCodes = Array.isArray(countries)
+    ? countries.reduce(
+        (acc, { code, label }) => ({ ...acc, [code]: label }),
+        {}
+      )
+    : {};
 
   const handleCountryChange = (e) => {
     const newCountry = e.target.value;
@@ -39,7 +41,7 @@ const PhoneInput = ({
           <select
             value={selectedCountry}
             onChange={handleCountryChange}
-            className="appearance-none bg-none rounded-l-lg border-0 border-r border-gray-200 bg-transparent py-3 pl-3.5 pr-8 leading-tight text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:text-gray-400"
+            className="appearance-none bg-none rounded-l-lg border-0 border-r border-gray-200 bg-transparent py-3 pl-3.5 pr-8 leading-tight text-gray-700 focus:border-amber-300 focus:outline-hidden focus:ring-3 focus:ring-amber-500/10 dark:border-gray-800 dark:text-gray-400"
           >
             {countries.map((country) => (
               <option
@@ -78,8 +80,9 @@ const PhoneInput = ({
         value={phoneNumber}
         onChange={handlePhoneNumberChange}
         placeholder={placeholder}
-        className={`dark:bg-dark-900 h-11 w-full ${selectPosition === "start" ? "pl-[84px]" : "pr-[84px]"
-          } rounded-lg border border-gray-300 bg-transparent py-3 px-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800`}
+        className={`dark:bg-dark-900 h-11 w-full ${
+          selectPosition === "start" ? "pl-[84px]" : "pr-[84px]"
+        } rounded-lg border border-gray-300 bg-transparent py-3 px-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-amber-300 focus:outline-hidden focus:ring-3 focus:ring-amber-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-amber-800`}
       />
 
       {/* Dropdown position: End */}
@@ -88,7 +91,7 @@ const PhoneInput = ({
           <select
             value={selectedCountry}
             onChange={handleCountryChange}
-            className="appearance-none bg-none rounded-r-lg border-0 border-l border-gray-200 bg-transparent py-3 pl-3.5 pr-8 leading-tight text-gray-700 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:text-gray-400"
+            className="appearance-none bg-none rounded-r-lg border-0 border-l border-gray-200 bg-transparent py-3 pl-3.5 pr-8 leading-tight text-gray-700 focus:border-amber-300 focus:outline-hidden focus:ring-3 focus:ring-amber-500/10 dark:border-gray-800 dark:text-gray-400"
           >
             {countries.map((country) => (
               <option

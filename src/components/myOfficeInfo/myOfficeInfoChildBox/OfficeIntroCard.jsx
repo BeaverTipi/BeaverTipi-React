@@ -256,7 +256,6 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
           />
         )}
       </div>
-
       <button
         type="button"
         onClick={handleSave}

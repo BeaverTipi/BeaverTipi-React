@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+
+input[type="date"] {
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+}

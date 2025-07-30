@@ -27,3 +27,31 @@
 <result property="mbrStatusCode"  column=" MBR_STATUS_CODE_B" />
 <result property="mbrDeleteDate"  column=" MBR_DELETE_DATE_B" />
 <result property="mbrZip"         column=" MBR_ZIP_B" />
+
+
+, L.LSTG_ID
+, L.MBR_CD
+, L.LSTG_TYPE_CODE2
+, L.LSTG_ADD
+, L.LSTG_ADD2
+, L.LSTG_EX_AREA
+, L.LSTG_GR_AREA
+, L.LSTG_ROOM_CNT
+, L.LSTG_ROOM_NUM
+, L.LSTG_DST
+, L.LSTG_TYPE_SALE
+, L.LSTG_LEASE
+, L.LSTG_LEASE_M
+, L.LSTG_LEASE_AMT
+, L.LSTG_FLOOR
+, L.LSTG_PARK_YN
+, L.LSTG_LAT
+, L.LSTG_LNG
+, L.LSTG_DEL
+, L.LSTG_REG_DATE
+, L.LSTG_PROD_STAT
+, L.LSTG_NM
+, L.LSTG_TYPE_CODE1
+, L.RENTAL_PTY_ID
+, L.LSTG_POSTAL
+, L.LSTG_FEE

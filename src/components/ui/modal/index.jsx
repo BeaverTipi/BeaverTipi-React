@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
 
 export const Modal = ({
   isOpen,
@@ -7,6 +8,7 @@ export const Modal = ({
   className,
   showCloseButton = false, // Default to true for backwards compatibility
   isFullscreen = false,
+  closeOnOverlayClick = false,
 }) => {
   const modalRef = useRef(null);
 
@@ -27,14 +29,19 @@ export const Modal = ({
   }, [isOpen, onClose]);
 
   useEffect(() => {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     } else {
       document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
     }
 
     return () => {
       document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "0px";
     };
   }, [isOpen]);
 
@@ -44,19 +51,18 @@ export const Modal = ({
     ? "w-full h-full"
     : "relative w-full rounded-3xl  dark:bg-gray-900 z-10001";
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
+  const modalContent = (
+    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-[99999]">
       {!isFullscreen && (
         <div
           className="fixed inset-0 z-40 bg-black/10 backdrop-blur-xs"
           onClick={onClose}
         />
       )}
-
       <div
         ref={modalRef}
-        className={`${contentClasses}  ${className}`}
-        onClick={(e) => e.stopPropagation()}
+        className={`${contentClasses} ${className}`}
+        onClick={closeOnOverlayClick ? undefined : (e) => e.stopPropagation()}
       >
         {showCloseButton && (
           <button
@@ -83,4 +89,6 @@ export const Modal = ({
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };

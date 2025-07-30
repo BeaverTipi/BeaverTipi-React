@@ -14,27 +14,46 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  DocsIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
-
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev1.beavertipi.com") {
+    HOSTNAME = "hbdev.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
 const navItems = [
   {
-    icon: <GridIcon />,
+    icon: <PieChartIcon />,
+    name: "대시보드",
+    path: "/broker/myoffice",
+  },
+  {
+    icon: <UserCircleIcon />,
     name: "오피스 관리",
     subItems: [
       { name: "사무소 정보", path: "/broker/myoffice/info/text", pro: false }
-      , { name: "지도 UI", path: "/broker/myoffice/info/map", pro: false }],
+      ]
   },
   {
-    icon: <GridIcon />,
-    name: "상품 관리",
-    subItems: [
-      { name: "신규 매물 등록", path: "/broker/myoffice/lstg/new", pro: false }
-      , { name: "등록 매물", path: "/broker/myoffice/lstg/mng", pro: false }],
+    icon: <PageIcon />,
+    name: " 매물 관리",
+    path: "/broker/myoffice/lstg/mng",
+    pro: false
   },
   {
-    icon: <GridIcon />,
+    icon: <DocsIcon />,
     name: "계약 정보",
     subItems: [
       { name: "내 계약 관리", path: "/broker/myoffice/cont/mng", pro: false }
@@ -42,19 +61,24 @@ const navItems = [
       , { name: "진행중인 계약", path: "/broker/myoffice/cont/proceeding", pro: false }],
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/broker/myoffice/calendar",
-  },
-  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/broker/myoffice/profile",
   },
   {
+    icon: <CalenderIcon />,
+    name: "Calendar",
+    path: "/broker/myoffice/calendar",
+  },
+  {
     name: "Forms",
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/broker/myoffice/form-elements", pro: false }],
+  },
+  {
+    name: "PDF-Coordinates",
+    icon: <GridIcon />,
+    path: "/broker/myoffice/pdf-coor"
   },
   {
     name: "Tables",
@@ -298,7 +322,7 @@ const AppSidebar = () => {
       <div
         className="py-8 flex justify-center"
       >
-        <a href="http://localhost/">
+        <a href={`${SPRING_URL_ORIGIN}`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
