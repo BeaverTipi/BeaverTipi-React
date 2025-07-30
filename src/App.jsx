@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
-import SignIn from "./pages/AuthPages/SignIn";
+// import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
@@ -37,6 +37,7 @@ import { ContextMenuProvider } from "./context/ContextMenuContext";
 import { useContextMenu } from "./context/ContextMenuContext";
 import { useEffect } from "react";
 import ContractSignature from "./pages/ContractSignature";
+import SignIn from "./pages/SignIn";
 
 const GlobalContextMenu = () => {
   const { contextMenu, setContextMenu } = useContextMenu();
@@ -59,7 +60,8 @@ export default function App() {
   useEffect(() => {
     const blockDefaultContext = (e) => e.preventDefault();
     document.addEventListener("contextmenu", blockDefaultContext);
-    return () => document.removeEventListener("contextmenu", blockDefaultContext);
+    return () =>
+      document.removeEventListener("contextmenu", blockDefaultContext);
   }, []);
   return (
     <ContextMenuProvider>
@@ -78,11 +80,15 @@ export default function App() {
                 path="/broker"
                 element={<Navigate to="/broker/myoffice" replace />}
               />
-              {
-                //<Route path="/broker/myoffice/listing-details" element={<ListingDetails />} />
-              }
-              <Route path="/contract" element={<ContractSignature />} />
-
+              <Route path="/contract/:" element={
+                <ProtectedRoute>
+                  <ContractSignature />
+                </ProtectedRoute>
+              } />
+              <Route path="/signin/:" element={
+                <ProtectedRoute>
+                  <SignIn />
+                </ProtectedRoute>} />
               {/* 인증이 필요한 대시보드 라우트 */}
               <Route
                 path="/broker/myoffice"
@@ -97,7 +103,7 @@ export default function App() {
                 {/* 실제 기능 라우트 */}
                 <Route path="info" element={<OfficeInfo />}>
                   <Route path="text" element={<OfficeText />} />
-                  <Route path="map" element={<OfficeMap />} />
+
                 </Route>
 
                 <Route path="lstg" element={<Listing />}>

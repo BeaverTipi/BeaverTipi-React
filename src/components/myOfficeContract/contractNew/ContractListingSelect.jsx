@@ -27,9 +27,12 @@ function ContractListingSelect({ onSave }) {
 
   // 공통코드 옵션, 검색어, 페이지네이션
   const [listingTypeOptions, setListingTypeOptions] = useState([]);
+  const [listingTypeDetailOptions, setListingTypeDetailOptions] = useState([]);
   const [typeSaleOptions, setTypeSaleOptions] = useState([]);
   const [prodStatOptions, setProdStatOptions] = useState([]);
   const [filterListingTypeValue, setFilterListingTypeValue] = useState("000");
+  const [filterListingTypeDetailValue, setFilterListingTypeDetailValue] =
+    useState("000");
   const [filterTypeSaleValue, setFilterTypeSaleValue] = useState("000");
   const [filterProdStatValue, setFilterProdStatValue] = useState("000");
   const [filterStartDate, setFilterStartDate] = useState("");
@@ -42,6 +45,17 @@ function ContractListingSelect({ onSave }) {
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [clickedRowId, setClickedRowId] = useState(null);
+  useEffect(() => {
+    if (clickedRowId !== null) {
+      const timer = setTimeout(() => {
+        setClickedRowId(null);
+      }, 2500);
+
+      return () => clearTimeout(timer); // 💡 컴포넌트 언마운트나 clickedRowId 재변경 시 클린업
+    }
+  }, [clickedRowId]);
+
   const isValidDate = (dateStr) => {
     if (!dateStr) return false;
     const date = new Date(dateStr);
@@ -51,6 +65,7 @@ function ContractListingSelect({ onSave }) {
       dateStr === date.toISOString().slice(0, 10)
     );
   };
+
 
   useEffect(() => {
     axios
@@ -67,6 +82,7 @@ function ContractListingSelect({ onSave }) {
           typeSale: "TRDST",
           prodStat: "PRDST",
           listingType: "LSTG1",
+          listingTypeDetail: "LSTG2",
         },
       })
       .then((data) => {
@@ -85,9 +101,15 @@ function ContractListingSelect({ onSave }) {
           value: lstg1.codeValue,
           label: lstg1.codeName,
         }));
+        const lstg2Opt = data.listingTypeDetail.map((lstg2) => ({
+          ...lstg2,
+          value: lstg2.codeValue,
+          label: lstg2.codeName,
+        }));
         setTypeSaleOptions(trdstOpt);
         setProdStatOptions(prdstOpt);
         setListingTypeOptions(lstg1Opt);
+        setListingTypeDetailOptions(lstg2Opt);
       })
       .catch((err) => {
         console.error("공통코드 오류남(ContractListingSelect)", err);
@@ -110,6 +132,13 @@ function ContractListingSelect({ onSave }) {
   const getListingTypeCode1Name = (lstgTypeCode1) => {
     const matched = listingTypeOptions.find(
       (opt) => opt.value === lstgTypeCode1
+    );
+    return matched ? matched.label : "기타";
+  };
+
+  const getListingTypeCode2Name = (lstgTypeCode2) => {
+    const matched = listingTypeDetailOptions.find(
+      (opt) => opt.value === lstgTypeCode2
     );
     return matched ? matched.label : "기타";
   };
@@ -154,6 +183,11 @@ function ContractListingSelect({ onSave }) {
       )
         return false;
       if (
+        filterListingTypeDetailValue !== "000" &&
+        lstg.lstgTypeCode2 !== filterListingTypeDetailValue
+      )
+        return false;
+      if (
         filterTypeSaleValue !== "000" &&
         lstg.lstgTypeSale !== filterTypeSaleValue
       )
@@ -193,6 +227,7 @@ function ContractListingSelect({ onSave }) {
     searchText,
     backspaceUsed,
     filterListingTypeValue,
+    filterListingTypeDetailValue,
     filterTypeSaleValue,
     filterProdStatValue,
     filterStartDate,
@@ -201,6 +236,7 @@ function ContractListingSelect({ onSave }) {
 
   const handleResetFilters = () => {
     setFilterListingTypeValue("000");
+    setFilterListingTypeDetailValue("000");
     setFilterTypeSaleValue("000");
     setFilterProdStatValue("000");
     setSearchCategory("전체");
@@ -212,6 +248,8 @@ function ContractListingSelect({ onSave }) {
       const now = new Date();
       return now.toISOString().split("T")[0]; // 예: "2025-07-21"
     });
+    setClickedRowId(null);
+
   };
 
   const paginatedList = useMemo(() => {
@@ -235,9 +273,9 @@ function ContractListingSelect({ onSave }) {
                   ＊ 매물 유형
                 </Label>
                 <SelectControlled
-                  value={filterListingTypeValue}
-                  onChange={(val) => setFilterListingTypeValue(val)}
-                  options={listingTypeOptions}
+                  value={filterListingTypeDetailValue}
+                  onChange={(val) => setFilterListingTypeDetailValue(val)}
+                  options={listingTypeDetailOptions}
                   placeholder="--매물유형 선택--"
                   className="max-h-9 text-xs w-[90px]"
                 />
@@ -276,7 +314,22 @@ function ContractListingSelect({ onSave }) {
                   onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
                   onKeyDown={(e) => {
-                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
                     if (!allowed.includes(e.key)) {
                       e.preventDefault(); // 숫자와 하이픈 외 입력 차단
                     }
@@ -298,7 +351,22 @@ function ContractListingSelect({ onSave }) {
                   onFocus={(e) => e.target.showPicker && e.target.showPicker()} // 💥
                   className="pl-2 pr-2 ml-0 w-[130px] max-h-9 text-xs"
                   onKeyDown={(e) => {
-                    const allowed = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "Backspace", "ArrowLeft", "ArrowRight"];
+                    const allowed = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "-",
+                      "Backspace",
+                      "ArrowLeft",
+                      "ArrowRight",
+                    ];
                     if (!allowed.includes(e.key)) {
                       e.preventDefault(); // 숫자와 하이픈 외 입력 차단
                     }
@@ -425,7 +493,15 @@ function ContractListingSelect({ onSave }) {
                   paginatedList.map((lstg, idx) => (
                     <TableRow
                       key={lstg.lstgId}
-                      className={"hover:bg-gray-100 dark:hover:bg-white/5"}
+                      onClick={() => {
+                        setClickedRowId(lstg.lstgId); // 클릭된 Row 기억
+                        console.log("📣 Row clicked!", lstg.lstgId);
+                        handleSelectListing(lstg.lstgId);
+                      }}
+                      className={`cursor-pointer ${clickedRowId === lstg.lstgId
+                        ? "bg-gray-100 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
+                        : "hover:bg-gray-100 dark:hover:bg-white/5"
+                        } transition-colors duration-150`}
                     >
                       <TableCell className="px-5 py-4 sm:px-6 text-center">
                         <div className="pointer-events-none flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -436,17 +512,14 @@ function ContractListingSelect({ onSave }) {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap">
-                          {getListingTypeCode1Name(lstg.lstgTypeCode1)}
+                          {getListingTypeCode2Name(lstg.lstgTypeCode2)}
                         </div>
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                         <div
                           title={lstg.lstgNm}
                           className="cursor-pointer text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
-                          onClick={() => {
-                            console.log("📣 Row clicked!", lstg.lstgId);
-                            handleSelectListing(lstg.lstgId);
-                          }}
+
                         >
                           {lstg.lstgNm}
                         </div>
@@ -479,8 +552,13 @@ function ContractListingSelect({ onSave }) {
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow className={"hover:bg-gray-100 dark:hover:bg-white/5"} >
-                    <TableCell className="text-gray-500 text-theme-xs dark:text-gray-400" colSpan={8}>
+                  <TableRow
+                    className={"hover:bg-gray-100 dark:hover:bg-white/5"}
+                  >
+                    <TableCell
+                      className="text-gray-500 text-theme-xs dark:text-gray-400"
+                      colSpan={8}
+                    >
                       <div className="py-4 pointer-events-none overflow-hidden text-center text-lg whitespace-nowrap">
                         없어요
                       </div>

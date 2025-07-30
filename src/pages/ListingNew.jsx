@@ -18,9 +18,21 @@ const ListingNew = () => {
   const secureAxios = useSecureAxios();
   const { lstgId } = useParams();
   const isEditMode = !!lstgId;
-  const BACKEND_PORT = 80;
-  const SPRING_URL_ORIGIN = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
-
+  
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev1.beavertipi.com") {
+    HOSTNAME = "hbdev.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
   const axiosForFormData = axios.create({
     baseURL: SPRING_URL_ORIGIN,
     withCredentials: true,

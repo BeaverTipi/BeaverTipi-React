@@ -14,10 +14,25 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  DocsIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
-
+  const PROTOCOL = window.location.protocol; // 'http:' or 'https:'
+  let HOSTNAME = window.location.hostname;   // e.g., react.beavertipi.com
+  
+  // 👉 react 서브도메인 접근 시 백엔드는 beavertipi.com 사용
+  if (HOSTNAME === "react.beavertipi.com") {
+    HOSTNAME = "beavertipi.com";
+  }
+    if (HOSTNAME === "dev.beavertipi.com") {
+    HOSTNAME = "dev1.beavertipi.com";
+  }
+      if (HOSTNAME === "hbdev1.beavertipi.com") {
+    HOSTNAME = "hbdev.beavertipi.com";
+  }
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
+  
 const navItems = [
   {
     icon: <PieChartIcon />,
@@ -29,16 +44,16 @@ const navItems = [
     name: "오피스 관리",
     subItems: [
       { name: "사무소 정보", path: "/broker/myoffice/info/text", pro: false }
-      , { name: "지도 UI", path: "/broker/myoffice/info/map", pro: false }],
+      ]
   },
   {
     icon: <PageIcon />,
     name: " 매물 관리",
-      path: "/broker/myoffice/lstg/mng",
-  pro: false
+    path: "/broker/myoffice/lstg/mng",
+    pro: false
   },
   {
-    icon: <ListIcon />,
+    icon: <DocsIcon />,
     name: "계약 정보",
     subItems: [
       { name: "내 계약 관리", path: "/broker/myoffice/cont/mng", pro: false }
@@ -307,7 +322,7 @@ const AppSidebar = () => {
       <div
         className="py-8 flex justify-center"
       >
-        <a href="http://localhost/">
+        <a href={`${SPRING_URL_ORIGIN}`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img

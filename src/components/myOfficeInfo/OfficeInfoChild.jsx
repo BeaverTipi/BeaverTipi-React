@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useRef } from "react";
+import OfficeIntroCard from "./myOfficeInfoChildBox/OfficeIntroCard";
+import OfficeIntroPreview from "./myOfficeInfoChildBox/OfficeIntroPreviewBox";
+import NameCardPreviewBox from "./myOfficeInfoChildBox/NameCardPreviewBox";
 
-export default function OfficeInfoMainForm() {
+export default function OfficeInfoChild({ onEditTabMove }) {
+  const introPreviewRef = useRef();
+
+  // 저장 후 프리뷰 새로고침
+  const handleSaved = () => {
+    if (introPreviewRef.current) {
+      introPreviewRef.current.refresh();
+    }
+  };
+
   return (
-    <div style={{ padding: 20 }}>
-      <h2>사무소 정보</h2>
-      <p>여기에 사무소 정보를 입력하거나, 불러올 수 있습니다.</p>
-      {/* 폼/입력/수정 등 원하는 UI 추가! */}
+    <div style={{ display: "flex", gap: 40, padding: "40px 20px", maxWidth: 1100, margin: "0 auto" }}>
+      <div style={{ flex: "0 0 470px", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+        <OfficeIntroCard onSaved={handleSaved} />
+      </div>
+      <div style={{ flex: "0 0 420px", display: "flex", flexDirection: "column", gap: 28, alignItems: "center" }}>
+        <OfficeIntroPreview ref={introPreviewRef} />
+        <NameCardPreviewBox onEditClick={onEditTabMove} />
+      </div>
     </div>
   );
 }
