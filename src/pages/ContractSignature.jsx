@@ -1,17 +1,20 @@
-
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useDomain } from "../hooks/useDomain";
-import { contractSignatureReducer, initialState, MSG, ROLE } from "../js/reducerContractSignature";
+import {
+  contractSignatureReducer,
+  initialState,
+  MSG,
+  ROLE,
+} from "../js/reducerContractSignature";
 import { useAES256 } from "../hooks/useAES256";
 import { Navigate, useNavigate, useParams } from "react-router";
 import { useSecureAxiosFactory } from "../hooks/useSecureAxiosFactory";
 import { createWebSocketHandlers } from "../js/webSocketContractSignautre";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import { useWaitForStateChange } from "../hooks/useWaitForStateChange";
 import SignaturePDFViewer from "../components/myOfficeContract/ContractSignature/SignaturePDFViewer";
 import SignatureStatusBoard from "../components/myOfficeContract/ContractSignature/SignatureStatusBoard";
 import SignatureCanvas from "../components/myOfficeContract/ContractSignature/SignatureCanvas";
-
 
 function ContractSignature() {
   const createSecureAxios = useSecureAxiosFactory();
@@ -28,17 +31,22 @@ function ContractSignature() {
   const realtimeWs = useRef(null);
   const getStateRef = useRef(null);
   getStateRef.current = state;
-  const { initWebSocket, realtimeWebSocket, sendMsg, createDispatchWithWebSocket, registerTabVisibilityHandler }
-    = createWebSocketHandlers({
-      PROTOCOL: PROTOCOL,
-      HOSTNAME: HOSTNAME,
-      globalContId: globalContId,
-      myRole: myRole,
-      initWsRef: initWs,
-      realtimeWsRef: realtimeWs,
-      dispatch: dispatch,
-      getState: () => getStateRef.current,
-    });
+  const {
+    initWebSocket,
+    realtimeWebSocket,
+    sendMsg,
+    createDispatchWithWebSocket,
+    registerTabVisibilityHandler,
+  } = createWebSocketHandlers({
+    PROTOCOL: PROTOCOL,
+    HOSTNAME: HOSTNAME,
+    globalContId: globalContId,
+    myRole: myRole,
+    initWsRef: initWs,
+    realtimeWsRef: realtimeWs,
+    dispatch: dispatch,
+    getState: () => getStateRef.current,
+  });
   const dispatchWs = createDispatchWithWebSocket();
 
   useEffect(() => {
@@ -54,13 +62,14 @@ function ContractSignature() {
   }, []);
 
   useEffect(() => {
-    if (!globalContId || !myRole) { return; }
+    if (!globalContId || !myRole) {
+      return;
+    }
     console.debug("하하");
     // initWebSocket();
 
     return registerTabVisibilityHandler();
   }, [globalContId, myRole]);
-
 
   // const { waitAuthorization } = useWaitForStateChange(
   //   state => state.signers?.[myRole],
@@ -82,10 +91,8 @@ function ContractSignature() {
 
     setMyRole(data.myRole);
 
-
     dispatch({ type: MSG.RESET, payload: data });
-  }
-
+  };
 
   const handleAuthorizationWithInitWebSocket = async () => {
     try {
@@ -179,8 +186,6 @@ function ContractSignature() {
   //       [s => s.signers?.[myRole].isJoined === true, 3000, "클라이언트 연결 대기 중..."]
   //     );
 
-
-
   //   }
   //   catch (authError) { console.warn(authError); }
   // };
@@ -208,8 +213,7 @@ function ContractSignature() {
         {/* 좌측: PDF 미리보기 */}
         <div className="bg-gray-800 p-4 rounded-lg shadow-md overflow-auto max-h-[75vh]">
           <h2 className="text-lg font-semibold mb-4">계약서 미리보기</h2>
-          {/* <SignaturePDFViewer
-          /> */}
+          <SignaturePDFViewer contId={globalContId} />
         </div>
 
         {/* 우측: 서명판 + 상태표시 */}
@@ -234,4 +238,4 @@ function ContractSignature() {
   );
 }
 
-export default ContractSignature
+export default ContractSignature;
