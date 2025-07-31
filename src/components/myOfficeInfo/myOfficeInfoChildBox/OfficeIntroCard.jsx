@@ -102,7 +102,7 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
   const handleFontSize = e => doCommand("fontSize", e.target.value);
   const handleColor = e => doCommand("foreColor", e.target.value);
   const handleAlign = cmd => doCommand(cmd);
-  const handleInput = () => {};
+  const handleInput = () => { };
 
   const handleImageChange = e => {
     const file = e.target.files?.[0];
@@ -224,6 +224,7 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
           <option value="5">크게</option>
           <option value="6">더 크게</option>
           <option value="7">왕크게</option>
+          <option value="7">왕크게</option>
         </select>
         <input type="color" title="글씨 색상" style={styles.colorInput} onChange={handleColor} />
         <button style={styles.btn} title="왼쪽 정렬" onMouseDown={e => e.preventDefault()} onClick={() => handleAlign("justifyLeft")}>L</button>
@@ -234,6 +235,7 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
         </button>
         <input type="file" ref={fileRef} accept="image/*" style={styles.fileInput} onChange={handleImageChange} />
       </div>
+
 
       <div style={styles.editorBox}>
         <div

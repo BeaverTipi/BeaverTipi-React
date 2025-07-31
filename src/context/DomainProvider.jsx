@@ -17,6 +17,7 @@ export const DomainProvider = ({ prefix = "", children }) => {
     return {
       SPRING_URL_ORIGIN: `${PROTOCOL}//${HOSTNAME}`,
       SPRING_URL_PREFIX: prefix || "/rest/broker/myoffice",
+      HOSTNAME,
     };
   }, [PROTOCOL, HOSTNAME, prefix]);
 

@@ -13,13 +13,20 @@ import { Modal } from "../../ui/modal";
 import isEqual from "lodash.isequal";
 import { useAES256 } from "../../../hooks/useAES256";
 import Swal from "sweetalert2";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
+import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
 
 function ProceedingContracts() {
+  console.log("🌐 DOMAIN:", useDomain());
+
   const navigate = useNavigate();
   const axios = useSecureAxios();
+  const createSecureAxios = useSecureAxiosFactory({
+    maxAgeMs: 300_000,
+    retryCount: 2,
+  });
+  const authAxios = createSecureAxios("/rest/contract");
   const { encrypt, decrypt } = useAES256();
   const [procContracts, setProcContracts] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);
@@ -218,7 +225,6 @@ function ProceedingContracts() {
     });
     setSelectedIds([]); // 모드 변경 시 선택 초기화
     setClickedRowId(null);
-
   };
   /*(1/5)↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑*/
 
@@ -329,39 +335,47 @@ function ProceedingContracts() {
   const handleContractSignaturePageNavigate = async (contId) => {
     try {
       // Response data = { success, signYn, message }
-      // 1. 서명페이지 개설 여부 확인
-      const { success, signYn, message: signStatusMsg }
-        = await axios.post(`cont/proc/sign-status`, {
-          contId: contId,
-          _method: "GET",
-        });
+      // 1. 서명페이지 개설 여부(유효성) 확인
+      const {
+        success,
+        signYn,
+        message: signStatusMsg,
+      } = await axios.post(`cont/proc/sign-status`, {
+        contId: contId,
+        _method: "GET",
+      });
 
       if (!success || signYn === "N") {
         return Swal.fire({
           icon: "info",
           title: "서명페이지가 만료되었습니다",
-          text: signStatusMsg || "해당 계약의 서명 가능 기간이 종료되었습니다.",
+          text: signStatusMsg || "해당 계약의 서명 유효 시간이 종료되었습니다.",
           confirmButtonColor: "#085D89", // sky-800
           scrollbarPadding: false,
         });
       }
 
+      const encryptedContId = encrypt(contId);
       // 2.인가 요청
-      const authData = await axios.post("/rest/contract/authorize", {
-        contId,
-        _method: "GET"
+      const authData = await authAxios.post("authorize", {
+        encryptedContId,
+        _method: "GET",
       });
       if (!authData.success) {
         //비로그인 상태 처리
-        if (authData.message === "로그인이 필요합니다.") return navigate("/signin");
+        if (authData.message === "로그인이 필요합니다.")
+          return navigate("/signin");
 
         //기타 인가 실패
-        return Swal.fire({ icon: "info", title: "접근 불가", text: authData.message || "해당 계약 정보에 접근할 권한이 없습니다.", })
+        return Swal.fire({
+          icon: "info",
+          title: "접근 불가",
+          text: authData.message || "해당 계약 정보에 접근할 권한이 없습니다.",
+        });
       }
 
       // 3. 서명페이지 이동
-      const encryptedContId = encrypt(contId);
-      window.location.href = `${SPRING_URL_ORIGIN}/contract/${encryptedContId}`;
+      window.location.href = `/contract/${encryptedContId}`;
     } catch (err_open) {
       console.error(err_open);
       Swal.fire({
@@ -429,7 +443,8 @@ function ProceedingContracts() {
         scrollbarPadding: false,
       });
 
-      if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
+      // if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
+      await handleContractSignaturePageNavigate(contId);
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({
@@ -763,10 +778,11 @@ function ProceedingContracts() {
                         setSelectedContract(proc);
                         setShowModal(true);
                       }}
-                      className={`cursor-pointer ${clickedRowId === proc.contId
-                        ? "bg-gray-100 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
-                        : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        } transition-colors duration-150`}
+                      className={`cursor-pointer ${
+                        clickedRowId === proc.contId
+                          ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
+                          : "hover:bg-gray-100 dark:hover:bg-white/5"
+                      } transition-colors duration-150`}
                     >
                       {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                       <TableCell className="relative px-5 py-4 sm:px-6 text-center">
@@ -838,7 +854,7 @@ function ProceedingContracts() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                            " 원"
+                              " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -892,10 +908,11 @@ function ProceedingContracts() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
