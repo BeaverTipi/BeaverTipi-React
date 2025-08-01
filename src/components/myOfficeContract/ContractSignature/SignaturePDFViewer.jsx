@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ContractPDFRenderer from "../../ContractPDFRenderer";
 import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
+import Swal from "sweetalert2";
 
 /**
  * 계약 PDF를 보여주는 컴포넌트
@@ -53,6 +54,7 @@ export default function SignaturePDFViewer({ myRole, contId, refreshKey, overrid
     };
 
     loadSignedPdf();
+    Swal.fire("씨발!", "서명 성공!", "info");
 
     return () => {
       if (currentUrl && !overrideUrl) URL.revokeObjectURL(currentUrl); // 메모리 누수 방지

@@ -100,7 +100,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
               >
                 <div className="w-10 h-10 overflow-hidden rounded-full">
                   <img
-                    src={item.mbrProfilImage || "/images/재윤비버.png"}
+                    src={item.file.filePathUrl || "/images/재윤비버.png"}
                     alt={item.mbrNnm}
                     width={40}
                     height={40}
@@ -109,7 +109,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                 </div>
                 <div>
                   <span className="mt-2 font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                    {item.mbrNm}
+                    &nbsp;&nbsp;&nbsp;{item.mbrNm}
                   </span>
                 </div>
               </div>
@@ -144,7 +144,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                   회원 상세 정보
                 </h2>
                 <img
-                  src={modalData.profileImgUrl || "/images/재윤비버.png"}
+                  src={modalData.file.filePathUrl || "/images/재윤비버.png"}
                   alt="프로필"
                   className="w-24 h-24 rounded-full object-cover mx-auto"
                 />
