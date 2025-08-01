@@ -29,6 +29,9 @@ export const MSG = {
   SET_SIGNERS_LESSOR: "SET_SIGNERS_LESSOR",
   SET_SIGNERS_AGENT: "SET_SIGNERS_AGENT",
   SET_SIGNATURE_ORIGIN: "SET_SIGNATURE_ORIGIN",
+  SET_SIGNATURE_LESSOR: "SET_SIGNATURE_LESSOR",
+  SET_SIGNATURE_LESSEE: "SET_SIGNATURE_LESSEE",
+  SET_SIGNATURE_AGENT: "SET_SIGNATURE_AGENT",
 }
 
 export const initialState = {
@@ -41,9 +44,9 @@ export const initialState = {
     lessorSignedPdfPath: "",
     lesseeSignedPdfData: "",
     lesseeSignedPdfId: "",
-    lesseeSIgnedPdfPath: "",
+    lesseeSignedPdfPath: "",
     agentSignedPdfData: "",
-    agendSignedPdfId: "",
+    agentSignedPdfId: "",
     agentSignedPdfPath: "",
   },
   signers: {
@@ -125,24 +128,76 @@ export function contractSignatureReducer(state, action) {
         signers: mergedSigners,
       }
     };
-    case MSG.SET_SIGNERS_LESSEE:
-    case MSG.SET_SIGNERS_LESSOR:
-    case MSG.SET_SIGNERS_AGENT: {
-      const role = type.replace("SET_SIGNERS_", "");
-      const updatedSigners = {
-        ...state.signers,
-        [role]: { ...state.signers[role], ...(action.payload || {}) },
-      };
-
+    case MSG.SET_SIGNERS_LESSOR: {
+      if (state.signature.contId !== payload.contId) {
+        console.warn("위조된 계약 정보(ID)");
+      }
       return {
         ...state,
-        signers: updatedSigners,
         signature: {
           ...state.signature,
-          signatureStatus: calculateSignatureStatus(updatedSigners),
+          lessorSignedPdfId: payload.tempPdfId,
+          lessorSignedPdfUrl: payload.tempPdfUrl,
         },
+        signers: {
+          ...state.signers,
+          LESSOR: {
+            ...state.signers.LESSOR,
+            signerStatus: payload.signerStatus,
+            signedAt: payload.signedAt,
+            isSigned: payload.isSigned,
+            hashVal: payload.hashVal
+          },
+        }
       };
     }
+    case MSG.SET_SIGNERS_LESSEE: {
+      if (state.signature.contId !== payload.contId) {
+        console.warn("위조된 계약 정보(ID)");
+      }
+      return {
+        ...state,
+        signature: {
+          ...state.signature,
+          lesseeSignedPdfId: payload.tempPdfId,
+          lesseeSignedPdfUrl: payload.tempPdfUrl,
+        },
+        signers: {
+          ...state.signers,
+          LESSEE: {
+            ...state.signers.LESSEE,
+            signerStatus: payload.signerStatus,
+            signedAt: payload.signedAt,
+            isSigned: payload.isSigned,
+            hashVal: payload.hashVal
+          },
+        }
+      };
+    }
+    case MSG.SET_SIGNERS_AGENT: {
+      if (state.signature.contId !== payload.contId) {
+        console.warn("위조된 계약 정보(ID)");
+      }
+      return {
+        ...state,
+        signature: {
+          ...state.signature,
+          agentSignedPdfId: payload.tempPdfId,
+          agentSignedPdfUrl: payload.tempPdfUrl,
+        },
+        signers: {
+          ...state.signers,
+          AGENT: {
+            ...state.signers.AGENT,
+            signerStatus: payload.signerStatus,
+            signedAt: payload.signedAt,
+            isSigned: payload.isSigned,
+            hashVal: payload.hashVal
+          },
+        }
+      };
+    }
+    // case MSG.SET_SIGNATURE_LESSOR: {}
     default:
       return state;
   }

@@ -41,6 +41,10 @@ export default function PdfCoordinatePicker({ pdfFile }) {
     console.log("📌 좌표:", newCoord);
   };
 
+  const handleResetCoordinates = () => {
+    setCoordinates((_prev) => []);
+  }
+
   const copyToClipboard = () => {
     const text = JSON.stringify(coordinates, null, 2);
     navigator.clipboard.writeText(text);
@@ -60,6 +64,9 @@ export default function PdfCoordinatePicker({ pdfFile }) {
       <div>
         <button onClick={copyToClipboard} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
           JSON 복사
+        </button>
+        <button onClick={handleResetCoordinates} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+          초기화
         </button>
       </div>
       <pre className="bg-gray-100 text-sm p-4 mt-4 rounded max-h-[300px] overflow-auto">

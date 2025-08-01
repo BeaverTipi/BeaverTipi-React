@@ -3,6 +3,7 @@ import { ThemeProvider } from "./ThemeContext";
 import { ContextMenuProvider } from "./ContextMenuContext";
 import { AESProvider } from "./AESProvider";
 import { SecureAxiosProvider } from "./SecureAxiosProvider";
+import { AxiosProvider } from "./AxiosProvider";
 
 export default function AppProviders({ children }) {
   return (
@@ -11,9 +12,11 @@ export default function AppProviders({ children }) {
         <ContextMenuProvider>
 
           <AESProvider>
-            <SecureAxiosProvider>
-              {children}
-            </SecureAxiosProvider>
+            <AxiosProvider>
+              <SecureAxiosProvider>
+                {children}
+              </SecureAxiosProvider>
+            </AxiosProvider>
           </AESProvider>
 
         </ContextMenuProvider>

@@ -108,10 +108,14 @@ export const ContractInfoProvider = ({ children }) => {
       , endDateDay: contract.endDateDay
       , lessorTaxYN: contract.lessorTaxYN
       , listingDeposit: contract.listingDeposit //계약금
+      , listingDepositKorean: ""
       , listingDepositDay: contract.listingDepositDay //계약금 지불일
       , middlePayment: contract.middlePayment //중도금
+      , middlePaymentKorean: ""
       , balancePayment: contract.balancePayment //잔금
+      , balancePaymentKorean: ""
       , managementTotal: contract.managementTotal
+      , managementTotalKorean: ""
       , management1: contract.management1
       , management2: contract.management2
       , management3: contract.management3
@@ -120,6 +124,14 @@ export const ContractInfoProvider = ({ children }) => {
       , management6: contract.management6
       , management7: contract.management7
       , management8: contract.management8
+      , management1Korean: contract.management1Korean
+      , management2Korean: contract.management2Korean
+      , management3Korean: contract.management3Korean
+      , management4Korean: contract.management4Korean
+      , management5Korean: contract.management5Korean
+      , management6Korean: contract.management6Korean
+      , management7Korean: contract.management7Korean
+      , management8Korean: contract.management8Korean
       , managementOther: contract.managementTotal
       , twoWeeksLaterDate: contract.twoWeeksLaterDate
       , twoWeeksLaterDateYear: contract.twoWeekslaterDateYear
