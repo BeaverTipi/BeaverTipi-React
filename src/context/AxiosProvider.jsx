@@ -21,7 +21,7 @@ export function AxiosProvider({ children }) {
     , withCredentials: true
   });
 
-  //서버에 요청 보내기 전에 실행되는 필터(interceptor)
+  //서버에 요청 보내기 전에 실행되는 필터(interceptor)g
   myofficeAPI.interceptors.request.use(
     config => {
       const token = localStorage.getItem("JWT-TOKEN");

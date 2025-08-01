@@ -8,7 +8,7 @@ import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
  * @param {string} props.contId - 계약 ID (서명용 PDF 조회용)
  * @param {number} [props.refreshKey] - PDF 갱신용 키 (서명 직후 강제 리렌더링 용도)
  */
-export default function SignaturePDFViewer({ contId, refreshKey, overrideUrl }) {
+export default function SignaturePDFViewer({ myRole, contId, refreshKey, overrideUrl }) {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const createSecureAxios = useSecureAxiosFactory();
@@ -31,7 +31,8 @@ export default function SignaturePDFViewer({ contId, refreshKey, overrideUrl }) 
         }
         const response = await authAxios.post("pdf/download", {
           contId
-          , _method: "POST"
+          , role: myRole
+          , _method: "GET"
         });
 
         const base64String = response?.base64;

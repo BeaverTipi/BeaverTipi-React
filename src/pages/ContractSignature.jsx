@@ -15,6 +15,7 @@ import { useWaitForStateChange } from "../hooks/useWaitForStateChange";
 import SignaturePDFViewer from "../components/myOfficeContract/ContractSignature/SignaturePDFViewer";
 import SignatureStatusBoard from "../components/myOfficeContract/ContractSignature/SignatureStatusBoard";
 import SignatureCanvas from "../components/myOfficeContract/ContractSignature/SignatureCanvas";
+import { useSignatureHash } from "../hooks/useSignatureHash";
 
 function ContractSignature() {
   const createSecureAxios = useSecureAxiosFactory();
@@ -27,6 +28,7 @@ function ContractSignature() {
   const [myRole, setMyRole] = useState(null);
   const { HOSTNAME } = useDomain();
   const PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
+  const createHash = useSignatureHash();
   const initWs = useRef(null);
   const realtimeWs = useRef(null);
   const getStateRef = useRef(null);
@@ -190,6 +192,41 @@ function ContractSignature() {
   //   catch (authError) { console.warn(authError); }
   // };
 
+  const handleSignatureOnSigned = async ({ dataUrl, signerInfo }) => {
+    try {
+      const signedAt = new Date().toISOString();
+
+      const hashVal = createHash({
+        base64Image: dataUrl,
+        telno: signerInfo.telno,
+        contId: globalContId,
+        role: myRole,
+        signedAt: signedAt,
+      });
+      const contractDigitalSign = {
+        contId: signerInfo.contId,
+        contDtBaseData: dataUrl,
+        contDtSignType: signerInfo.role,
+        contDtSignDtm: signedAt,
+        contDtSignHashVal: hashVal,
+      };
+
+      const payload = ({
+        _method: "POST",
+        contractDigitalSign,
+      });
+
+      const data = await authAxios.post(
+        `signature/upload/two/${signerInfo.role}`,
+        payload
+      );
+    }
+    catch (error) {
+      console.warn("onSigned ERROR", error);
+    }
+  }
+
+
   //#################### 렌더링 ####################
   if (!state) {
     return <div className="text-red-500">에러 발생: {state.error.message}</div>;
@@ -213,7 +250,11 @@ function ContractSignature() {
         {/* 좌측: PDF 미리보기 */}
         <div className="bg-gray-800 p-4 rounded-lg shadow-md overflow-auto max-h-[75vh]">
           <h2 className="text-lg font-semibold mb-4">계약서 미리보기</h2>
-          <SignaturePDFViewer contId={globalContId} />
+          <SignaturePDFViewer
+            myRole={myRole}
+            contId={globalContId}
+          // overrideUrl={overrideUrl}
+          />
         </div>
 
         {/* 우측: 서명판 + 상태표시 */}
@@ -229,8 +270,11 @@ function ContractSignature() {
 
           <div className="bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">서명하기</h2>
-            {/* <SignatureCanvas
-            /> */}
+            <SignatureCanvas
+              signers={state.signers}
+              onSigned={handleSignatureOnSigned}
+              myRole={myRole}
+            />
           </div>
         </div>
       </div>
