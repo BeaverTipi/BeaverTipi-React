@@ -69,9 +69,9 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
 
   const testDummyData = () => {
     setLesseeInfo({
-      mbrCd: "M2507000112"
+      mbrCd: "M2508000002"
       , mbrNm: "배비"
-      , mbrTelno: "010-3333-4444"
+      , mbrTelno: "01021212121"
       , mbrEmlAddr: "sajaboys3@ddit.or.kr"
       , mbrBasicAddr: "대전광역시 중구 계룡로 846"
       , mbrDetailAddr: "3층 304호"

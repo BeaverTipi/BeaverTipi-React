@@ -50,7 +50,7 @@ export const ContractInfoProvider = ({ children }) => {
   }
 
   const updateLessorInfo = lessorGroup => {
-    const { "0": lessor = {}, ...coLessor } = lessorGroup;
+    const { "0": lessor, ...coLessor } = lessorGroup;
     setContractInfo(prev => ({
       ...prev
       , lessorInfo: lessorGroup

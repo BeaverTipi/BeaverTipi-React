@@ -82,7 +82,22 @@ function AddTenancy({
         }
       }));
       console.log("방금 추가한 임대인 리스트 -------_> ", tenancyList);
-    });
+    }).then(() => {
+      axios.post("/cont/new/lessorAcc", {
+        rentalPtyId: contractInfo?.listingInfo.rentalPtyId
+      })
+        .then(data => {
+          setTenancyList(prev => ({
+            ...prev,
+            ["0"]: {
+              ...prev["0"],
+              lessorBankNm: data?.["0"].accBank,
+              lessorBankAcc: data?.["0"].accNum,
+            }
+          }));
+        });
+
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -146,7 +161,7 @@ function AddTenancy({
         mbrNm: "홍길동",
         lessorBankNm: "004", // 예: 국민은행 (실제 codeValue에 맞게 입력)
         lessorBankAcc: "110-1234-5678",
-        mbrTelNo: "+821012345678",
+        mbrTelno: "01012345678",
         mbrBasicAddr: "서울특별시 강남구 테헤란로",
         mbrDetailAddr: "101동 202호",
         mbrEmlAddr: "gildong@example.com",
@@ -158,7 +173,7 @@ function AddTenancy({
         mbrNm: "김철수",
         lessorBankNm: "088", // 예: 신한은행
         lessorBankAcc: "140-9876-5432",
-        mbrTelNo: "+821055566677",
+        mbrTelno: "01055566677",
         mbrBasicAddr: "부산광역시 해운대구 해운대로",
         mbrDetailAddr: "301동 404호",
         mbrEmlAddr: "chulsoo@example.com",
@@ -313,11 +328,25 @@ function AddTenancy({
               </div>
               {/* 휴대폰 번호 */}
               <div className="pt-6">
-                <PhoneInput
+                <Input
+                  id="mbrTelno"
+                  name="mbrTelno"
+                  placeholer="전화번호"
+                  value={tenancyList[idx]?.mbrTelno}
+                  onChange={e => {
+                    const updated = {
+                      ...oneTenancy,
+                      mbrTelno: e.target.value,
+                    };
+                    // setTenancyList((prev) => ({ ...prev, idx: updated }));
+                    updateLessor(idx, updated);
+                  }}
+                />
+                {/* <PhoneInput
                   id="mbrTelno"
                   name="mbrTelno"
                   countries={countries}
-                  value={tenancyList[idx]?.mbrTelNo}
+                  value={tenancyList[idx]?.mbrTelno}
                   onChange={(val) => {
                     const updated = {
                       ...oneTenancy,
@@ -326,7 +355,7 @@ function AddTenancy({
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
                     updateLessor(idx, updated);
                   }}
-                />
+                /> */}
               </div>
 
               {/* 주소 */}

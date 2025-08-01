@@ -450,9 +450,15 @@ function ContractListingSelect({ onSave }) {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  >
+                    매물 주소
                   </TableCell>
                   <TableCell
                     isHeader
@@ -525,6 +531,9 @@ function ContractListingSelect({ onSave }) {
                         </div>
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        {lstg.lstgAdd + " " + lstg.lstgAdd2}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                         <div className="pointer-events-none flex justify-center -space-x-2 text-center overflow-hidden text-ellipsis whitespace-nowrap">
                           {lstg.tenancyInfo !== null
                             ? lstg.tenancyInfo.mbrNm
@@ -557,7 +566,7 @@ function ContractListingSelect({ onSave }) {
                   >
                     <TableCell
                       className="text-gray-500 text-theme-xs dark:text-gray-400"
-                      colSpan={8}
+                      colSpan={9}
                     >
                       <div className="py-4 pointer-events-none overflow-hidden text-center text-lg whitespace-nowrap">
                         없어요

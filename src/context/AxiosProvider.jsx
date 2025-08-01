@@ -3,7 +3,14 @@ import axios from 'axios';
 
 export function AxiosProvider({ children }) {
 
-  const SPRING_URL_ORIGIN = "http://localhost";
+  const BACKEND_PORT = 80;
+  const PROTOCOL = window.location.protocol;
+  let HOSTNAME = window.location.hostname;
+  if (HOSTNAME === "react.beavertipi.com") HOSTNAME = "beavertipi.com";
+  if (HOSTNAME === "dev.beavertipi.com") HOSTNAME = "dev1.beavertipi.com";
+  if (HOSTNAME === "hbdev.beavertipi.com") HOSTNAME = "hbdev1.beavertipi.com";
+
+  const SPRING_URL_ORIGIN = `${PROTOCOL}//${HOSTNAME}`;
   const SPRING_URL_PREFIX = "/rest/broker/myoffice";
   const myofficeAPI = axios.create({
     baseURL: SPRING_URL_ORIGIN + SPRING_URL_PREFIX

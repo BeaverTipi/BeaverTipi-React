@@ -17,7 +17,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
 import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
 
-function ProceedingContracts() {
+function ContractsList() {
   console.log("🌐 DOMAIN:", useDomain());
 
   const navigate = useNavigate();
@@ -292,11 +292,11 @@ function ProceedingContracts() {
         return { contrOpt, trdstOpt };
       })
       .then(({ contrOpt, trdstOpt }) => {
-        console.log(contrOpt, trdstOpt);
+        console.log(contractStatOptions, contractTypeOptions);
       });
 
     axios
-      .post("cont/proc/list")
+      .post("cont/mng/list")
       .then((data) => {
         // console.log("proceeding-contracts:: ", data);
         if (!isEqual(data, procContracts)) {
@@ -307,7 +307,7 @@ function ProceedingContracts() {
       .then((data) =>
         console.log(
           `%c[STATE] procContracts`,
-          "color:gray; font-weight:bold",
+          "color:yellow; font-weight:bold",
           procContracts
         )
       );
@@ -501,7 +501,7 @@ function ProceedingContracts() {
 
   return (
     <>
-      <ComponentCard title="📝 진행중인 계약">
+      <ComponentCard title="📝 내 계약 관리">
         {/* 검색요소 */}
         <div className="mb-2 p-3 pb-1 border rounded-xl bg-gray-50">
           <div
@@ -729,7 +729,7 @@ function ProceedingContracts() {
                     isHeader
                     className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
-                    매물주소
+                    매물 주소
                   </TableCell>
                   <TableCell
                     isHeader
@@ -1019,4 +1019,4 @@ function ProceedingContracts() {
   );
 }
 
-export default ProceedingContracts;
+export default ContractsList;
