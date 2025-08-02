@@ -37,6 +37,7 @@ export default function SignaturePDFViewer({ myRole, contId, refreshKey, overrid
         });
 
         const base64String = response?.base64;
+        console.warn("===<><><PDF 로드 중...>\n", "contId: ", contId, "\nbase64: ", base64String?.slice(0, 100) + "...");
         if (!base64String) throw new Error("PDF base64 응답 없음");
 
         const byteCharacters = atob(base64String);

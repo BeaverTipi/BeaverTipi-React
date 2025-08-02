@@ -32,6 +32,7 @@ function ContractSignature() {
   const initWs = useRef(null);
   const realtimeWs = useRef(null);
   const getStateRef = useRef(null);
+  const [overrideUrl, setOverrideUrl] = useState(null);
   getStateRef.current = state;
   const {
     initWebSocket,
@@ -50,6 +51,21 @@ function ContractSignature() {
     getState: () => getStateRef.current,
   });
   const dispatchWs = createDispatchWithWebSocket();
+
+  const handleFuckedUp = () => {
+    const payload = {
+      signerStatus: MSG.U_SIGNED,
+      isSigned: true,
+      isValid: true
+    };
+    if (myRole === ROLE.LESSEE) {
+      dispatch(MSG.SET_SIGNERS_LESSOR, payload);
+    }
+    if (myRole === ROLE.AGENT) {
+      dispatch(MSG.SET_SIGNERS_LESSEE, payload);
+    }
+  }
+
 
   useEffect(() => {
     console.debug("암호화된 ID", encryptedContId);
@@ -92,6 +108,7 @@ function ContractSignature() {
     }
 
     setMyRole(data.myRole);
+    setOverrideUrl(data);
 
     dispatch({ type: MSG.RESET, payload: data });
   };
@@ -216,10 +233,36 @@ function ContractSignature() {
         contractDigitalSign,
       });
 
+
+      Swal.fire({
+        title: "서명 작업을 처리 중입니다...",
+        html: "서명 해시 위변조 검증 중입니다.<br/>잠시만 기다려주세요.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const data = await authAxios.post(
         `signature/upload/two/${signerInfo.role}`,
         payload
       );
+
+      // 서버 응답이 성공이면
+      if (data.success) {
+        Swal.close();
+        await Swal.fire({
+          icon: "success",
+          title: "서명 완료!",
+          text: "계약 서명이 성공적으로 완료되었습니다.",
+          timer: 1200,
+          showConfirmButton: false,
+        });
+        navigate(-1); // 이전 페이지로 이동
+      } else {
+        Swal.fire("서명 실패", data.message || "서명 처리 중 오류가 발생했습니다.", "error");
+      }
     }
     catch (error) {
       console.warn("onSigned ERROR", error);
@@ -243,7 +286,7 @@ function ContractSignature() {
 
   return (
     <div className="min-h-screen w-full bg-gray-900 text-white p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">전자계약 서명 {globalContId}</h1>
+      <h1 className="text-2xl font-semibold">전자계약 서명</h1>
 
       {/* 계약 주요정보 요약 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">

@@ -146,7 +146,8 @@ export function contractSignatureReducer(state, action) {
             signerStatus: payload.signerStatus,
             signedAt: payload.signedAt,
             isSigned: payload.isSigned,
-            hashVal: payload.hashVal
+            hashVal: payload.hashVal,
+            isValid: true
           },
         }
       };
@@ -169,7 +170,8 @@ export function contractSignatureReducer(state, action) {
             signerStatus: payload.signerStatus,
             signedAt: payload.signedAt,
             isSigned: payload.isSigned,
-            hashVal: payload.hashVal
+            hashVal: payload.hashVal,
+            isValid: true
           },
         }
       };
@@ -192,7 +194,8 @@ export function contractSignatureReducer(state, action) {
             signerStatus: payload.signerStatus,
             signedAt: payload.signedAt,
             isSigned: payload.isSigned,
-            hashVal: payload.hashVal
+            hashVal: payload.hashVal,
+            isValid: true
           },
         }
       };

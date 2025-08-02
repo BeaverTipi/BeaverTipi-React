@@ -44,7 +44,7 @@ function ContractListingSelect({ onSave }) {
   const [searchText, setSearchText] = useState("");
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
   const [clickedRowId, setClickedRowId] = useState(null);
   useEffect(() => {
     if (clickedRowId !== null) {

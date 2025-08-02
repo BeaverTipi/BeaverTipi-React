@@ -10,6 +10,7 @@ import { useSecureAxios } from "../../../hooks/useSecureAxios";
 import { useAES256 } from "../../../hooks/useAES256";
 import { Navigate, useNavigate } from "react-router";
 
+import { useWaitForStateChange } from "../../../hooks/useWaitForStateChange";
 /*
   사용자가 모든 계약데이터를 입력한 뒤, 마지막 확인 및 파일 첨부를 하는 단계
   폼 제출 버튼이 존재하고 contractInfo 상태를 최종적으로 서버에 전송하는 위치
@@ -21,6 +22,79 @@ function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
   const { listing, tenancy, lessee, broker, files } = contractInfo;
   const [uploadedFiles, setUploadedFiles] = useState(contractInfo.files || []);
   const { encryptWithRandomIV, encrypt } = useAES256();
+  // const handleSubmitProceedingContract = async () => {
+  //   const hasStandardPdf = uploadedFiles.some(
+  //     (file) => file.name === "표준임대차계약서.pdf"
+  //   );
+
+  //   if (!hasStandardPdf) {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "필수 서류 누락",
+  //       text: "'표준임대차계약서.pdf' 파일이 첨부되지 않았습니다.",
+  //       confirmButtonText: "확인",
+  //     });
+  //     return;
+  //   }
+
+  //   const base64Files =
+  //     await Promise.all(contractInfo.files.map(async (file) => {
+  //       const base64 = await fileToBase64(file);
+  //       return {
+  //         name: file.name,
+  //         content: base64,
+  //       };
+  //     }));
+
+  //   const payload = {
+  //     contractInfo: contractInfo,
+  //     files: uploadedFiles.map((file) => ({
+  //       fileId: null,
+  //       fileAttachSeq: null,
+  //       fileSourceRef: null,
+  //       fileSourceId: null,
+  //       fileOriginalname: file.name,
+  //       fileSavedname: null,
+  //       fileMime: file.type,
+  //       fileDir: null,
+  //       fileSize: file.size,
+  //       docTypeCd: null,
+  //       filePathUrl: file.path || null,
+  //       regDtm: null
+  //     })),
+  //     base64Files: base64Files,
+  //   };
+  //   console.log("전송합니다 --->> ", payload);
+  //   await axios.post("cont/new/submit", payload)
+  //     .then(data => {
+  //       const contId = data?.contId;
+  //       console.log("1298u24398q23re98eqr2q99", contId);
+  //       if (contId) {
+  //         const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
+  //         const localStorageValue = encrypt(contId);
+  //         localStorage.setItem(localStorageKey, localStorageValue);
+
+
+
+  //         Swal.fire({
+  //           icon: "success",
+  //           title: "제출 완료!",
+  //           text: "신규 계약이 성공적으로 등록되었습니다.",
+  //         }).then(() => {
+  //           window.location.href = "/broker/myoffice/cont/proceeding"
+  //         });
+  //       } else {
+  //         throw new Error("계약 ID 누락");
+  //       }
+  //     }).catch(error => {
+  //       console.error("❌ 계약 제출 실패", error);
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "전송 실패",
+  //         text: error?.response?.data?.message || "서버와 통신하지 못했습니다.",
+  //       });
+  //     })
+  // }
   const handleSubmitProceedingContract = async () => {
     const hasStandardPdf = uploadedFiles.some(
       (file) => file.name === "표준임대차계약서.pdf"
@@ -36,14 +110,15 @@ function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
       return;
     }
 
-    const base64Files =
-      await Promise.all(contractInfo.files.map(async (file) => {
+    const base64Files = await Promise.all(
+      contractInfo.files.map(async (file) => {
         const base64 = await fileToBase64(file);
         return {
           name: file.name,
           content: base64,
         };
-      }));
+      })
+    );
 
     const payload = {
       contractInfo: contractInfo,
@@ -59,38 +134,53 @@ function NewContractInfoLayout({ onBack, onFilesUploaded, attachedFile }) {
         fileSize: file.size,
         docTypeCd: null,
         filePathUrl: file.path || null,
-        regDtm: null
+        regDtm: null,
       })),
       base64Files: base64Files,
     };
-    console.log("전송합니다 --->> ", payload);
-    await axios.post("cont/new/submit", payload)
-      .then(data => {
-        const contId = data?.contId;
-        console.log("1298u24398q23re98eqr2q99", contId);
-        if (contId) {
-          const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
-          const localStorageValue = encrypt(contId);
-          localStorage.setItem(localStorageKey, localStorageValue);
-          Swal.fire({
-            icon: "success",
-            title: "제출 완료!",
-            text: "신규 계약이 성공적으로 등록되었습니다.",
-          }).then(() => {
-            window.location.href = "/broker/myoffice/cont/proceeding"
-          });
-        } else {
-          throw new Error("계약 ID 누락");
-        }
-      }).catch(error => {
-        console.error("❌ 계약 제출 실패", error);
-        Swal.fire({
-          icon: "error",
-          title: "전송 실패",
-          text: error?.response?.data?.message || "서버와 통신하지 못했습니다.",
+
+    Swal.fire({
+      title: "계약을 등록 중입니다...",
+      html: "서버에서 계약을 처리 중입니다.<br/>잠시만 기다려주세요.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    try {
+      const data = await axios.post("cont/new/submit", payload);
+
+      Swal.close(); // 로딩창 닫기
+
+      const contId = data?.contId;
+      if (contId) {
+        const localStorageKey = encrypt("NEXT_PROCEEDING-CONTRACT");
+        const localStorageValue = encrypt(contId);
+        localStorage.setItem(localStorageKey, localStorageValue);
+
+        // ✅ 성공 메시지 표시
+        await Swal.fire({
+          icon: "success",
+          title: "제출 완료!",
+          text: "신규 계약이 성공적으로 등록되었습니다.",
         });
-      })
-  }
+
+        window.location.href = "/broker/myoffice/cont/proceeding";
+      } else {
+        throw new Error("계약 ID 누락");
+      }
+    } catch (error) {
+      Swal.close();
+      console.error("❌ 계약 제출 실패", error);
+      Swal.fire({
+        icon: "error",
+        title: "전송 실패",
+        text: error?.response?.data?.message || "서버와 통신하지 못했습니다.",
+      });
+    }
+  };
 
 
   function fileToBase64(file) {

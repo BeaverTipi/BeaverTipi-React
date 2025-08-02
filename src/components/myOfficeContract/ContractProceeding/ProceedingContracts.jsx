@@ -422,6 +422,16 @@ function ProceedingContracts() {
 
     if (!result.isConfirmed) return;
 
+    Swal.fire({
+      title: "서명 페이지 개설 중입니다...",
+      html: "서버에서 계약을 처리 중입니다.<br/>잠시만 기다려주세요.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
       const _data = await axios.post("cont/proc/open-signpage", {
         contId,

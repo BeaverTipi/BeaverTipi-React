@@ -91,8 +91,8 @@ function AddTenancy({
             ...prev,
             ["0"]: {
               ...prev["0"],
-              lessorBankNm: data?.["0"].accBank,
-              lessorBankAcc: data?.["0"].accNum,
+              lessorBankNm: data?.accBank,
+              lessorBankAcc: data?.accNum,
             }
           }));
         });
@@ -261,16 +261,17 @@ function AddTenancy({
             <hr />
           </div>
         </div>
+
         {Object.entries(tenancyList).map(([idx, oneTenancy]) => (
           <React.Fragment key={idx}>
-            < div
+            <div
               oneTenancy
               key={parseInt(idx) + 1}
               className="grid grid-cols-4 gap-4"
             >
-              {idx === "0" ? (
+              {idx === "0" ? (<>
                 <h2 className="col-span-4">임대사업자 대표</h2>
-              ) : (<>
+              </>) : (<>
                 <h2 className="col-span-4">공동사업자 {idx}</h2>
               </>)}
               <div className="flex items-center gap-3">
@@ -296,8 +297,14 @@ function AddTenancy({
                   }}
                 />
               </div>
-              <div className="flex flex-row gap-6 pt-4 col-span-4">
-                <Label className={"w-17"}>은행 계좌</Label>
+              <div />
+              <div className="flex items-center gap-3 col-span-2">
+                <Label
+                  htmlFor={"lessorBankNm"}
+                  className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe"
+                >
+                  은행 계좌
+                </Label>
                 <SelectControlled
                   id="lessorBankNm"
                   options={bankList}
@@ -313,6 +320,7 @@ function AddTenancy({
                   }}
                 />
                 <Input
+                  className="flex-1"
                   name="lessorBankAcc"
                   placeholder="계좌번호"
                   value={tenancyList[idx]?.lessorBankAcc}
@@ -327,11 +335,18 @@ function AddTenancy({
                 />
               </div>
               {/* 휴대폰 번호 */}
-              <div className="pt-6">
+              <div className="flex items-center gap-3 ">
+                <Label
+                  htmlFor={"mbrTelno"}
+                  className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe"
+                >
+                  임대인 번호
+                </Label>
                 <Input
+                  className="flex-1"
                   id="mbrTelno"
                   name="mbrTelno"
-                  placeholer="전화번호"
+                  placeholer="휴대전화 번호"
                   value={tenancyList[idx]?.mbrTelno}
                   onChange={e => {
                     const updated = {
@@ -342,25 +357,37 @@ function AddTenancy({
                     updateLessor(idx, updated);
                   }}
                 />
-                {/* <PhoneInput
-                  id="mbrTelno"
-                  name="mbrTelno"
-                  countries={countries}
-                  value={tenancyList[idx]?.mbrTelno}
-                  onChange={(val) => {
+              </div>
+              <div className="flex items-center gap-3 ">
+                <Label
+                  htmlFor={"mbrEmlAddr"}
+                  className="w-[120px] whitespace-nowrap text-sm font-bold justify-end-safe"
+                >
+                  임대인 이메일
+                </Label>
+                <Input
+                  id="mbrEmlAddr"
+                  name="mbrEmlAddr"
+                  placeholer="이메일 주소"
+                  value={tenancyList[idx]?.mbrEmlAddr}
+                  onChange={e => {
                     const updated = {
                       ...oneTenancy,
-                      mbrTelNo: val,
+                      mbrEmlAddr: e.target.value,
                     };
                     // setTenancyList((prev) => ({ ...prev, idx: updated }));
                     updateLessor(idx, updated);
                   }}
-                /> */}
+                />
               </div>
 
               {/* 주소 */}
-              <div className="pt-6 space-y-3">
+              <div className="col-span-2 flex items-center gap-3">
+                <Label className="w-[100px] whitespace-nowrap text-sm font-bold justify-end-safe">
+                  임대인 주소
+                </Label>
                 <Input
+                  className="flex-1"
                   id="mbrBasicAddr"
                   name="mbrBasicAddr"
                   placeholder="기본주소"
@@ -374,6 +401,18 @@ function AddTenancy({
                     updateLessor(idx, updated);
                   }}
                 />
+                <button
+                  className="w-[80px] text-sm text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
+                >
+                  주소찾기
+                </button>
+
+              </div>
+              <div></div>
+              <div></div>
+              <div className="col-span-2 flex items-center gap-3">
+                <Label className="w-[120px] whitespace-nowrap text-sm font-bold justify-end-safe">
+                </Label>
                 <Input
                   id="mbrDetailAddr"
                   name="mbrDetailAddr"
@@ -389,41 +428,24 @@ function AddTenancy({
                   }}
                 />
               </div>
-
-              {/* 이메일 주소 */}
-              <div className="pt-6">
-                <Input
-                  id="mbrEmlAddr"
-                  name="mbrEmlAddr"
-                  placeholder="이메일 주소"
-                  value={tenancyList[idx]?.mbrEmlAddr}
-                  onChange={(e) => {
-                    const updated = {
-                      ...oneTenancy,
-                      mbrEmlAddr: e.target.value,
-                    };
-                    // setTenancyList((prev) => ({ ...prev, idx: updated }));
-                    updateLessor(idx, updated);
-                  }}
-                />
-              </div>
-              <Input
-                className="flex-1 invisible"
-                readOnly
-                type="text"
-                name="lessorMbrCd"
-                id="lessorMbrCd"
-                placeholder="회원코드"
-                value={tenancyList[idx]?.lessorMbrCd || ""}
-                onChange={(e) => {
-                  const updated = {
-                    ...oneTenancy,
-                    mbrCd: e.target.value
-                  };
-                  updateLessor(idx, updated);
-                }}
-              />
             </div>
+
+            <Input
+              className="flex-1 invisible"
+              readOnly
+              type="text"
+              name="lessorMbrCd"
+              id="lessorMbrCd"
+              placeholder="회원코드"
+              value={tenancyList[idx]?.lessorMbrCd || ""}
+              onChange={(e) => {
+                const updated = {
+                  ...oneTenancy,
+                  mbrCd: e.target.value
+                };
+                updateLessor(idx, updated);
+              }}
+            />
             <div className="col-span-4">
               <hr />
             </div>
