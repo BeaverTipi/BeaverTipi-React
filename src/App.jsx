@@ -123,7 +123,7 @@ export default function App() {
           <Route path="form-elements" element={<FormElements />} />
           <Route
             path="pdf-coor"
-            element={<PdfCoordinatePicker pdfFile="/표준임대차계약서.pdf" />}
+            element={<PdfCoordinatePicker pdfFile="/표준임대차계약서3.pdf" />}
           />
           {/* Tables */}
           <Route path="basic-tables" element={<BasicTables />} />

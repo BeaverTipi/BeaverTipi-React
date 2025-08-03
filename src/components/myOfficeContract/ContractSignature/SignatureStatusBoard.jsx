@@ -11,7 +11,7 @@
 
 */
 import React from "react";
-
+import { getKSTDate } from "../../../js/getKSTDate";
 const roleKorMap = {
   AGENT: "중개인",
   LESSOR: "임대인",
@@ -101,7 +101,7 @@ function SignatureStatusBoard({ signers, signature, contId }) {
                 className="text-xs text-gray-400"
                 title={lessorInfo.signedAt}
               >
-                {new Date(lessorInfo.signedAt).toLocaleString()}
+                {getKSTDate(lessorInfo.signedAt).toLocaleString()}
                 &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
                 {lessorInfo.ipAddr || ""}
               </span>
@@ -140,7 +140,7 @@ function SignatureStatusBoard({ signers, signature, contId }) {
                 className="text-xs text-gray-400"
                 title={lesseeInfo.signedAt}
               >
-                {new Date(lesseeInfo.signedAt).toLocaleString()}
+                {getKSTDate(lesseeInfo.signedAt).toLocaleString()}
                 &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
                 {lessorInfo.ipAddr || ""}
               </span>
@@ -176,7 +176,7 @@ function SignatureStatusBoard({ signers, signature, contId }) {
                 className="text-xs text-gray-400"
                 title={agentInfo.signedAt}
               >
-                {new Date(agentInfo.signedAt).toLocaleString()}
+                {getKSTDate(agentInfo.signedAt).toLocaleString()}
                 &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
                 {lessorInfo.ipAddr || ""}
               </span>

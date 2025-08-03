@@ -16,6 +16,7 @@ import SignaturePDFViewer from "../components/myOfficeContract/ContractSignature
 import SignatureStatusBoard from "../components/myOfficeContract/ContractSignature/SignatureStatusBoard";
 import SignatureCanvas from "../components/myOfficeContract/ContractSignature/SignatureCanvas";
 import { useSignatureHash } from "../hooks/useSignatureHash";
+import { getKSTDate } from "../js/getKSTDate";
 
 function ContractSignature() {
   const createSecureAxios = useSecureAxiosFactory();
@@ -224,7 +225,7 @@ function ContractSignature() {
 
   const handleSignatureOnSigned = async ({ dataUrl, signerInfo }) => {
     try {
-      const signedAt = new Date().toISOString();
+      const signedAt = getKSTDate().toISOString();
 
       const hashVal = createHash({
         base64Image: dataUrl,

@@ -5,10 +5,7 @@ import Textarea from "../../form/input/TextArea";
 import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 
-export default function HousingContractForm({
-  contractInfo,
-  handleChange,
-}) {
+export default function HousingContractForm({ contractInfo, handleChange }) {
   return (
     <ComponentCard
       title="주택임대차표준계약서"
@@ -108,7 +105,7 @@ export default function HousingContractForm({
                 <Input
                   name="listingAdd2"
                   className="col-span-3"
-                  value={contractInfo.listingAdd2 || ""}
+                  value={contractInfo.listingAdd2 + "호실"}
                   onChange={handleChange}
                   placeholder="층수, 호수 등 상세"
                 />
@@ -126,7 +123,17 @@ export default function HousingContractForm({
                 <label className="text-sm font-bold mb-2">구조·용도</label>
                 <Input
                   name="listingTypeCode1"
-                  value={contractInfo.listingTypeCode1 || ""}
+                  value={
+                    contractInfo.listingTypeCode1 === "001"
+                      ? "원룸/투룸/다세대"
+                      : contractInfo.listingTypeCode1 === "002"
+                      ? "오피스"
+                      : contractInfo.listingTypeCode1 === "003"
+                      ? "아파트"
+                      : contractInfo.listingTypeCode1 === "004"
+                      ? "상가"
+                      : "주거용지"
+                  }
                   onChange={handleChange}
                   placeholder="구조·용도"
                 />

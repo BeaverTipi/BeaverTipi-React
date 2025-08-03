@@ -3,10 +3,7 @@ import Input from "../../form/input/InputField";
 import Textarea from "../../form/input/TextArea";
 import ComponentCard from "../../common/ComponentCard";
 
-export default function ContractTermsSection({
-  contractInfo,
-  handleChange,
-}) {
+export default function ContractTermsSection({ contractInfo, handleChange }) {
   return (
     <ComponentCard
       title="계약 내용"
@@ -170,8 +167,8 @@ export default function ContractTermsSection({
           <div className="grid grid-cols-4 gap-4">
             <label className="col-span-1">수리 완료 시기</label>
             <Input
-              name="repairDeadline"
-              value={contractInfo?.repairDeadline || ""}
+              name="repairDeadlineDate"
+              value={contractInfo?.repairDeadlineDate || ""}
               onChange={handleChange}
               placeholder="YYYY-MM-DD 또는 기타"
             />

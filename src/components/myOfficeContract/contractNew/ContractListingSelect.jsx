@@ -17,6 +17,7 @@ import {
 } from "../../ui/table";
 import Label from "../../form/Label";
 import { useContractInfo } from "../../../context/ContractInfoContext";
+import { getKSTDate } from "../../../js/getKSTDate";
 
 function ContractListingSelect({ onSave }) {
   const axios = useSecureAxios();
@@ -37,7 +38,7 @@ function ContractListingSelect({ onSave }) {
   const [filterProdStatValue, setFilterProdStatValue] = useState("000");
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState(() => {
-    const now = new Date();
+    const now = getKSTDate();
     return now.toISOString().split("T")[0]; // 예: "2025-07-21"
   });
   const [searchCategory, setSearchCategory] = useState("전체");
@@ -58,7 +59,7 @@ function ContractListingSelect({ onSave }) {
 
   const isValidDate = (dateStr) => {
     if (!dateStr) return false;
-    const date = new Date(dateStr);
+    const date = getKSTDate(dateStr);
     return (
       date instanceof Date &&
       !isNaN(date) &&
@@ -244,7 +245,7 @@ function ContractListingSelect({ onSave }) {
     setCurrentPage(1);
     setFilterStartDate("");
     setFilterEndDate(() => {
-      const now = new Date();
+      const now = getKSTDate();
       return now.toISOString().split("T")[0]; // 예: "2025-07-21"
     });
     setClickedRowId(null);

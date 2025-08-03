@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
 import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
+import { getKSTDate } from "../../../js/getKSTDate";
 
 function ContractsList() {
   console.log("🌐 DOMAIN:", useDomain());
@@ -57,12 +58,12 @@ function ContractsList() {
   /*(1/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/
   const [filterStartDate, setFilterStartDate] = useState("");
   const [filterEndDate, setFilterEndDate] = useState(() => {
-    const now = new Date();
+    const now = getKSTDate();
     return now.toISOString().split("T")[0]; // 예: "2025-07-21"
   });
   const isValidDate = (dateStr) => {
     if (!dateStr) return false;
-    const date = new Date(dateStr);
+    const date = getKSTDate(dateStr);
     return (
       date instanceof Date &&
       !isNaN(date) &&
@@ -220,7 +221,7 @@ function ContractsList() {
     setIsBulkMode(false);
     setFilterStartDate("");
     setFilterEndDate(() => {
-      const now = new Date();
+      const now = getKSTDate();
       return now.toISOString().split("T")[0]; // 예: "2025-07-21"
     });
     setSelectedIds([]); // 모드 변경 시 선택 초기화

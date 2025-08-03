@@ -29,7 +29,7 @@ export default function ContractLawSection({
               <label className="font-semibold">임대인 부담</label>
               <Textarea
                 name="lessorBurden"
-                value={contractInfo?.landlordBurden || ""}
+                value={contractInfo?.lessorBurden || ""}
                 onChange={handleChange}
                 placeholder="임대인 부담 수선비 내용 입력"
               />

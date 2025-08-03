@@ -23,20 +23,20 @@ export default function ContractSignSection({
         {/* 날짜 입력 */}
         <div className="grid grid-cols-3 gap-4">
           <Input
-            name="contractYear"
-            value={contractInfo?.contractYear || ""}
+            name="contractConclusionDateYear"
+            value={contractInfo?.contractConclusionDateYear || ""}
             onChange={handleChange}
             placeholder="년"
           />
           <Input
-            name="contractMonth"
-            value={contractInfo?.contractMonth || ""}
+            name="contractConclusionDateMonth"
+            value={contractInfo?.contractConclusionDateMonth || ""}
             onChange={handleChange}
             placeholder="월"
           />
           <Input
-            name="contractDay"
-            value={contractInfo?.contractDay || ""}
+            name="contractConclusionDateDay"
+            value={contractInfo?.contractConclusionDateDay || ""}
             onChange={handleChange}
             placeholder="일"
           />
@@ -53,8 +53,8 @@ export default function ContractSignSection({
               placeholder="주소"
             />
             <Input
-              name="lessorTelNo"
-              value={contractInfo?.lessorTelNo || ""}
+              name="lessorTelno"
+              value={contractInfo?.lessorTelno || ""}
               onChange={handleChange}
               placeholder="전화번호"
             />
@@ -90,8 +90,8 @@ export default function ContractSignSection({
               placeholder="주소"
             />
             <Input
-              name="lesseeTelNo"
-              value={contractInfo?.lesseeTelNo || ""}
+              name="lesseeTelno"
+              value={contractInfo?.lesseeTelno || ""}
               onChange={handleChange}
               placeholder="전화번호"
             />
@@ -145,8 +145,8 @@ export default function ContractSignSection({
               placeholder="대표자 성명"
             />
             <Input
-              name="agentTelNo"
-              value={contractInfo?.agagentTelNoentPhone || ""}
+              name="agentTelno"
+              value={contractInfo?.agentTelno || ""}
               onChange={handleChange}
               placeholder="전화번호"
             />

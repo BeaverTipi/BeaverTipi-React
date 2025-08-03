@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDomain } from "../../../hooks/useDomain";
 import { useSecureAxiosFactory } from "../../../hooks/useSecureAxiosFactory";
-
+import { getKSTDate } from "../../../js/getKSTDate";
 function ProceedingContracts() {
   console.log("🌐 DOMAIN:", useDomain());
 
@@ -209,7 +209,7 @@ function ProceedingContracts() {
     filterStartDate,
     filterEndDate,
   ]);
-
+  console.log("KSTDATE::", getKSTDate().toISOString());
   const handleResetFilters = () => {
     setFilterContractStatValue("000");
     setFilterContractTypeValue("000");
@@ -733,16 +733,17 @@ function ProceedingContracts() {
                   </TableCell>
                   <TableCell
                     isHeader
+                    className="w-[300px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  >
+                    매물주소
+                  </TableCell>
+                  <TableCell
+                    isHeader
                     className="w-[200px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>
-                  <TableCell
-                    isHeader
-                    className="w-[800px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                  >
-                    매물주소
-                  </TableCell>
+
                   <TableCell
                     isHeader
                     className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
@@ -834,23 +835,6 @@ function ProceedingContracts() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
                         <div
-                          title={proc.listingInfo?.lstgNm}
-                          // truncate = overflow-hidden + whitespace-nowrap + text-overflow: ellipsis
-                          className="text-gray-500 hover:underline truncate whitespace-nowrap overflow-hidden text-start"
-                          onClick={() => {
-                            console.log(
-                              "📣 Row clicked!",
-                              proc.listingInfo?.lstgId,
-                              proc.contId
-                            );
-                            // handleSelectListing(lstg.lstgId);
-                          }}
-                        >
-                          {proc.listingInfo?.lstgNm || "-"}
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
-                        <div
                           title={
                             proc.listingInfo?.lstgAdd +
                             " " +
@@ -867,11 +851,28 @@ function ProceedingContracts() {
                             // handleSelectListing(lstg.lstgId);
                           }}
                         >
-                          {proc.listingInfo?.lstgAdd +
-                            " " +
-                            proc.listingInfo?.lstgAdd2}
+                          {proc.listingInfo?.lstgAdd}&nbsp;&nbsp;
+                          {proc.listingInfo?.lstgAdd2}
                         </div>
                       </TableCell>
+                      <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
+                        <div
+                          title={proc.listingInfo?.lstgNm}
+                          // truncate = overflow-hidden + whitespace-nowrap + text-overflow: ellipsis
+                          className="text-gray-500 hover:underline truncate whitespace-nowrap overflow-hidden text-start"
+                          onClick={() => {
+                            console.log(
+                              "📣 Row clicked!",
+                              proc.listingInfo?.lstgId,
+                              proc.contId
+                            );
+                            // handleSelectListing(lstg.lstgId);
+                          }}
+                        >
+                          {proc.listingInfo?.lstgNm || "-"}
+                        </div>
+                      </TableCell>
+
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                         <div className="flex justify-center -space-x-2 text-center overflow-hidden text-ellipsis whitespace-nowrap">
                           {proc.tenancyInfo !== null

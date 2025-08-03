@@ -23,8 +23,8 @@ export default function ContractSpecialTerms({
         <div className="grid grid-cols-4 gap-4 items-end">
           <label className="col-span-1 font-semibold">전입신고 마감일</label>
           <Input
-            name="moveInDeadline"
-            value={contractInfo?.moveInDeadline || moveInDeadline}
+            name="twoWeeksLaterDate"
+            value={contractInfo?.twoWeeksLaterDate || moveInDeadline}
             onChange={handleChange}
             placeholder="YYYY-MM-DD"
             className="col-span-2"
