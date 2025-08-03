@@ -66,7 +66,6 @@ function ContractListingSelect({ onSave }) {
     );
   };
 
-
   useEffect(() => {
     axios
       .post("/cont/new/listing")
@@ -249,7 +248,6 @@ function ContractListingSelect({ onSave }) {
       return now.toISOString().split("T")[0]; // 예: "2025-07-21"
     });
     setClickedRowId(null);
-
   };
 
   const paginatedList = useMemo(() => {
@@ -438,25 +436,25 @@ function ContractListingSelect({ onSave }) {
                 <TableRow>
                   <TableCell
                     isHeader
-                    className="w-[70px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[80px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     번호
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     유형
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[200px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[800px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물 주소
                   </TableCell>
@@ -468,19 +466,19 @@ function ContractListingSelect({ onSave }) {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     거래유형
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[200px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     매물 등록일자
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     거래상태
                   </TableCell>
@@ -504,10 +502,11 @@ function ContractListingSelect({ onSave }) {
                         console.log("📣 Row clicked!", lstg.lstgId);
                         handleSelectListing(lstg.lstgId);
                       }}
-                      className={`cursor-pointer ${clickedRowId === lstg.lstgId
-                        ? "bg-gray-100 dark:bg-gray-700"  // ✅ 클릭된 Row의 고정 배경색
-                        : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        } transition-colors duration-150`}
+                      className={`cursor-pointer ${
+                        clickedRowId === lstg.lstgId
+                          ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
+                          : "hover:bg-gray-100 dark:hover:bg-white/5"
+                      } transition-colors duration-150`}
                     >
                       <TableCell className="px-5 py-4 sm:px-6 text-center">
                         <div className="pointer-events-none flex justify-center items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -524,8 +523,7 @@ function ContractListingSelect({ onSave }) {
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                         <div
                           title={lstg.lstgNm}
-                          className="cursor-pointer text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
-
+                          className="cursor-pointer overflow-hidden text-gray-500 hover:underline flex -space-x-2 overflow-hidden text-ellipsis whitespace-nowrap"
                         >
                           {lstg.lstgNm}
                         </div>
@@ -583,10 +581,11 @@ function ContractListingSelect({ onSave }) {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
@@ -603,8 +602,9 @@ function ContractListingSelect({ onSave }) {
       >
         <ComponentCard
           title={selectedListing?.lstgNm || "선택된 매물"}
-          desc={`${selectedListing?.lstgAdd || ""} ${selectedListing?.lstgAdd2 || ""
-            }`}
+          desc={`${selectedListing?.lstgAdd || ""} ${
+            selectedListing?.lstgAdd2 || ""
+          }`}
         >
           <div className="p-6 space-y-6">
             <div className="flex items-start justify-between">
@@ -694,10 +694,11 @@ function ContractListingSelect({ onSave }) {
                 onClick={handleGoToContract}
                 disabled={!selectedListing?.tenancyInfo}
                 className={`px-6 text-white 
-                ${selectedListing?.tenancyInfo
+                ${
+                  selectedListing?.tenancyInfo
                     ? "bg-amber-600 hover:bg-amber-800"
                     : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                }`}
               >
                 계약으로 이동
               </Button>

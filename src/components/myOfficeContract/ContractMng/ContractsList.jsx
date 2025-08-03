@@ -553,25 +553,25 @@ function ContractsList() {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[200px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[800px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물 주소
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[150px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     임대인
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[150px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     임차인
                   </TableCell>
@@ -597,7 +597,7 @@ function ContractsList() {
                     isHeader
                     className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
-                    서명 페이지
+                    비고
                   </TableCell>
                 </TableRow>
               </TableHeader>
@@ -616,10 +616,11 @@ function ContractsList() {
                         setSelectedContract(proc);
                         setShowModal(true);
                       }}
-                      className={`cursor-pointer ${clickedRowId === proc.contId
-                        ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
-                        : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        } transition-colors duration-150`}
+                      className={`cursor-pointer ${
+                        clickedRowId === proc.contId
+                          ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
+                          : "hover:bg-gray-100 dark:hover:bg-white/5"
+                      } transition-colors duration-150`}
                     >
                       {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                       <TableCell className="relative px-5 py-4 sm:px-6 text-center">
@@ -670,7 +671,11 @@ function ContractsList() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
                         <div
-                          title={proc.listingInfo?.lstgAdd + " " + proc.listingInfo?.lstgAdd2}
+                          title={
+                            proc.listingInfo?.lstgAdd +
+                            " " +
+                            proc.listingInfo?.lstgAdd2
+                          }
                           // truncate = overflow-hidden + whitespace-nowrap + text-overflow: ellipsis
                           className="text-gray-500 hover:underline truncate whitespace-nowrap overflow-hidden text-start"
                           onClick={() => {
@@ -682,7 +687,9 @@ function ContractsList() {
                             // handleSelectListing(lstg.lstgId);
                           }}
                         >
-                          {proc.listingInfo?.lstgAdd + " " + proc.listingInfo?.lstgAdd2}
+                          {proc.listingInfo?.lstgAdd +
+                            " " +
+                            proc.listingInfo?.lstgAdd2}
                         </div>
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
@@ -708,7 +715,7 @@ function ContractsList() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                            " 원"
+                              " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -719,29 +726,7 @@ function ContractsList() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                          {proc.contSignYn === "N" ? (
-                            <button
-                              className="w-[50px] text-xs text-amber-800 border border-amber-800 rounded px-3 py-1 hover:text-amber-600 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-gray-800"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleContractSignaturePageOpen(proc.contId);
-                              }}
-                            >
-                              개설
-                            </button>
-                          ) : (
-                            <button
-                              className="w-[50px] text-xs text-sky-800 border border-sky-800 rounded px-3 py-1 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-gray-800"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleContractSignaturePageNavigate(
-                                  proc.contId
-                                ); // 동일한 함수 재사용
-                              }}
-                            >
-                              이동
-                            </button>
-                          )}
+                          -
                         </div>
                       </TableCell>
                     </TableRow>
@@ -762,10 +747,11 @@ function ContractsList() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}

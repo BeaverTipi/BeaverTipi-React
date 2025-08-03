@@ -733,25 +733,25 @@ function ProceedingContracts() {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[350px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[200px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물명
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[450px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="w-[800px] px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     매물주소
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[150px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     임대인
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[150px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     임차인
                   </TableCell>
@@ -775,7 +775,7 @@ function ProceedingContracts() {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="w-[100px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
+                    className="w-[120px] px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                   >
                     서명 페이지
                   </TableCell>

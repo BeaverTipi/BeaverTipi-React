@@ -42,13 +42,18 @@ export default function StandardLeaseForm({
         contractInfo={contractInfo}
         handleChange={handleChange}
       />
-      <div className="mt-6 flex justify-end">
-        <Button
-          onClick={onNext}
-          className="bg-amber-500 text-white hover:bg-amber-600"
-        >
-          다음 →
-        </Button>
+      <div className="flex flex-col justify-evenly">
+        <div className="mt-6 flex justify-end">
+          <Button
+            onClick={onNext}
+            className="bg-amber-500 text-white hover:bg-amber-600"
+          >
+            다음 →
+          </Button>
+        </div>
+        <div className="w-full flex flex-row justify-end text-gray-400">
+          <p className="pt-3">test</p>
+        </div>
       </div>
     </ComponentCard>
   );
