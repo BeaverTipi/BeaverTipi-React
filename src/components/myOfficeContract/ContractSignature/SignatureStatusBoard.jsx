@@ -74,7 +74,12 @@ function SignatureStatusBoard({ signers, signature, contId }) {
     <>
       <div className="space-y-3">
         <div
-          id={`${contId}-${lessorInfo.role}-${lessorInfo.telno || lessorInfo.code || lessorInfo.id || lessorInfo.name}`}
+          id={`${contId}-${lessorInfo.role}-${
+            lessorInfo.telno ||
+            lessorInfo.code ||
+            lessorInfo.id ||
+            lessorInfo.name
+          }`}
           className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
         >
           <div className="flex items-center gap-3">
@@ -92,8 +97,13 @@ function SignatureStatusBoard({ signers, signature, contId }) {
           {/* Right: Time + Status */}
           <div className="flex flex-col items-end gap-1">
             {lessorInfo.signedAt ? (
-              <span className="text-xs text-gray-400" title={lessorInfo.signedAt}>
+              <span
+                className="text-xs text-gray-400"
+                title={lessorInfo.signedAt}
+              >
                 {new Date(lessorInfo.signedAt).toLocaleString()}
+                &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
+                {lessorInfo.ipAddr || ""}
               </span>
             ) : (
               <span className="text-xs text-gray-400 italic">미서명</span>
@@ -103,7 +113,12 @@ function SignatureStatusBoard({ signers, signature, contId }) {
         </div>
 
         <div
-          id={`${contId}-${lesseeInfo.role}-${lesseeInfo.telno || lesseeInfo.code || lesseeInfo.id || lesseeInfo.name}`}
+          id={`${contId}-${lesseeInfo.role}-${
+            lesseeInfo.telno ||
+            lesseeInfo.code ||
+            lesseeInfo.id ||
+            lesseeInfo.name
+          }`}
           className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
         >
           <div className="flex items-center gap-3">
@@ -121,8 +136,13 @@ function SignatureStatusBoard({ signers, signature, contId }) {
           {/* Right: Time + Status */}
           <div className="flex flex-col items-end gap-1">
             {lesseeInfo.signedAt ? (
-              <span className="text-xs text-gray-400" title={lesseeInfo.signedAt}>
+              <span
+                className="text-xs text-gray-400"
+                title={lesseeInfo.signedAt}
+              >
                 {new Date(lesseeInfo.signedAt).toLocaleString()}
+                &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
+                {lessorInfo.ipAddr || ""}
               </span>
             ) : (
               <span className="text-xs text-gray-400 italic">미서명</span>
@@ -132,7 +152,9 @@ function SignatureStatusBoard({ signers, signature, contId }) {
         </div>
 
         <div
-          id={`${contId}-${agentInfo.role}-${agentInfo.telno || agentInfo.code || agentInfo.id || agentInfo.name}`}
+          id={`${contId}-${agentInfo.role}-${
+            agentInfo.telno || agentInfo.code || agentInfo.id || agentInfo.name
+          }`}
           className="flex items-center justify-between bg-gray-700 px-4 py-3 rounded shadow-sm"
         >
           <div className="flex items-center gap-3">
@@ -150,8 +172,13 @@ function SignatureStatusBoard({ signers, signature, contId }) {
           {/* Right: Time + Status */}
           <div className="flex flex-col items-end gap-1">
             {agentInfo.signedAt ? (
-              <span className="text-xs text-gray-400" title={agentInfo.signedAt}>
+              <span
+                className="text-xs text-gray-400"
+                title={agentInfo.signedAt}
+              >
                 {new Date(agentInfo.signedAt).toLocaleString()}
+                &nbsp;&nbsp;|&nbsp;&nbsp;IP&nbsp;:&nbsp;
+                {lessorInfo.ipAddr || ""}
               </span>
             ) : (
               <span className="text-xs text-gray-400 italic">미서명</span>
@@ -159,7 +186,6 @@ function SignatureStatusBoard({ signers, signature, contId }) {
             {getStatusBadge(agentInfo)}
           </div>
         </div>
-
       </div>
     </>
   );

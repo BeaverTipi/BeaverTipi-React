@@ -110,6 +110,19 @@ function ContractSignature() {
     setMyRole(data.myRole);
     setOverrideUrl(data);
 
+    // if (data.myRole === "LESSEE" || data.myRole === "AGENT") {
+    //   Swal.fire({
+    //     html: "<strong>다른 계약자와 동일한 IP를 사용 중입니다.</strong><br/><p>같은 환경에서 진행 중인지 확인해주세요.</p>",
+    //     icon: "warn",
+    //     showCancelButton: true,
+    //     confirmButtonText: "확인",
+    //     cancelButtonText: "거절",
+    //     confirmButtonColor: "#085D89", // sky-800
+    //     cancelButtonColor: "#a84545 ", // gray-300
+    //     scrollbarPadding: false,
+    //   });
+    // }
+
     dispatch({ type: MSG.RESET, payload: data });
   };
 
