@@ -26,7 +26,7 @@ export function AESProvider({ children }) {
     return decrypted.toString(CryptoJS.enc.Utf8);
   };
 
-    // ✅ 동적 IV를 이용한 암호화
+  // ✅ 동적 IV를 이용한 암호화
   const encryptWithRandomIV = (plainText) => {
     const randomIv = CryptoJS.lib.WordArray.random(16);
     const encrypted = CryptoJS.AES.encrypt(plainText, key, {
@@ -52,8 +52,35 @@ export function AESProvider({ children }) {
     return decrypted.toString(CryptoJS.enc.Utf8);
   };
 
+  const toUrlSafeBase64 = (str) => {
+    return str
+      .replace(/\+/g, "-") // + → -
+      .replace(/\//g, "_") // / → _
+      .replace(/=+$/, ""); // = 제거 (padding 제거)
+  };
+  const encodeURI = (encrypted) => {
+    return toUrlSafeBase64(encrypted); //<--URL_safe
+  };
+  const fromUrlSafeBase64 = (str) => {
+    let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    return base64;
+  };
+  const decodeURI = (URIEncoded) => {
+    return fromUrlSafeBase64(URIEncoded);
+  };
+
   return (
-    <AESContext.Provider value={{ encrypt, decrypt, encryptWithRandomIV, decryptWithIV }}>
+    <AESContext.Provider
+      value={{
+        encrypt,
+        decrypt,
+        encryptWithRandomIV,
+        decryptWithIV,
+        encodeURI,
+        decodeURI,
+      }}
+    >
       {children}
     </AESContext.Provider>
   );

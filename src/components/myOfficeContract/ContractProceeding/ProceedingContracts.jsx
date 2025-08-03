@@ -27,7 +27,7 @@ function ProceedingContracts() {
     retryCount: 2,
   });
   const authAxios = createSecureAxios("/rest/contract");
-  const { encrypt, decrypt } = useAES256();
+  const { encrypt, decrypt, encodeURI, decodeURI } = useAES256();
   const [procContracts, setProcContracts] = useState(null);
   const [selectedContract, setSelectedContract] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -356,6 +356,7 @@ function ProceedingContracts() {
       }
 
       const encryptedContId = encrypt(contId);
+      const encodedEncryptedContId = encodeURI(encryptedContId);
       // 2.인가 요청
       const authData = await authAxios.post("authorize", {
         encryptedContId,
@@ -374,8 +375,9 @@ function ProceedingContracts() {
         });
       }
 
-      // 3. 서명페이지 이동
-      window.location.href = `/contract/${encryptedContId}`;
+      // // 3. 서명페이지 이동
+      // window.location.href = `/contract/${encryptedContId}`;
+      window.location.href = `/contract/${encodedEncryptedContId}`;
     } catch (err_open) {
       console.error(err_open);
       Swal.fire({
@@ -794,10 +796,11 @@ function ProceedingContracts() {
                         setSelectedContract(proc);
                         setShowModal(true);
                       }}
-                      className={`cursor-pointer ${clickedRowId === proc.contId
-                        ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
-                        : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        } transition-colors duration-150`}
+                      className={`cursor-pointer ${
+                        clickedRowId === proc.contId
+                          ? "bg-gray-100 dark:bg-gray-700" // ✅ 클릭된 Row의 고정 배경색
+                          : "hover:bg-gray-100 dark:hover:bg-white/5"
+                      } transition-colors duration-150`}
                     >
                       {/*(5/5)↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓*/}
                       <TableCell className="relative px-5 py-4 sm:px-6 text-center">
@@ -848,7 +851,11 @@ function ProceedingContracts() {
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400 h-full">
                         <div
-                          title={proc.listingInfo?.lstgAdd + " " + proc.listingInfo?.lstgAdd2}
+                          title={
+                            proc.listingInfo?.lstgAdd +
+                            " " +
+                            proc.listingInfo?.lstgAdd2
+                          }
                           // truncate = overflow-hidden + whitespace-nowrap + text-overflow: ellipsis
                           className="text-gray-500 hover:underline truncate whitespace-nowrap overflow-hidden text-start"
                           onClick={() => {
@@ -860,7 +867,9 @@ function ProceedingContracts() {
                             // handleSelectListing(lstg.lstgId);
                           }}
                         >
-                          {proc.listingInfo?.lstgAdd + " " + proc.listingInfo?.lstgAdd2}
+                          {proc.listingInfo?.lstgAdd +
+                            " " +
+                            proc.listingInfo?.lstgAdd2}
                         </div>
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
@@ -886,7 +895,7 @@ function ProceedingContracts() {
                         <div className="overflow-hidden text-right whitespace-nowrap">
                           {proc.contDeposit != null
                             ? Number(proc.contDeposit).toLocaleString("ko-KR") +
-                            " 원"
+                              " 원"
                             : "-"}{" "}
                         </div>
                       </TableCell>
@@ -940,10 +949,11 @@ function ProceedingContracts() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                className={`px-3 py-1 rounded ${i + 1 === currentPage
-                  ? "bg-amber-600 border border-amber-400 text-white"
-                  : "bg-gray-100 border border-gray-300 text-gray-400"
-                  }`}
+                className={`px-3 py-1 rounded ${
+                  i + 1 === currentPage
+                    ? "bg-amber-600 border border-amber-400 text-white"
+                    : "bg-gray-100 border border-gray-300 text-gray-400"
+                }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}

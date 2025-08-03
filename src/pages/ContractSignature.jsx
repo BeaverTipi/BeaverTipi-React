@@ -22,7 +22,7 @@ function ContractSignature() {
   const authAxios = createSecureAxios("/rest/contract");
   const { encryptedContId } = useParams();
   const navigate = useNavigate();
-  const { encrypt, decrypt } = useAES256();
+  const { encrypt, decrypt, encodeURI, decodeURI } = useAES256();
   const [globalContId, setGlobalContId] = useState(null);
   const [state, dispatch] = useReducer(contractSignatureReducer, initialState);
   const [myRole, setMyRole] = useState(null);
@@ -56,7 +56,7 @@ function ContractSignature() {
     const payload = {
       signerStatus: MSG.U_SIGNED,
       isSigned: true,
-      isValid: true
+      isValid: true,
     };
     if (myRole === ROLE.LESSEE) {
       dispatch(MSG.SET_SIGNERS_LESSOR, payload);
@@ -64,12 +64,12 @@ function ContractSignature() {
     if (myRole === ROLE.AGENT) {
       dispatch(MSG.SET_SIGNERS_LESSEE, payload);
     }
-  }
-
+  };
 
   useEffect(() => {
     console.debug("암호화된 ID", encryptedContId);
-    setGlobalContId(decrypt(encryptedContId));
+    setGlobalContId(decrypt(decodeURI(encryptedContId)));
+    console.debug("디코딩, 복호화까지 된 ID: ", globalContId);
     console.debug("계약ID", globalContId);
     handleAuthorization();
     realtimeWebSocket();
@@ -228,11 +228,10 @@ function ContractSignature() {
         contDtSignHashVal: hashVal,
       };
 
-      const payload = ({
+      const payload = {
         _method: "POST",
         contractDigitalSign,
-      });
-
+      };
 
       Swal.fire({
         title: "서명 작업을 처리 중입니다...",
@@ -261,14 +260,16 @@ function ContractSignature() {
         });
         navigate(-1); // 이전 페이지로 이동
       } else {
-        Swal.fire("서명 실패", data.message || "서명 처리 중 오류가 발생했습니다.", "error");
+        Swal.fire(
+          "서명 실패",
+          data.message || "서명 처리 중 오류가 발생했습니다.",
+          "error"
+        );
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.warn("onSigned ERROR", error);
     }
-  }
-
+  };
 
   //#################### 렌더링 ####################
   if (!state) {
@@ -296,7 +297,7 @@ function ContractSignature() {
           <SignaturePDFViewer
             myRole={myRole}
             contId={globalContId}
-          // overrideUrl={overrideUrl}
+            // overrideUrl={overrideUrl}
           />
         </div>
 
