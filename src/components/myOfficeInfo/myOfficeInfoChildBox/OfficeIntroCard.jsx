@@ -89,6 +89,7 @@ function EditableImage({ img, idx, onMove, onResize, onDelete, isEditing }) {
 }
 
 export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
+  console.log("렌더링되면서 이거 나올꺼야 mbrCd:", mbrCd);
   const ref = useRef();
   const fileRef = useRef();
   const [images, setImages] = useState([]);
@@ -139,6 +140,7 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
   const openFileDialog = () => { fileRef.current.click(); };
 
   const handleSave = () => {
+    console.log("저장 클릭시 mbrCd:", mbrCd);
     if (loading) return;
     setLoading(true);
     const target = ref.current.parentElement;
@@ -153,8 +155,10 @@ export default function OfficeIntroCard({ isEditing = true, onSaved, mbrCd }) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("sourceRef", "BROKER_INTRO");
-        formData.append("sourceId", mbrCd);
-        formData.append("docTypeCd", `DESC_${mbrCd}`);
+        // formData.append("sourceId", mbrCd);
+        // formData.append("docTypeCd", `DESC_${mbrCd}`);
+     console.log("formData sourceId:", formData.get("sourceId"));
+      console.log("formData docTypeCd:", formData.get("docTypeCd"));
 
         try {
           const res = await axios.post("/rest/broker/introcard/save", formData, {
