@@ -4,7 +4,7 @@ import { useSecureAxios } from "../../hooks/useSecureAxios";
 import { mapFilterToPeriod } from "./mapFilterToPeriod";
 
 const ContractTrendChart = () => {
-  const [filter, setFilter] = useState("이번 달");
+  const [filter, setFilter] = useState("올해");
   const [chartData, setChartData] = useState({
     categories: [],
     success: [],
