@@ -28,7 +28,8 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
     *임차인우편주소 mbrZip
    */
   useEffect(() => {
-    axios
+    console.log("---<><>lstgId: ", lstgId);
+    axios    
       .post("cont/new/lessee", { lstgId: lstgId })
       .then((data) => {
         setWishlist(data);
@@ -100,7 +101,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
               >
                 <div className="w-10 h-10 overflow-hidden rounded-full">
                   <img
-                    src={item.file.filePathUrl || "/images/재윤비버.png"}
+                    src={item.file?.filePathUrl || "/images/재윤비버.png"}
                     alt={item.mbrNnm}
                     width={40}
                     height={40}
