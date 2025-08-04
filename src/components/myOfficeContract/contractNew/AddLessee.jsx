@@ -145,7 +145,7 @@ function AddLessee({ lessee, lstgId, onSave, onBack }) {
                   회원 상세 정보
                 </h2>
                 <img
-                  src={modalData.file.filePathUrl || "/images/재윤비버.png"}
+                  src={modalData.file?.filePathUrl || "/images/재윤비버.png"}
                   alt="프로필"
                   className="w-24 h-24 rounded-full object-cover mx-auto"
                 />
