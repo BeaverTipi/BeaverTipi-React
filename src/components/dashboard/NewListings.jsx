@@ -38,7 +38,7 @@ const formatPrice = (item) => {
         신규 매물 등록
       </h3>
       <ul className="space-y-4">
-        {listings.map((item) => (
+        {listings.slice(0, 5).map((item) => (
           <li
             key={item.LSTG_ID}
             className="flex items-start justify-between rounded-lg bg-white hover:bg-gray-50 dark:bg-transparent dark:hover:bg-white/5 p-3 transition"
