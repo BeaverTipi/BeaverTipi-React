@@ -61,69 +61,13 @@ const navItems = [
       , { name: "진행중인 계약", path: "/broker/myoffice/cont/proceeding", pro: false }],
   },
   {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/broker/myoffice/profile",
-  },
-  {
     icon: <CalenderIcon />,
     name: "Calendar",
     path: "/broker/myoffice/calendar",
   },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/broker/myoffice/form-elements", pro: false }],
-  },
-  {
-    name: "PDF-Coordinates",
-    icon: <GridIcon />,
-    path: "/broker/myoffice/pdf-coor"
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/broker/myoffice/basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "/broker/myoffice/blank", pro: false },
-      { name: "404 Error", path: "/broker/myoffice/error-404", pro: false },
-    ],
-  },
 ];
 
 const othersItems = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/broker/myoffice/line-chart", pro: false },
-      { name: "Bar Chart", path: "/broker/myoffice/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/broker/myoffice/alerts", pro: false },
-      { name: "Avatar", path: "/broker/myoffice/avatars", pro: false },
-      { name: "Badge", path: "/broker/myoffice/badge", pro: false },
-      { name: "Buttons", path: "/broker/myoffice/buttons", pro: false },
-      { name: "Images", path: "/broker/myoffice/images", pro: false },
-      { name: "Videos", path: "/broker/myoffice/videos", pro: false },
-    ],
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/broker/myoffice/signin", pro: false },
-      { name: "Sign Up", path: "/broker/myoffice/signup", pro: false },
-    ],
-  },
 ];
 
 const AppSidebar = () => {

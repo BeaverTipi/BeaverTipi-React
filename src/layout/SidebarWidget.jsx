@@ -9,16 +9,16 @@ export default function SidebarWidget() {
       </div>
 
       <p className="mb-4 text-gray-500 inline-block text-theme-sm dark:text-gray-400">
-        Leading Tailwind CSS Admin Template with 400+ UI Component and Pages.
+        소규모 임대 사업자를 위한 <br/>건물 관리 <br/>부동산 중개 플랫폼
       </p>
 
       <a
-        href="https://tailadmin.com/pricing"
+        href="https://www.beaver.com"
         target="_blank"
         rel="nofollow"
         className="flex items-center justify-center p-3 font-medium text-white rounded-lg bg-brand-500 text-theme-sm hover:bg-brand-600"
       >
-        찬영 계획
+        Main
       </a>
     </div>
   );

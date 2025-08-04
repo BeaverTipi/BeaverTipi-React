@@ -40,7 +40,7 @@ function ProceedingContracts() {
   const [searchText, setSearchText] = useState("");
   const [backspaceUsed, setBackspaceUsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const [clickedRowId, setClickedRowId] = useState(null);
   const { SPRING_URL_ORIGIN } = useDomain();
 
@@ -456,7 +456,7 @@ function ProceedingContracts() {
       });
 
       // if (result2.isConfirmed) window.location.href = `${SPRING_URL_ORIGIN}/contract/${encrypt(contId)}`;
-      await handleContractSignaturePageNavigate(contId);
+      if (result2.isConfirmed) await handleContractSignaturePageNavigate(contId);
     } catch (err) {
       console.error("서명 페이지 개설 실패", err);
       Swal.fire({
